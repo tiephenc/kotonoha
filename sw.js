@@ -1,7 +1,7 @@
 /* Kotonoha · service worker : le site reste utilisable hors connexion.
    Page : réseau d'abord (les mises à jour arrivent tout de suite), copie locale sinon.
    Polices Google : copie locale d'abord. Comptes, Ko-fi et autres services : jamais mis en cache. */
-const VERSION='kotonoha-ad6f40ed82';
+const VERSION='kotonoha-4cb427f31b';
 const SHELL=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./icon-maskable-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(VERSION).then(c=>c.addAll(SHELL)).then(()=>self.skipWaiting()));});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==VERSION).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});

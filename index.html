@@ -863,6 +863,13 @@ kbd{font:600 11px var(--sans);border:1px solid currentColor;border-radius:3px;pa
 @media (prefers-reduced-motion:reduce){.fkit .kit,#focpill,.fbox{animation:none!important}}
 @media (min-width:761px){header.top .hud{display:none}}
 @media (max-width:400px){header.top .hud{display:none}.focbtn .fl{font-size:11.5px}}
+.ambgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:8px 0}
+.amb{display:flex;flex-direction:column;border:1.5px solid var(--line);background:var(--paper)}
+.amb button{border:0;background:none;padding:9px 6px;font:600 13px var(--sans);color:var(--ink);cursor:pointer}
+.amb.on{border-color:var(--accent);background:var(--accent-soft)}.amb.on button{color:var(--accent)}
+.amb input[type=range]{margin:0 8px 8px;accent-color:var(--accent)}
+.ytframe{width:100%;aspect-ratio:16/9;border:0;margin-top:6px}
+.famb .chk{display:flex;gap:8px;align-items:center;font-size:13px}
 </style>
 </head>
 <body>
@@ -10469,6 +10476,7 @@ function viewApropos(anchor){const nv=Object.values(UNITS).reduce((a,u)=>a+(u.vo
      ${CONFIG.publicBuild?'':'<li>Paquets Anki « Japonais : La grande épopée » : contenu personnel importé pour votre usage privé ; il n’est pas inclus dans une version publique du site.</li>'}
      ${HASCORE?'<li>Listes « Core 2k/6k Optimized Japanese Vocabulary » : paquet Anki personnel importé pour votre usage privé (contenu d’origine iKnow!) ; il n’est pas inclus dans une version publique du site. Les enregistrements et images ne sont pas intégrés : ils se chargent depuis votre propre fichier.</li>':''}
      <li>fzstd (décompression des paquets Anki) : © Arjun Barrett, licence MIT.</li>
+     <li>Ambiances du minuteur Focus (sons tirés du projet libre Blanket, convertis en MP3) : ${Object.values(AMB).map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${esc(x.t)}</a>, ${esc(x.c)}, ${esc(x.l)}`).join(' ; ')}. Licences CC BY : <a href="https://creativecommons.org/licenses/by/4.0/deed.fr" target="_blank" rel="noopener">creativecommons.org</a>.</li>
      ${CONFIG.coreImport?'<li>sql.js (lecture des paquets Anki dans le navigateur) : licence MIT.</li>':''}
      <li>Illustrations (kitsune, kamon, cartes) et textes : créations originales pour Kotonoha.</li></ul>
      <p class="small muted">Version ${CONFIG.version}.</p></div>
@@ -10568,7 +10576,7 @@ const mediaName=s=>{const m=String(s||'').match(/(?:sound:|src=")([^\]"]+)/);ret
 
 /* ---------- État ---------- */
 function coreState(){const c=S.core&&typeof S.core==='object'?S.core:(S.core={});c.c=c.c||{};c.sess=c.sess||[];c.days=c.days||{};
-  c.set=Object.assign({nd:10,ord:'core',auto:1,furi:1,romaji:1,n:20,dir:'fj',write:1},c.set||{});if(!CDIR[c.set.dir])c.set.dir='fj';c.nd=c.nd||{d:'',n:0};if(c.cur===undefined)c.cur=null;return c;}
+  if(!c.set||typeof c.set!=='object')c.set={};const D={nd:10,ord:'core',auto:1,furi:1,romaji:1,n:20,dir:'fj',write:1};for(const k in D)if(c.set[k]===undefined)c.set[k]=D[k];if(!CDIR[c.set.dir])c.set.dir='fj';c.nd=c.nd||{d:'',n:0};if(c.cur===undefined)c.cur=null;return c;}
 function cst(id){const s=S.core.c[id];if(s)return s;const a=CORE.init&&CORE.init[id];if(!a)return null;
   const t=a[0];return {s:t===2?2:t===1||t===3?t:0,due:t===2?a[2]:Date.now(),st:Math.max(1,a[3]||1),df:5,iv:a[3]||0,r:a[5]||0,l:a[6]||0,lr:a[7]||null,ok:0,ko:0,imp:1};}
 const isNew=s=>!s||!s.s;
@@ -11124,7 +11132,7 @@ function mentionsSection(){const host=CONFIG.host||'';
     <li>Aucun outil de mesure d’audience, aucun cookie publicitaire. Le site enregistre seulement, dans votre navigateur, ce qui est nécessaire à son fonctionnement (progression, réglages${SB?', session de connexion':''}).</li>
     <li>Les polices sont chargées depuis Google Fonts : votre navigateur contacte alors les serveurs de Google.</li>
     <li>La synthèse vocale est celle de votre navigateur ou de votre système.</li>
-    <li>Le lecteur Spotify du minuteur « Focus » vient de spotify.com et ne se charge que si vous le demandez ; Spotify applique alors sa propre politique de confidentialité.</li>
+    <li>Minuteur « Focus » : le lien Spotify ouvre Spotify dans un nouvel onglet ou dans son application ; le lecteur YouTube vient de youtube-nocookie.com et ne se charge que si vous le demandez. Ces services appliquent alors leur propre politique de confidentialité.</li>
     ${CONFIG.coreImport?'<li>Un paquet Anki importé dans l’onglet Vocabulaire est lu sur votre appareil et conservé dans le stockage de votre navigateur ; il n’est jamais envoyé.</li>':''}
     ${CONFIG.supportUrl?'<li>Le soutien se fait sur Ko-fi, qui traite seul les paiements selon sa propre politique de confidentialité ; le formulaire intégré n’est chargé que si vous le demandez.</li>':''}
     <li>Pour toute question ou demande sur vos données : <a href="mailto:${CONFIG.contact}">${CONFIG.contact}</a>.</li></ul></div>`;}
@@ -11427,8 +11435,8 @@ function wireCoreImport(){const f=$('#vcorefile');if(f)f.onchange=()=>{const fil
    ===================================================================== */
 const FOC_PRE=[[50,10],[25,5],[90,15]];
 function focState(){const f=S.focus&&typeof S.focus==='object'?S.focus:(S.focus={});
-  f.set=Object.assign({work:50,brk:10,sound:1,notif:0,amb:'none',vol:0.35,spotify:''},f.set||{});f.log=f.log||{};f.cur=f.cur||{ph:'idle'};return f;}
-const FZ={tick:null,open:false,audio:null,amb:null,spot:false};
+  if(!f.set||typeof f.set!=='object')f.set={};const D={work:50,brk:10,sound:1,notif:0,mix:{},vol:0.6,ambBrk:0,spotify:'',yt:''};for(const k in D)if(f.set[k]===undefined)f.set[k]=D[k];if(typeof f.set.mix!=='object'||!f.set.mix)f.set.mix={};delete f.set.amb;f.log=f.log||{};f.cur=f.cur||{ph:'idle'};return f;}
+const FZ={tick:null,open:false,audio:null,yt:false,bufs:{},src:{},master:null,prev:null};
 /* ph : idle | work | wdone (travail fini, pause à lancer) | brk | bdone (pause finie) ; end = horodatage ; rest = ms restantes si en pause */
 function focRemain(){const c=focState().cur;if(c.rest!=null)return c.rest;if(c.end)return Math.max(0,c.end-Date.now());return focState().set[c.ph==='brk'||c.ph==='wdone'?'brk':'work']*60000;}
 const mmss=ms=>{const t=Math.ceil(ms/1000),m=Math.floor(t/60),s=t%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');};
@@ -11448,25 +11456,32 @@ function actx(){if(!FZ.audio){const C=window.AudioContext||window.webkitAudioCon
 function focChime(n){if(!focState().set.sound)return;const a=actx();if(!a)return;for(let i=0;i<n;i++){const t=a.currentTime+i*0.45;
   [[660,0.25],[990,0.12],[1320,0.06]].forEach(([f,v])=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+1.6);o.connect(g).connect(a.destination);o.start(t);o.stop(t+1.7);});}}
 function focNotify(t,b){try{if(focState().set.notif&&'Notification' in window&&Notification.permission==='granted'&&document.hidden)new Notification('Kotonoha · '+t,{body:b,tag:'kotonoha-focus'});}catch(e){}}
-/* ---------- Ambiances synthétisées (aucun fichier, aucune connexion) ---------- */
-const AMB={none:'Aucune',pluie:'Pluie',brun:'Bruit doux',vagues:'Vagues',feu:'Feu de bois'};
-function noiseBuf(a,kind){const n=a.sampleRate*4,b=a.createBuffer(2,n,a.sampleRate);for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);let last=0;
-  for(let i=0;i<n;i++){const w=Math.random()*2-1;if(kind==='brun'){last=(last+0.02*w)/1.02;d[i]=last*3.5;}else d[i]=w;}}return b;}
-function focAmbStop(){const A=FZ.amb;if(!A)return;try{A.g.gain.setTargetAtTime(0,A.a.currentTime,0.3);setTimeout(()=>{A.nodes.forEach(n=>{try{n.stop&&n.stop();n.disconnect();}catch(e){}});},900);}catch(e){}clearInterval(A.cr);FZ.amb=null;}
-function focAmbPlay(kind){focAmbStop();if(kind==='none')return;const a=actx();if(!a)return;const g=a.createGain();g.gain.value=0;g.connect(a.destination);const nodes=[g];
-  const src=t=>{const s=a.createBufferSource();s.buffer=noiseBuf(a,t);s.loop=true;s.start();nodes.push(s);return s;};
-  if(kind==='brun'){src('brun').connect(g);}
-  else if(kind==='pluie'){const s=src('blanc'),hp=a.createBiquadFilter(),lp=a.createBiquadFilter();hp.type='highpass';hp.frequency.value=600;lp.type='lowpass';lp.frequency.value=6000;s.connect(hp).connect(lp).connect(g);
-    const r=src('brun'),rg=a.createGain();rg.gain.value=0.5;r.connect(rg).connect(g);nodes.push(hp,lp,rg);}
-  else if(kind==='vagues'){const s=src('brun'),m=a.createGain(),lfo=a.createOscillator(),lg=a.createGain();lfo.frequency.value=0.09;lg.gain.value=0.45;m.gain.value=0.55;lfo.connect(lg).connect(m.gain);lfo.start();s.connect(m).connect(g);nodes.push(m,lfo,lg);}
-  else if(kind==='feu'){const s=src('brun'),lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;s.connect(lp).connect(g);nodes.push(lp);
-    const cr=setInterval(()=>{if(Math.random()<0.55){const t=a.currentTime,o=a.createBufferSource(),bf=a.createBuffer(1,Math.floor(a.sampleRate*0.03),a.sampleRate),d=bf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
-      o.buffer=bf;const cg=a.createGain();cg.gain.value=0.25+Math.random()*0.5;const bp=a.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1500+Math.random()*2500;o.connect(bp).connect(cg).connect(g);o.start(t);}},180);
-    FZ.amb={a,g,nodes,cr};}
-  if(!FZ.amb)FZ.amb={a,g,nodes};g.gain.setTargetAtTime(focState().set.vol,a.currentTime,0.6);}
-function focAmb(on){const k=focState().set.amb;if(on&&k!=='none'){if(!FZ.amb)focAmbPlay(k);}else if(!on)focAmbStop();}
-/* ---------- Spotify (chargé seulement sur demande) ---------- */
-function spotEmbed(u){const m=String(u||'').trim().match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(playlist|album|track|show|episode|artist)\/([A-Za-z0-9]{10,})/);return m?`https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator`:null;}
+/* ---------- Ambiances : vrais enregistrements libres (dossier sons/) ---------- */
+const AMB={
+  pluie:{t:'Pluie',f:'rain',c:'alex36917 (Freesound n° 524605), édition Porrumentzio',l:'CC BY',u:'https://freesound.org/people/alex36917/sounds/524605/'},
+  orage:{t:'Orage',f:'storm',c:'Digifish music (Freesound n° 41739), édition Porrumentzio',l:'CC BY',u:'https://freesound.org/people/digifishmusic/sounds/41739/'},
+  riviere:{t:'Rivière',f:'stream',c:'gluckose (Freesound n° 333987)',l:'CC0',u:'https://freesound.org/people/gluckose/sounds/333987/'},
+  vagues:{t:'Vagues',f:'waves',c:'Luftrum (Freesound n° 48412), édition Porrumentzio',l:'CC BY',u:'https://freesound.org/people/Luftrum/sounds/48412/'},
+  vent:{t:'Vent',f:'wind',c:'felix.blume (Freesound n° 217506), édition Porrumentzio',l:'CC0',u:'https://freesound.org/people/felix.blume/sounds/217506/'},
+  oiseaux:{t:'Oiseaux',f:'birds',c:'kvgarlic (Freesound n° 156826), édition Porrumentzio',l:'CC0',u:'https://freesound.org/people/kvgarlic/sounds/156826/'},
+  nuit:{t:'Nuit d’été',f:'summer-night',c:'Lisa Redfern (SoundBible n° 2083)',l:'domaine public',u:'https://soundbible.com/2083-Crickets-Chirping-At-Night.html'},
+  feu:{t:'Feu de bois',f:'fireplace',c:'ezwa (SoundBible n° 1543)',l:'domaine public',u:'https://soundbible.com/1543-Fireplace.html'},
+  cafe:{t:'Café',f:'coffee-shop',c:'stephan (SoundBible n° 1664)',l:'domaine public',u:'https://soundbible.com/1664-Restaurant-Ambiance.html'}};
+async function ambBuf(k){if(FZ.bufs[k])return FZ.bufs[k];const a=actx();const r=await fetch('sons/'+AMB[k].f+'.mp3');if(!r.ok)throw new Error('son');const b=await a.decodeAudioData(await r.arrayBuffer());FZ.bufs[k]=b;return b;}
+function ambMaster(){const a=actx();if(!FZ.master){FZ.master=a.createGain();FZ.master.gain.value=focState().set.vol;FZ.master.connect(a.destination);}return FZ.master;}
+async function ambStart(k){if(FZ.src[k])return;const a=actx();if(!a)return;FZ.src[k]='…';let b;try{b=await ambBuf(k);}catch(e){delete FZ.src[k];toast('Ce son n’a pas pu être chargé.');return;}
+  if(FZ.src[k]!=='…')return;const s=a.createBufferSource(),g=a.createGain();s.buffer=b;s.loop=true;s.loopStart=0.06;s.loopEnd=Math.max(0.2,b.duration-0.06);
+  g.gain.value=0;g.gain.setTargetAtTime(focState().set.mix[k]||0.7,a.currentTime,0.8);s.connect(g).connect(ambMaster());s.start(0,0.06);FZ.src[k]={s,g};}
+function ambStopOne(k){const x=FZ.src[k];delete FZ.src[k];if(!x||x==='…')return;const a=actx();x.g.gain.setTargetAtTime(0,a.currentTime,0.4);setTimeout(()=>{try{x.s.stop();x.s.disconnect();x.g.disconnect();}catch(e){}},1500);}
+function ambStopAll(){Object.keys(FZ.src).forEach(ambStopOne);}
+function ambShouldPlay(){const c=focState().cur;return (c.ph==='work'||(focState().set.ambBrk&&c.ph==='brk'))&&c.rest==null;}
+function focAmb(on){const mix=focState().set.mix;if(on&&ambShouldPlay())Object.keys(mix).forEach(k=>{if(AMB[k])ambStart(k);});else ambStopAll();}
+function ambPreview(k){clearTimeout(FZ.prev);ambStart(k);FZ.prev=setTimeout(()=>{if(!ambShouldPlay())ambStopAll();},8000);}
+/* ---------- Musique : Spotify (ouvert dans Spotify) et YouTube (intégré sur demande) ---------- */
+function spotLink(u){const m=String(u||'').trim().match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(playlist|album|track|show|episode|artist)\/([A-Za-z0-9]{10,})/)||String(u||'').trim().match(/^spotify:(playlist|album|track|show|episode|artist):([A-Za-z0-9]{10,})$/);
+  return m?{web:`https://open.spotify.com/${m[1]}/${m[2]}`,app:`spotify:${m[1]}:${m[2]}`}:null;}
+function ytEmbed(u){u=String(u||'').trim();let m=u.match(/[?&]list=([A-Za-z0-9_-]{10,})/);if(m&&!/[?&]v=/.test(u))return `https://www.youtube-nocookie.com/embed/videoseries?list=${m[1]}&rel=0`;
+  m=u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|live\/|embed\/|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);return m?`https://www.youtube-nocookie.com/embed/${m[1]}?rel=0`:null;}
 /* ---------- Interface ---------- */
 function focBtnHtml(){const c=focState().cur,run=c.ph==='work'||c.ph==='brk';
   return `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span class="fl">${run?mmss(focRemain()):c.ph==='wdone'?'Pause !':c.ph==='bdone'?'Reprendre':'Focus'}</span>`;}
@@ -11496,18 +11511,24 @@ function focPanelHtml(){const f=focState(),s=f.set,c=f.cur,[t,d]=focPhaseTxt(),k
     <label class="chk"><input type="checkbox" id="fsnd" ${s.sound?'checked':''}> Petit carillon à la fin</label>
     ${'Notification' in window?`<label class="chk"><input type="checkbox" id="fntf" ${s.notif&&Notification.permission==='granted'?'checked':''}> Notification si l’onglet est en arrière-plan</label>`:''}
    </details>
-   <div class="famb"><h3>Ambiance</h3><div class="seg" role="group" aria-label="Ambiance">${Object.keys(AMB).map(k=>`<button type="button" data-a="${k}" aria-selected="${s.amb===k}">${AMB[k]}</button>`).join('')}</div>
-    <label class="frow">Volume <input type="range" id="fvol" min="0" max="1" step="0.05" value="${s.vol}"></label>
-    <p class="small muted">Sons générés par votre navigateur, sans connexion ; ils jouent pendant les blocs.</p></div>
-   <div class="fspot"><h3>Spotify</h3>
-    <form id="fspf" class="frow"><input id="fspu" type="url" placeholder="Lien d’une playlist, d’un album ou d’un titre Spotify" value="${esc(s.spotify)}" aria-label="Lien Spotify"><button class="btn sec" type="submit">Charger</button></form>
-    <div id="fspbox">${FZ.spot&&spotEmbed(s.spotify)?`<iframe class="spotframe" src="${esc(spotEmbed(s.spotify))}" title="Lecteur Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`:''}</div>
-    <p class="small muted" id="fspm">Le lecteur vient de spotify.com et ne se charge que si vous cliquez sur « Charger ». Selon votre compte Spotify, il joue les titres en entier ou des extraits.</p></div>
+   <div class="famb"><h3>Ambiance</h3><p class="small muted">Enregistrements réels, à mélanger. Ils jouent pendant les blocs${s.ambBrk?' et les pauses':''} ; un clic donne un aperçu.</p>
+    <div class="ambgrid">${Object.keys(AMB).map(k=>{const on=s.mix[k]!=null;return `<div class="amb${on?' on':''}"><button type="button" data-a="${k}" aria-pressed="${on}">${AMB[k].t}</button>${on?`<input type="range" data-v="${k}" min="0.05" max="1" step="0.05" value="${s.mix[k]}" aria-label="Volume ${AMB[k].t}">`:''}</div>`;}).join('')}</div>
+    <label class="frow">Volume général <input type="range" id="fvol" min="0" max="1" step="0.05" value="${s.vol}"></label>
+    <label class="chk"><input type="checkbox" id="fambbrk" ${s.ambBrk?'checked':''}> Garder l’ambiance pendant les pauses</label></div>
+   <div class="fspot"><h3>Musique</h3>
+    <p class="small muted">Spotify : collez le lien d’une playlist, puis ouvrez-la dans l’application ou le lecteur web Spotify, où les titres sont joués en entier avec votre compte. Le minuteur continue ici.</p>
+    <form id="fspf" class="frow"><input id="fspu" type="url" placeholder="Lien Spotify (playlist, album, titre)" value="${esc(s.spotify)}" aria-label="Lien Spotify"><button class="btn sec" type="submit">Enregistrer</button></form>
+    ${spotLink(s.spotify)?`<div class="toolbar"><a class="btn" href="${esc(spotLink(s.spotify).web)}" target="_blank" rel="noopener">Ouvrir dans Spotify</a><a class="btn-ghost small" href="${esc(spotLink(s.spotify).app)}">Ouvrir dans l’application de bureau</a></div>`:''}
+    <p class="small" id="fspm" role="status"></p>
+    <p class="small muted" style="margin-top:14px">YouTube : collez le lien d’une vidéo, d’un direct ou d’une playlist ; elle se joue ici, en entier, sans compte (publicités possibles).</p>
+    <form id="fytf" class="frow"><input id="fytu" type="url" placeholder="Lien YouTube" value="${esc(s.yt)}" aria-label="Lien YouTube"><button class="btn sec" type="submit">Charger</button></form>
+    <div id="fytbox">${FZ.yt&&ytEmbed(s.yt)?`<iframe class="ytframe" src="${esc(ytEmbed(s.yt))}" title="Lecteur YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`:''}</div>
+    <p class="small muted" id="fytm">Le lecteur vient de youtube-nocookie.com et ne se charge que si vous cliquez sur « Charger ».</p></div>
   </div>`;}
 function focRender(){const b=$('#focbtn');if(b){b.innerHTML=focBtnHtml();b.classList.toggle('on',['work','brk','wdone','bdone'].includes(focState().cur.ph));b.classList.toggle('brk',['brk','wdone'].includes(focState().cur.ph));b.setAttribute('aria-label',focState().cur.ph==='idle'?'Minuteur de concentration':focState().cur.ph==='brk'?'Pause en cours':'Concentration en cours');}
   let pan=$('#focpanel');if(!pan){pan=document.createElement('div');pan.id='focpanel';document.body.appendChild(pan);pan.onclick=e=>{if(e.target===pan)focClose();};}
-  /* le lecteur Spotify reste en place pendant les mises à jour */
-  const keep=$('#fspbox iframe');pan.innerHTML=focPanelHtml();if(keep&&$('#fspbox')){$('#fspbox').innerHTML='';$('#fspbox').appendChild(keep);}
+  /* le lecteur YouTube reste en place (la musique continue) pendant les mises à jour */
+  const keep=$('#fytbox iframe');pan.innerHTML=focPanelHtml();if(keep&&$('#fytbox')){$('#fytbox').innerHTML='';$('#fytbox').appendChild(keep);}
   pan.classList.toggle('on',FZ.open);focWire();focPill();}
 function focPaint(){const c=focState().cur,b=$('#focbtn .fl');if(b)b.textContent=c.ph==='work'||c.ph==='brk'?mmss(focRemain()):c.ph==='wdone'?'Pause !':c.ph==='bdone'?'Reprendre':'Focus';
   const n=$('#fnum');if(n)n.textContent=mmss(focRemain());const r=$('#focpanel .fp');if(r&&c.dur){const p=1-focRemain()/(c.dur*60000);r.style.strokeDasharray=`${(339.3*p).toFixed(1)} 339.3`;}
@@ -11526,12 +11547,17 @@ function focWire(){const f=focState(),s=f.set,on=(id,fn)=>{const e=$('#'+id);if(
   if(fb)fb.onchange=()=>{s.brk=Math.min(60,Math.max(1,+fb.value||10));save();focRender();$('#focpanel .fset').open=true;};
   const sn=$('#fsnd');if(sn)sn.onchange=()=>{s.sound=sn.checked?1:0;save();if(s.sound){actx();focChime(1);}};
   const nt=$('#fntf');if(nt)nt.onchange=async()=>{if(nt.checked){let p='denied';try{p=await Notification.requestPermission();}catch(e){}s.notif=p==='granted'?1:0;if(!s.notif){nt.checked=false;toast('Notifications refusées par le navigateur.');}}else s.notif=0;save();};
-  document.querySelectorAll('#focpanel .famb .seg button').forEach(b=>b.onclick=()=>{s.amb=b.dataset.a;save();focAmbStop();const c=f.cur;if(b.dataset.a!=='none'){actx();focAmbPlay(b.dataset.a);if(!(c.ph==='work'&&c.rest==null))setTimeout(()=>{if(!(f.cur.ph==='work'&&f.cur.rest==null))focAmbStop();},6000);}
-    document.querySelectorAll('#focpanel .famb .seg button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));});
-  const v=$('#fvol');if(v)v.oninput=()=>{s.vol=+v.value;if(FZ.amb)FZ.amb.g.gain.setTargetAtTime(s.vol,FZ.amb.a.currentTime,0.1);};if(v)v.onchange=()=>save();
-  const sp=$('#fspf');if(sp)sp.onsubmit=e=>{e.preventDefault();const u=$('#fspu').value.trim(),em=spotEmbed(u);
-    if(!em){$('#fspm').textContent='Lien non reconnu : copiez le lien d’une playlist, d’un album ou d’un titre depuis Spotify (Partager → Copier le lien).';return;}
-    s.spotify=u;save();FZ.spot=true;$('#fspbox').innerHTML=`<iframe class="spotframe" src="${esc(em)}" title="Lecteur Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;};
+  document.querySelectorAll('#focpanel .amb button').forEach(b=>b.onclick=()=>{const k=b.dataset.a;actx();
+    if(s.mix[k]!=null){delete s.mix[k];ambStopOne(k);}else{s.mix[k]=0.7;if(ambShouldPlay())ambStart(k);else ambPreview(k);}save();focRender();$('#focpanel .famb').scrollIntoView({block:'nearest'});});
+  document.querySelectorAll('#focpanel .amb input[type=range]').forEach(r=>{r.oninput=()=>{const k=r.dataset.v;s.mix[k]=+r.value;const x=FZ.src[k];if(x&&x!=='…')x.g.gain.setTargetAtTime(s.mix[k],actx().currentTime,0.1);};r.onchange=()=>save();});
+  const v=$('#fvol');if(v){v.oninput=()=>{s.vol=+v.value;if(FZ.master)FZ.master.gain.setTargetAtTime(s.vol,actx().currentTime,0.1);};v.onchange=()=>save();}
+  const ab=$('#fambbrk');if(ab)ab.onchange=()=>{s.ambBrk=ab.checked?1:0;save();focAmb(true);if(!ambShouldPlay())ambStopAll();};
+  const sp=$('#fspf');if(sp)sp.onsubmit=e=>{e.preventDefault();const u=$('#fspu').value.trim();
+    if(u&&!spotLink(u)){$('#fspm').textContent='Lien non reconnu : dans Spotify, choisissez Partager puis Copier le lien de la playlist.';return;}
+    s.spotify=u;save();focRender();$('#focpanel .fspot').scrollIntoView({block:'nearest'});};
+  const yt=$('#fytf');if(yt)yt.onsubmit=e=>{e.preventDefault();const u=$('#fytu').value.trim(),em=ytEmbed(u);
+    if(!em){$('#fytm').textContent='Lien non reconnu : copiez l’adresse d’une vidéo, d’un direct ou d’une playlist YouTube.';return;}
+    s.yt=u;save();FZ.yt=true;$('#fytbox').innerHTML=`<iframe class="ytframe" src="${esc(em)}" title="Lecteur YouTube" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen loading="lazy"></iframe>`;};
   const pan=$('#focpanel');if(pan)pan.onkeydown=e=>{if(e.key==='Escape')focClose();};}
 /* ---------- Statistiques (Progrès) ---------- */
 function focStats(){const f=focState(),L=f.log,days=[];for(let i=13;i>=0;i--){const k=dayKey(today()-i*DAY);days.push({k,m:(L[k]||{}).m||0,n:(L[k]||{}).n||0,t:today()-i*DAY});}
