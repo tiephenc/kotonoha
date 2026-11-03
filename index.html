@@ -656,7 +656,7 @@ nav.main a .pill{background:#FBF4E8;color:var(--accent);font-family:var(--sans);
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* ===================== Vocabulaire Core ===================== */
 nav.main a .nl{display:inline}
-@media (min-width:761px){nav.main a{padding:14px 7px}}@media (max-width:1400px) and (min-width:761px){.brand .lat{display:none}}@media (max-width:1100px) and (min-width:761px){nav.main a{font-size:15px;padding:14px 5px}}@media (max-width:900px) and (min-width:761px){nav.main a{font-size:13px;padding:14px 3px;letter-spacing:.02em}header.top .wrap{gap:4px}}
+@media (min-width:761px){nav.main a{padding:14px 7px}}@media (min-width:761px){.brand .lat{display:none}nav.main a{font-size:15.5px;padding:14px 5px}}@media (max-width:1100px) and (min-width:761px){nav.main a{font-size:15px;padding:14px 5px}}@media (max-width:900px) and (min-width:761px){nav.main a{font-size:13px;padding:14px 3px;letter-spacing:.02em}header.top .wrap{gap:4px}}
 kbd{font:600 11px var(--sans);border:1px solid currentColor;border-radius:3px;padding:0 5px;margin-left:6px;opacity:.65;vertical-align:1px}
 .vbar{display:flex;height:8px;background:var(--paper-2);margin:10px 0 6px;overflow:hidden}
 .vbar.big{height:14px}
@@ -824,6 +824,45 @@ kbd{font:600 11px var(--sans);border:1px solid currentColor;border-radius:3px;pa
 .vmean .ven{font-size:14px;color:var(--ink-2)}
 .vgbtn.sug{box-shadow:0 0 0 3px var(--accent-soft);transform:translateY(-2px)}
 #vans{width:100%;display:flex;flex-direction:column;align-items:center;margin-top:12px}#vans .vfb{margin:0 0 8px;width:100%;max-width:520px;justify-content:center}
+/* ===================== Concentration ===================== */
+.focbtn{display:inline-flex;align-items:center;gap:6px;align-self:center;height:30px;padding:0 12px;border:1.5px solid #FBF4E8;background:#FBF4E8;color:var(--accent);border-radius:3px;font:700 13px var(--sans);cursor:pointer;white-space:nowrap;transition:transform .15s}
+.focbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.focbtn:hover{transform:translateY(-1px)}.focbtn.on{background:transparent;color:#FBF4E8;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.focbtn{padding:0 8px}.focbtn .fl{font-size:12px}}
+#focpanel{position:fixed;inset:0;z-index:45;background:rgba(20,12,8,.5);display:none;justify-content:flex-end}
+#focpanel.on{display:flex}
+.fbox{width:min(440px,100%);height:100%;overflow-y:auto;background:var(--bg);border-left:3px solid var(--accent);padding:22px 22px 40px;position:relative;animation:fslide .3s ease}
+@keyframes fslide{from{transform:translateX(30px);opacity:0}}
+.fbox .x{position:absolute;right:12px;top:8px;border:0;background:none;color:var(--ink);font-size:28px;cursor:pointer}
+.fhead{display:flex;align-items:center;gap:14px;margin-top:6px}
+.fkit{width:110px;flex:none}.fkit .kit{width:100%;height:auto}
+.fkit.ph-work .kit{animation:breathe 6s ease-in-out infinite}
+.fkit.ph-wdone .kit,.fkit.ph-bdone .kit{animation:hop .9s ease 2}
+@keyframes breathe{50%{transform:scale(1.03) translateY(2px)}}@keyframes hop{40%{transform:translateY(-10px)}}
+.ftime{position:relative;width:180px;height:180px;flex:none;display:grid;place-items:center}
+.fring{position:absolute;inset:0;transform:rotate(-90deg)}.fring circle{fill:none;stroke:var(--paper-2);stroke-width:7}.fring .fp{stroke:var(--accent);stroke-linecap:round;transition:stroke-dasharray 1s linear}
+.fnum{font-family:var(--display);font-size:52px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;position:relative}
+.fph{position:absolute;bottom:42px;font-size:12px;color:var(--ink-3)}
+.ft{display:flex;flex-direction:column;margin:14px 0 4px}.ft b{font-family:var(--display);font-weight:400;text-transform:uppercase;font-size:26px;color:var(--accent)}.ft span{color:var(--ink-2);font-size:14px}
+.fctl{margin:12px 0}.fstat{margin:0 0 12px}
+.fset,.famb,.fspot{border-top:1.5px solid var(--line);padding-top:12px;margin-top:12px}
+.fset summary{cursor:pointer;font-weight:700;font-size:14px}.fset .seg{margin:10px 0}
+.famb h3,.fspot h3{font-size:15px;margin:0 0 8px}.famb .seg{flex-wrap:wrap;display:flex}
+.frow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:8px 0;font-size:13px;color:var(--ink-2)}
+.frow input[type=number]{width:64px;font:inherit;padding:5px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
+.frow input[type=range]{flex:1;accent-color:var(--accent)}
+.frow input[type=url]{flex:1;min-width:0;font:inherit;font-size:14px;padding:8px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
+.fset .chk{display:flex;gap:8px;align-items:center;font-size:13px;margin:6px 0}
+.spotframe{width:100%;height:352px;border:0;border-radius:12px;margin-top:6px}
+#focpill{position:fixed;right:16px;bottom:16px;z-index:30;display:flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);border:0;padding:6px 14px 6px 6px;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.18);font:inherit}
+#focpill .pk{width:40px;height:40px;background:#241A13;border-radius:50%;overflow:hidden;display:block}#focpill .pk .kit{width:40px;height:auto;display:block;margin-top:3px}
+#focpill small{display:block;font-size:11px;opacity:.85;line-height:1.1}#focpill b{font-family:var(--display);font-weight:400;font-size:22px;line-height:1;font-variant-numeric:tabular-nums}
+#focpill.ph-wdone,#focpill.ph-bdone{animation:hop 1s ease 3}
+@media (max-width:760px){#focpill{bottom:calc(76px + env(safe-area-inset-bottom))}.ftime{width:150px;height:150px}.fnum{font-size:42px}.fph{bottom:32px}.fkit{width:86px}}
+.fchart{display:flex;align-items:flex-end;gap:4px;height:90px;margin-top:12px;border-bottom:1.5px solid var(--line)}.fchart i{flex:1;background:var(--accent);min-height:1px}
+@media (prefers-reduced-motion:reduce){.fkit .kit,#focpill,.fbox{animation:none!important}}
+@media (min-width:761px){header.top .hud{display:none}}
+@media (max-width:400px){header.top .hud{display:none}.focbtn .fl{font-size:11.5px}}
 </style>
 </head>
 <body>
@@ -839,6 +878,7 @@ kbd{font:600 11px var(--sans);border:1px solid currentColor;border-radius:3px;pa
     <a href="#profil" data-nav="profil"><span class="nk" aria-hidden="true">私</span>Profil</a>
   </nav>
   <button class="palbtn" id="palbtn" type="button" aria-label="Rechercher (Ctrl+K)" title="Rechercher (Ctrl+K)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
+  <button class="focbtn" id="focbtn" type="button" aria-label="Minuteur de concentration" title="Minuteur de concentration"><span class="fl">Focus</span></button>
   <a class="supbtn" id="supbtn" href="#soutenir" aria-label="Soutenir KOTONOHA" title="Soutenir KOTONOHA"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></a>
   <span class="hud" id="hud"></span>
 </div></header>
@@ -10074,6 +10114,7 @@ function viewProgres(){
     <div class="card panel"><h2>Mes soirées d'étude</h2>${heat()}<p class="small muted">17 dernières semaines, révisions Anki comprises.</p></div>
    </div>
    <div class="card panel" style="margin-top:14px"><h2>Recommandations</h2>${recoCards(recos())}</div>
+   ${typeof focStats==='function'?focStats():''}
    ${estCard()}${analysisCard()}
    <div class="card panel" style="margin-top:14px"><h2>${isSoir()?'Ema':'Kamon'} · ${got} / ${B.length}</h2><p class="small muted">${isSoir()?'Au sanctuaire, on suspend une plaque de bois pour chaque vœu. Ici, chaque étape franchie en accroche une.':'Chaque clan avait son blason. Ici, chaque étape franchie vous en fait gagner un.'}</p>
     ${badgeGrid(B)}
@@ -10112,7 +10153,7 @@ function viewProfil(){
 const isSoir=()=>false;
 function hashS(t){let h=7;for(const c of String(t))h=(h*31+c.charCodeAt(0))|0;return Math.abs(h);}
 function kitsune(mood){const C='#FBF4E8',I='#241A13',R='#D2233F',M='#EFDFC6';
-  const eyes=mood==='joie'?`<path d="M124 254 Q148 228 172 250" stroke="${I}" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M276 254 Q252 228 228 250" stroke="${I}" stroke-width="10" fill="none" stroke-linecap="round"/>`
+  const eyes=mood==='calme'?`<path d="M126 250 Q148 262 170 250" stroke="${I}" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M274 250 Q252 262 230 250" stroke="${I}" stroke-width="9" fill="none" stroke-linecap="round"/>`:mood==='joie'?`<path d="M124 254 Q148 228 172 250" stroke="${I}" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M276 254 Q252 228 228 250" stroke="${I}" stroke-width="10" fill="none" stroke-linecap="round"/>`
     :`<path d="M116 248 L180 232 L170 262 Z" fill="${I}"/><path d="M284 248 L220 232 L230 262 Z" fill="${I}"/><circle cx="160" cy="246" r="4" fill="${C}"/><circle cx="240" cy="246" r="4" fill="${C}"/>`;
   return `<svg class="kit" viewBox="0 0 400 450" role="img" aria-label="Kitsune, le renard guide de Kotonoha">
    <g class="ear l"><path d="M70 28 L178 168 L52 206 Z" fill="${C}"/><path d="M84 64 L150 160 L74 184 Z" fill="${I}"/></g>
@@ -11083,6 +11124,7 @@ function mentionsSection(){const host=CONFIG.host||'';
     <li>Aucun outil de mesure d’audience, aucun cookie publicitaire. Le site enregistre seulement, dans votre navigateur, ce qui est nécessaire à son fonctionnement (progression, réglages${SB?', session de connexion':''}).</li>
     <li>Les polices sont chargées depuis Google Fonts : votre navigateur contacte alors les serveurs de Google.</li>
     <li>La synthèse vocale est celle de votre navigateur ou de votre système.</li>
+    <li>Le lecteur Spotify du minuteur « Focus » vient de spotify.com et ne se charge que si vous le demandez ; Spotify applique alors sa propre politique de confidentialité.</li>
     ${CONFIG.coreImport?'<li>Un paquet Anki importé dans l’onglet Vocabulaire est lu sur votre appareil et conservé dans le stockage de votre navigateur ; il n’est jamais envoyé.</li>':''}
     ${CONFIG.supportUrl?'<li>Le soutien se fait sur Ko-fi, qui traite seul les paiements selon sa propre politique de confidentialité ; le formulaire intégré n’est chargé que si vous le demandez.</li>':''}
     <li>Pour toute question ou demande sur vos données : <a href="mailto:${CONFIG.contact}">${CONFIG.contact}</a>.</li></ul></div>`;}
@@ -11377,6 +11419,134 @@ function coreImportCard(){if(!CONFIG.coreImport)return '';
    <div class="small" id="vcorest" role="status" aria-live="polite"></div></div>`;}
 function wireCoreImport(){const f=$('#vcorefile');if(f)f.onchange=()=>{const file=f.files[0];if(file)importCoreFile(file,t=>{const s=$('#vcorest');if(s)s.textContent=t;});};
   const r=$('#vcorerm');if(r)r.onclick=()=>{$('#vcorermc').innerHTML='Retirer le Core et ses enregistrements de cet appareil ? Votre progression est conservée. <button class="btn" id="vcoreyes">Retirer</button>';$('#vcoreyes').onclick=removeImportedCore;};}
+
+/* =====================================================================
+   CONCENTRATION : minuteur (50/10 par défaut), kitsune, ambiances sonores
+   générées par le navigateur, lecteur Spotify chargé seulement sur demande.
+   Le temps compte dans les statistiques (Progrès), pas dans les XP.
+   ===================================================================== */
+const FOC_PRE=[[50,10],[25,5],[90,15]];
+function focState(){const f=S.focus&&typeof S.focus==='object'?S.focus:(S.focus={});
+  f.set=Object.assign({work:50,brk:10,sound:1,notif:0,amb:'none',vol:0.35,spotify:''},f.set||{});f.log=f.log||{};f.cur=f.cur||{ph:'idle'};return f;}
+const FZ={tick:null,open:false,audio:null,amb:null,spot:false};
+/* ph : idle | work | wdone (travail fini, pause à lancer) | brk | bdone (pause finie) ; end = horodatage ; rest = ms restantes si en pause */
+function focRemain(){const c=focState().cur;if(c.rest!=null)return c.rest;if(c.end)return Math.max(0,c.end-Date.now());return focState().set[c.ph==='brk'||c.ph==='wdone'?'brk':'work']*60000;}
+const mmss=ms=>{const t=Math.ceil(ms/1000),m=Math.floor(t/60),s=t%60;return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');};
+function focLog(min,done){if(min<=0&&!done)return;const f=focState(),k=dayKey(),d=f.log[k]||(f.log[k]={m:0,n:0});d.m+=Math.round(min);if(done)d.n++;
+  const ks=Object.keys(f.log).sort();if(ks.length>400)ks.slice(0,ks.length-400).forEach(x=>delete f.log[x]);}
+function focStart(ph){const f=focState(),min=f.set[ph==='brk'?'brk':'work'];f.cur={ph,end:Date.now()+min*60000,dur:min,at:Date.now()};save();focAmb(true);focRun();focRender();}
+function focPause(){const c=focState().cur;if(c.rest!=null){c.end=Date.now()+c.rest;delete c.rest;focAmb(true);}else if(c.end){c.rest=Math.max(0,c.end-Date.now());delete c.end;focAmb(false);}save();focRender();}
+function focStop(){const f=focState(),c=f.cur;if(c.ph==='work'&&c.dur){const left=(c.rest!=null?c.rest:Math.max(0,(c.end||0)-Date.now()));focLog((c.dur*60000-left)/60000,false);}
+  f.cur={ph:'idle'};save();focAmb(false);focRender();}
+function focFinish(){const f=focState(),c=f.cur;
+  if(c.ph==='work'){focLog(c.dur,true);f.cur={ph:'wdone'};focChime(2);focNotify('Bloc terminé','Bravo ! Une pause de '+f.set.brk+' minutes vous attend.');}
+  else if(c.ph==='brk'){f.cur={ph:'bdone'};focChime(1);focNotify('Pause terminée','Prêt pour un nouveau bloc ?');}
+  save();focAmb(false);focRender();}
+function focRun(){clearInterval(FZ.tick);FZ.tick=setInterval(()=>{const c=focState().cur;if((c.ph==='work'||c.ph==='brk')&&c.end&&c.end<=Date.now())focFinish();focPaint();},1000);}
+/* ---------- Son de fin et notification ---------- */
+function actx(){if(!FZ.audio){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;FZ.audio=new C();}if(FZ.audio.state==='suspended')FZ.audio.resume();return FZ.audio;}
+function focChime(n){if(!focState().set.sound)return;const a=actx();if(!a)return;for(let i=0;i<n;i++){const t=a.currentTime+i*0.45;
+  [[660,0.25],[990,0.12],[1320,0.06]].forEach(([f,v])=>{const o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+1.6);o.connect(g).connect(a.destination);o.start(t);o.stop(t+1.7);});}}
+function focNotify(t,b){try{if(focState().set.notif&&'Notification' in window&&Notification.permission==='granted'&&document.hidden)new Notification('Kotonoha · '+t,{body:b,tag:'kotonoha-focus'});}catch(e){}}
+/* ---------- Ambiances synthétisées (aucun fichier, aucune connexion) ---------- */
+const AMB={none:'Aucune',pluie:'Pluie',brun:'Bruit doux',vagues:'Vagues',feu:'Feu de bois'};
+function noiseBuf(a,kind){const n=a.sampleRate*4,b=a.createBuffer(2,n,a.sampleRate);for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);let last=0;
+  for(let i=0;i<n;i++){const w=Math.random()*2-1;if(kind==='brun'){last=(last+0.02*w)/1.02;d[i]=last*3.5;}else d[i]=w;}}return b;}
+function focAmbStop(){const A=FZ.amb;if(!A)return;try{A.g.gain.setTargetAtTime(0,A.a.currentTime,0.3);setTimeout(()=>{A.nodes.forEach(n=>{try{n.stop&&n.stop();n.disconnect();}catch(e){}});},900);}catch(e){}clearInterval(A.cr);FZ.amb=null;}
+function focAmbPlay(kind){focAmbStop();if(kind==='none')return;const a=actx();if(!a)return;const g=a.createGain();g.gain.value=0;g.connect(a.destination);const nodes=[g];
+  const src=t=>{const s=a.createBufferSource();s.buffer=noiseBuf(a,t);s.loop=true;s.start();nodes.push(s);return s;};
+  if(kind==='brun'){src('brun').connect(g);}
+  else if(kind==='pluie'){const s=src('blanc'),hp=a.createBiquadFilter(),lp=a.createBiquadFilter();hp.type='highpass';hp.frequency.value=600;lp.type='lowpass';lp.frequency.value=6000;s.connect(hp).connect(lp).connect(g);
+    const r=src('brun'),rg=a.createGain();rg.gain.value=0.5;r.connect(rg).connect(g);nodes.push(hp,lp,rg);}
+  else if(kind==='vagues'){const s=src('brun'),m=a.createGain(),lfo=a.createOscillator(),lg=a.createGain();lfo.frequency.value=0.09;lg.gain.value=0.45;m.gain.value=0.55;lfo.connect(lg).connect(m.gain);lfo.start();s.connect(m).connect(g);nodes.push(m,lfo,lg);}
+  else if(kind==='feu'){const s=src('brun'),lp=a.createBiquadFilter();lp.type='lowpass';lp.frequency.value=900;s.connect(lp).connect(g);nodes.push(lp);
+    const cr=setInterval(()=>{if(Math.random()<0.55){const t=a.currentTime,o=a.createBufferSource(),bf=a.createBuffer(1,Math.floor(a.sampleRate*0.03),a.sampleRate),d=bf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
+      o.buffer=bf;const cg=a.createGain();cg.gain.value=0.25+Math.random()*0.5;const bp=a.createBiquadFilter();bp.type='bandpass';bp.frequency.value=1500+Math.random()*2500;o.connect(bp).connect(cg).connect(g);o.start(t);}},180);
+    FZ.amb={a,g,nodes,cr};}
+  if(!FZ.amb)FZ.amb={a,g,nodes};g.gain.setTargetAtTime(focState().set.vol,a.currentTime,0.6);}
+function focAmb(on){const k=focState().set.amb;if(on&&k!=='none'){if(!FZ.amb)focAmbPlay(k);}else if(!on)focAmbStop();}
+/* ---------- Spotify (chargé seulement sur demande) ---------- */
+function spotEmbed(u){const m=String(u||'').trim().match(/open\.spotify\.com\/(?:intl-[a-z]{2}\/)?(playlist|album|track|show|episode|artist)\/([A-Za-z0-9]{10,})/);return m?`https://open.spotify.com/embed/${m[1]}/${m[2]}?utm_source=generator`:null;}
+/* ---------- Interface ---------- */
+function focBtnHtml(){const c=focState().cur,run=c.ph==='work'||c.ph==='brk';
+  return `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span class="fl">${run?mmss(focRemain()):c.ph==='wdone'?'Pause !':c.ph==='bdone'?'Reprendre':'Focus'}</span>`;}
+function focPhaseTxt(){const c=focState().cur,s=focState().set;
+  return {idle:['Prêt à se concentrer',`Un bloc de ${s.work} minutes, puis ${s.brk} minutes de pause.`],
+    work:[c.rest!=null?'En pause':'Concentration',c.rest!=null?'Le chrono est arrêté.':'Une seule chose à la fois : le kitsune veille.'],
+    wdone:['Bloc terminé',`Levez-vous, buvez un peu d’eau, regardez au loin : ${s.brk} minutes rien que pour vous.`],
+    brk:[c.rest!=null?'Pause suspendue':'Pause','Étirez-vous, respirez. Le prochain bloc démarrera quand vous le lancerez.'],
+    bdone:['Pause terminée','Prêt pour le bloc suivant ?']}[c.ph];}
+function focPanelHtml(){const f=focState(),s=f.set,c=f.cur,[t,d]=focPhaseTxt(),k=dayKey(),td=f.log[k]||{m:0,n:0};
+  const mood=c.ph==='work'?'calme':c.ph==='wdone'||c.ph==='bdone'?'joie':'joie';
+  const dur=(c.dur||s[c.ph==='brk'||c.ph==='wdone'?'brk':'work'])*60000,p=c.ph==='work'||c.ph==='brk'?1-focRemain()/dur:0;
+  return `<div class="fbox" role="dialog" aria-label="Minuteur de concentration"><button class="x" id="fclose" aria-label="Fermer">×</button>
+   <div class="fhead"><div class="fkit ph-${c.ph}">${kitsune(mood)}</div>
+    <div class="ftime"><svg viewBox="0 0 120 120" class="fring" aria-hidden="true"><circle cx="60" cy="60" r="54"/><circle cx="60" cy="60" r="54" class="fp" style="stroke-dasharray:${(339.3*p).toFixed(1)} 339.3"/></svg>
+     <div class="fnum" id="fnum" aria-live="off">${mmss(focRemain())}</div><div class="fph">${c.ph==='brk'||c.ph==='wdone'?'休憩 · pause':'集中 · travail'}</div></div></div>
+   <p class="ft"><b>${t}</b><span>${d}</span></p>
+   <div class="toolbar fctl">
+    ${c.ph==='idle'||c.ph==='bdone'?'<button class="btn big" id="fgo">Commencer le bloc</button>':''}
+    ${c.ph==='wdone'?'<button class="btn big" id="fbrk">Lancer la pause</button><button class="btn sec" id="fgo">Enchaîner un bloc</button>':''}
+    ${c.ph==='work'||c.ph==='brk'?`<button class="btn" id="fpause">${c.rest!=null?'Reprendre':'Pause'}</button>${c.ph==='brk'?'<button class="btn sec" id="fgo">Passer la pause</button>':''}<button class="btn-ghost small" id="fstop">Arrêter</button>`:''}
+   </div>
+   <p class="small muted fstat">Aujourd’hui : ${td.m} min de concentration, ${td.n} bloc${td.n>1?'s':''} terminé${td.n>1?'s':''}.</p>
+   <details class="fset"><summary>Durées, son et notifications</summary>
+    <div class="seg" role="group" aria-label="Durées">${FOC_PRE.map(([w,b])=>`<button type="button" data-w="${w}" data-b="${b}" aria-selected="${s.work===w&&s.brk===b}">${w} / ${b}</button>`).join('')}</div>
+    <div class="frow"><label>Travail <input type="number" id="fw" min="5" max="180" value="${s.work}"> min</label><label>Pause <input type="number" id="fb" min="1" max="60" value="${s.brk}"> min</label></div>
+    <label class="chk"><input type="checkbox" id="fsnd" ${s.sound?'checked':''}> Petit carillon à la fin</label>
+    ${'Notification' in window?`<label class="chk"><input type="checkbox" id="fntf" ${s.notif&&Notification.permission==='granted'?'checked':''}> Notification si l’onglet est en arrière-plan</label>`:''}
+   </details>
+   <div class="famb"><h3>Ambiance</h3><div class="seg" role="group" aria-label="Ambiance">${Object.keys(AMB).map(k=>`<button type="button" data-a="${k}" aria-selected="${s.amb===k}">${AMB[k]}</button>`).join('')}</div>
+    <label class="frow">Volume <input type="range" id="fvol" min="0" max="1" step="0.05" value="${s.vol}"></label>
+    <p class="small muted">Sons générés par votre navigateur, sans connexion ; ils jouent pendant les blocs.</p></div>
+   <div class="fspot"><h3>Spotify</h3>
+    <form id="fspf" class="frow"><input id="fspu" type="url" placeholder="Lien d’une playlist, d’un album ou d’un titre Spotify" value="${esc(s.spotify)}" aria-label="Lien Spotify"><button class="btn sec" type="submit">Charger</button></form>
+    <div id="fspbox">${FZ.spot&&spotEmbed(s.spotify)?`<iframe class="spotframe" src="${esc(spotEmbed(s.spotify))}" title="Lecteur Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`:''}</div>
+    <p class="small muted" id="fspm">Le lecteur vient de spotify.com et ne se charge que si vous cliquez sur « Charger ». Selon votre compte Spotify, il joue les titres en entier ou des extraits.</p></div>
+  </div>`;}
+function focRender(){const b=$('#focbtn');if(b){b.innerHTML=focBtnHtml();b.classList.toggle('on',['work','brk','wdone','bdone'].includes(focState().cur.ph));b.classList.toggle('brk',['brk','wdone'].includes(focState().cur.ph));b.setAttribute('aria-label',focState().cur.ph==='idle'?'Minuteur de concentration':focState().cur.ph==='brk'?'Pause en cours':'Concentration en cours');}
+  let pan=$('#focpanel');if(!pan){pan=document.createElement('div');pan.id='focpanel';document.body.appendChild(pan);pan.onclick=e=>{if(e.target===pan)focClose();};}
+  /* le lecteur Spotify reste en place pendant les mises à jour */
+  const keep=$('#fspbox iframe');pan.innerHTML=focPanelHtml();if(keep&&$('#fspbox')){$('#fspbox').innerHTML='';$('#fspbox').appendChild(keep);}
+  pan.classList.toggle('on',FZ.open);focWire();focPill();}
+function focPaint(){const c=focState().cur,b=$('#focbtn .fl');if(b)b.textContent=c.ph==='work'||c.ph==='brk'?mmss(focRemain()):c.ph==='wdone'?'Pause !':c.ph==='bdone'?'Reprendre':'Focus';
+  const n=$('#fnum');if(n)n.textContent=mmss(focRemain());const r=$('#focpanel .fp');if(r&&c.dur){const p=1-focRemain()/(c.dur*60000);r.style.strokeDasharray=`${(339.3*p).toFixed(1)} 339.3`;}
+  const pl=$('#focpill .pt');if(pl)pl.textContent=mmss(focRemain());}
+function focPill(){let p=$('#focpill');const c=focState().cur,show=!FZ.open&&c.ph!=='idle';
+  if(!show){if(p)p.remove();return;}
+  if(!p){p=document.createElement('button');p.id='focpill';p.type='button';p.onclick=focOpen;document.body.appendChild(p);}
+  p.className='ph-'+c.ph;p.setAttribute('aria-label','Ouvrir le minuteur');
+  p.innerHTML=`<span class="pk">${kitsune(c.ph==='work'?'calme':'joie')}</span><span><small>${c.ph==='work'?'集中':c.ph==='brk'?'休憩':c.ph==='wdone'?'Bloc fini':'Pause finie'}</small><b class="pt">${c.ph==='wdone'||c.ph==='bdone'?'→':mmss(focRemain())}</b></span>`;}
+function focOpen(){FZ.open=true;focRender();setTimeout(()=>{const b=$('#fgo')||$('#fbrk')||$('#fpause');if(b)b.focus();},30);}
+function focClose(){FZ.open=false;const p=$('#focpanel');if(p)p.classList.remove('on');focPill();const b=$('#focbtn');if(b)b.focus();}
+function focWire(){const f=focState(),s=f.set,on=(id,fn)=>{const e=$('#'+id);if(e)e.onclick=fn;};
+  on('fclose',focClose);on('fgo',()=>{actx();focStart('work');});on('fbrk',()=>{actx();focStart('brk');});on('fpause',focPause);on('fstop',focStop);
+  document.querySelectorAll('#focpanel .fset .seg button').forEach(b=>b.onclick=()=>{s.work=+b.dataset.w;s.brk=+b.dataset.b;save();focRender();$('#focpanel .fset').open=true;});
+  const fw=$('#fw'),fb=$('#fb');if(fw)fw.onchange=()=>{s.work=Math.min(180,Math.max(5,+fw.value||50));save();focRender();$('#focpanel .fset').open=true;};
+  if(fb)fb.onchange=()=>{s.brk=Math.min(60,Math.max(1,+fb.value||10));save();focRender();$('#focpanel .fset').open=true;};
+  const sn=$('#fsnd');if(sn)sn.onchange=()=>{s.sound=sn.checked?1:0;save();if(s.sound){actx();focChime(1);}};
+  const nt=$('#fntf');if(nt)nt.onchange=async()=>{if(nt.checked){let p='denied';try{p=await Notification.requestPermission();}catch(e){}s.notif=p==='granted'?1:0;if(!s.notif){nt.checked=false;toast('Notifications refusées par le navigateur.');}}else s.notif=0;save();};
+  document.querySelectorAll('#focpanel .famb .seg button').forEach(b=>b.onclick=()=>{s.amb=b.dataset.a;save();focAmbStop();const c=f.cur;if(b.dataset.a!=='none'){actx();focAmbPlay(b.dataset.a);if(!(c.ph==='work'&&c.rest==null))setTimeout(()=>{if(!(f.cur.ph==='work'&&f.cur.rest==null))focAmbStop();},6000);}
+    document.querySelectorAll('#focpanel .famb .seg button').forEach(x=>x.setAttribute('aria-selected',String(x===b)));});
+  const v=$('#fvol');if(v)v.oninput=()=>{s.vol=+v.value;if(FZ.amb)FZ.amb.g.gain.setTargetAtTime(s.vol,FZ.amb.a.currentTime,0.1);};if(v)v.onchange=()=>save();
+  const sp=$('#fspf');if(sp)sp.onsubmit=e=>{e.preventDefault();const u=$('#fspu').value.trim(),em=spotEmbed(u);
+    if(!em){$('#fspm').textContent='Lien non reconnu : copiez le lien d’une playlist, d’un album ou d’un titre depuis Spotify (Partager → Copier le lien).';return;}
+    s.spotify=u;save();FZ.spot=true;$('#fspbox').innerHTML=`<iframe class="spotframe" src="${esc(em)}" title="Lecteur Spotify" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;};
+  const pan=$('#focpanel');if(pan)pan.onkeydown=e=>{if(e.key==='Escape')focClose();};}
+/* ---------- Statistiques (Progrès) ---------- */
+function focStats(){const f=focState(),L=f.log,days=[];for(let i=13;i>=0;i--){const k=dayKey(today()-i*DAY);days.push({k,m:(L[k]||{}).m||0,n:(L[k]||{}).n||0,t:today()-i*DAY});}
+  const tot=Object.values(L).reduce((a,d)=>({m:a.m+(d.m||0),n:a.n+(d.n||0)}),{m:0,n:0}),mx=Math.max(30,...days.map(d=>d.m));
+  let ser=0,t=today();if(!((L[dayKey(t)]||{}).n))t-=DAY;while((L[dayKey(t)]||{}).n){ser++;t-=DAY;}
+  const w=days.slice(7).reduce((a,d)=>a+d.m,0);
+  return `<div class="card panel" style="margin-top:14px"><h2>Concentration</h2>
+   <div class="vend"><div><b>${Math.floor(tot.m/60)} h ${String(tot.m%60).padStart(2,'0')}</b><span>au total</span></div><div><b>${w} min</b><span>ces 7 jours</span></div><div><b>${tot.n}</b><span>blocs terminés</span></div><div><b>${ser} j</b><span>série de jours avec un bloc</span></div></div>
+   <div class="fchart" role="img" aria-label="Minutes de concentration sur 14 jours">${days.map(d=>`<i title="${fmtDate(new Date(d.t))} : ${d.m} min, ${d.n} bloc${d.n>1?'s':''}" style="height:${Math.round(d.m/mx*100)}%"></i>`).join('')}</div>
+   <div class="vfcl small muted"><span>il y a 13 j</span><span>aujourd’hui</span></div>
+   <p class="small muted">Temps passé avec le minuteur lancé (bouton « Focus » en haut de page). Il ne rapporte pas d’XP.</p></div>`;}
+/* Démarrage */
+(function(){const go=()=>{focState();const c=S.focus.cur;if((c.ph==='work'||c.ph==='brk')&&c.end&&c.end<=Date.now())focFinish();focRun();focRender();};
+  const b=$('#focbtn');if(b)b.onclick=()=>FZ.open?focClose():focOpen();
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else setTimeout(go,0);})();
 
 function validated(){return Object.keys(S.units).filter(k=>S.units[k].done&&S.units[k].done.test&&SYL[k]&&!SYL[k].preview);}
 function tile(id){
