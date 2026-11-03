@@ -34,5 +34,6 @@ Dans le dépôt GitHub, ouvrir **Settings**, puis **Pages**. Choisir **Deploy fr
 - **Vérification des lectures et des sens** : JMdict et KANJIDIC (EDRDG), sous licence CC BY-SA 4.0.
 - **Polices** : Google Fonts, sous licence SIL Open Font License 1.1.
 - **Décompression zstd** : fzstd, © Arjun Barrett, sous licence MIT.
+- **Lecture des paquets Anki** (`vendor/sql-wasm.*`) : sql.js, sous licence MIT.
 
 Kotonoha n'est affilié ni à la Japan Foundation ni au JEES, qui organisent le JLPT.
