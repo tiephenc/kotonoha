@@ -870,6 +870,7 @@ kbd{font:600 11px var(--sans);border:1px solid currentColor;border-radius:3px;pa
 .amb input[type=range]{margin:0 8px 8px;accent-color:var(--accent)}
 .ytframe{width:100%;aspect-ratio:16/9;border:0;margin-top:6px}
 .famb .chk{display:flex;gap:8px;align-items:center;font-size:13px}
+.vmn{margin-top:8px;font-size:14px;max-width:560px;color:var(--ink-2)}.vmn small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}.vcard .vmn{color:#4B3D33}.vcard .vmn small{color:#7E6E62}
 </style>
 </head>
 <body>
@@ -10541,6 +10542,7 @@ document.addEventListener('click',e=>{if(e.target.closest('#palbtn'))openPal();}
 /* HASCORE est défini au début du script (build.py), avant jeu.js. */
 const CORP={'2k':{t:'Core 2K',k:'二千',n:'Core 2000',d:'Les 2 000 premiers mots du Core, en 10 étapes de 200 mots.'},
             '6k':{t:'Core 6K',k:'六千',n:'Core 6000',d:'La suite du Core 6000 (index 2 001 à 5 999 dans ce paquet), en 12 étapes de 249 à 500 mots.'},
+            'kj':{t:'Kanjis N5–N1',k:'漢字',n:'Kanjis',d:'Vos paquets Anki de kanjis : un mot clé par carte, sens en français et moyen mnémotechnique, du N5 au N1.'},
             'jm':{t:'Fréquence',k:'頻度',n:'JMdict',d:'Mots courants classés par tranches de fréquence de 500 (JMdict, nf01 à nf24), en complément des listes Core 2k/6k : aucun mot du Core n’y figure.'}};
 const corpora=()=>{coreIdx();return Object.keys(CORP).filter(c=>CBYC[c]&&CBYC[c].length);};
 const POSFR={'Noun':'Nom','Verb':'Verbe','Verbal Noun':'Nom verbal (する)','Adverb':'Adverbe','Adjective':'Adjectif (い)','Adjectival Noun':'Nom adjectival (な)','Pronoun':'Pronom','Interjection':'Interjection','Conjunction':'Conjonction','Counter':'Compteur','Prefix':'Préfixe','Suffix':'Suffixe','Particle':'Particule','Pre-noun':'Déterminant (連体詞)','Numeric':'Nombre','Expression':'Expression','None':'—'};
@@ -10559,13 +10561,13 @@ const MAT=21, MIN=60000;
 let CW=null,CBYL={},CDUP=new Map(),CBYC={};
 function coreIdx(){if(CW||!HASCORE)return CW;CW=new Map();
   CORE.notes.forEach(a=>{const w={id:String(a[0]),nid:a[0],guid:a[1],cid:a[2],corpus:a[3],step:a[4],num:a[5],apos:a[6],k:a[7],f:a[8],kana:a[9],en:a[10],va:a[11],pos:a[12],caut:a[13],ex:a[14],rd:a[15],sk:a[16],se:a[17],sc:a[18],sa:a[19],si:a[20],notes:a[21],ci:+a[22],ovi:+a[23],osi:+a[24]};
-    w.list=w.corpus+'-'+String(w.step).padStart(2,'0');CW.set(w.id,w);(CBYC[w.corpus]=CBYC[w.corpus]||[]).push(w);});
+    w.mn=a[25]||'';w.list=w.corpus+'-'+String(w.step).padStart(2,'0');CW.set(w.id,w);(CBYC[w.corpus]=CBYC[w.corpus]||[]).push(w);});
   CORE.lists.forEach(l=>{CBYL[l.id]=Object.assign({},l,{ids:l.ids.map(String)});});
   (CORE.dups||[]).forEach(g=>g.forEach(n=>CDUP.set(String(n),g.map(String).filter(x=>x!==String(n)))));
   return CW;}
 const cw=id=>coreIdx().get(String(id));
 const listsOf=c=>CORE.lists.filter(l=>l.corpus===c).map(l=>CBYL[l.id]);
-const stepLbl=l=>l.corpus==='jm'?`Rang ${(l.step-1)*500+1}–${l.step*500}`:`Étape ${String(l.step).padStart(2,'0')}`;
+const stepLbl=l=>l.corpus==='kj'?l.name:l.corpus==='jm'?`Rang ${(l.step-1)*500+1}–${l.step*500}`:`Étape ${String(l.step).padStart(2,'0')}`;
 
 /* ---------- Affichage des champs Anki (furigana « 話[はなし] », <b> conservé) ---------- */
 function akRuby(s){const h=esc(s||'').replace(/&lt;(\/?)b&gt;/g,'<$1b>');
@@ -10689,7 +10691,7 @@ function opts(w,kind){coreIdx();const pool=CBYC[w.corpus],same=pool.filter(x=>x.
 let CAUD=null;
 async function coreSay(w,which){const f=mediaName(which==='s'?w.sa:w.va);
   if(f&&await coreMediaHas(f)){try{const u=await coreMediaURL(f);if(u){if(CAUD)CAUD.pause();CAUD=new Audio(u);await CAUD.play();return;}}catch(e){}}
-  sayText(which==='s'?akPlain(w.ex):w.kana);}
+  sayText(which==='s'?akPlain(w.ex):kana1(w));}
 
 /* ---------- Conversion romaji → kana (sans clavier japonais) ---------- */
 const RK=(()=>{const T={a:'あ',i:'い',u:'う',e:'え',o:'お'},cons={k:'かきくけこ',g:'がぎぐげご',s:'さしすせそ',z:'ざじずぜぞ',t:'たちつてと',d:'だぢづでど',n:'なにぬねの',h:'はひふへほ',b:'ばびぶべぼ',p:'ぱぴぷぺぽ',m:'まみむめも',r:'らりるれろ'};
@@ -10710,6 +10712,9 @@ function toKana(s){s=String(s||'').toLowerCase();let o='',i=0;
     if(!hit){o+=c;i++;}}
   return o;}
 const normA=s=>hira(String(s||'').normalize('NFKC').replace(/[\s〜～・。、]/g,''));
+const kanaList=w=>String(w.kana||'').split(/\s*[\/／]\s*/).filter(Boolean);
+const kana1=w=>kanaList(w)[0]||w.kana;
+const ansOK=(w,a,jp)=>!!a&&(kanaList(w).some(r=>normA(r)===a)||normA(w.kana)===a||(jp!==false&&normA(w.k)===a));
 
 /* =====================================================================
    VUES
@@ -10720,9 +10725,9 @@ function viewVocab(h){const el=$('#v-vocab');
   let m;
   if(h==='vocab-session')return vSession(el);
   if(h==='vocab-stats')return vStats(el);
-  if(h==='vocab-mots'||h.startsWith('vocab-mots-')){const a=h.slice(11);if(a){const mm=a.match(/^(2k|6k|jm)(?:-(\d\d))?$/);if(mm){V.br.corpus=mm[1];V.br.list=mm[2]?a:'';V.br.page=0;}}return vBrowse(el);}
-  if((m=h.match(/^vocab-(2k|6k|jm)$/)))return vCorpus(el,m[1]);
-  if((m=h.match(/^vocab-((2k|6k|jm)-\d\d)(?:-(\d+))?$/))&&CBYL[m[1]])return vList(el,m[1],m[3]!=null?+m[3]:null);
+  if(h==='vocab-mots'||h.startsWith('vocab-mots-')){const a=h.slice(11);if(a){const mm=a.match(/^(2k|6k|jm|kj)(?:-(\d\d))?$/);if(mm){V.br.corpus=mm[1];V.br.list=mm[2]?a:'';V.br.page=0;}}return vBrowse(el);}
+  if((m=h.match(/^vocab-(2k|6k|jm|kj)$/)))return vCorpus(el,m[1]);
+  if((m=h.match(/^vocab-((2k|6k|jm|kj)-\d\d)(?:-(\d+))?$/))&&CBYL[m[1]])return vList(el,m[1],m[3]!=null?+m[3]:null);
   return vHub(el);}
 
 const vbar=(o,big)=>`<div class="vbar${big?' big':''}" role="img" aria-label="${o.p} % maîtrisés, ${o.pc} % en cours"><i class="mt" style="width:${o.p}%"></i><i class="cr" style="width:${o.pc}%"></i></div>`;
@@ -10755,6 +10760,7 @@ function vHub(el){const now=Date.now(),all=scopeIds({}),T=cstats(all,now),nl=new
    <details class="card vsrc"><summary><b>Source et méthode</b></summary>
      ${HASAPKG?`<p class="small">Paquet Anki « ${esc(CORE.src.deck)} » (fichier ${esc(CORE.src.file)}) : ${CORE.notes.length} notes du modèle « Japanese », reproduites telles quelles avec leur identifiant de note, leur GUID, leur carte, le champ « Notes » (étape d’origine) et les index Core-Index, Optimized-Voc-Index et Optimized-Sent-Index. Les sens et les traductions des phrases sont en anglais dans la source ; lorsqu’un mot de même graphie et même lecture existe ailleurs dans Kotonoha, son sens français est affiché à part, avec sa provenance.</p>
      <p class="small">${(CORE.dups||[]).length} groupes d’entrées ont la même graphie et la même lecture (par exemple 円 « circle » et « yen ») : elles restent des cartes distinctes, signalées sur chaque fiche. ${(CORE.other||[]).length} note d’un autre modèle (« Basic++ », ${esc((CORE.other[0]||[,,,,['']])[4][0])}) est conservée dans les données mais ne fait partie d’aucune étape Core.</p>`:''}
+     ${CBYC.kj&&CBYC.kj.length?`<p class="small">Kanjis N5–N1 : ${CBYC.kj.length} cartes de vos paquets Anki, reprises telles quelles (sens français, mot et lecture du verso, moyen mnémotechnique) avec leur GUID. Le mot écrit est accepté, ou l’une des lectures indiquées entre parenthèses. Leur progression ici est indépendante de celle de l’onglet Réviser.</p>`:''}
      ${window.JMV?`<p class="small">Fréquence : ${JMV.notes.length} mots extraits de JMdict (© EDRDG, licence CC BY-SA 4.0 ; ${esc(JMV.src.version)}), choisis dans les tranches de fréquence nf01 à nf24 (500 mots chacune, d’après un corpus de presse) et absents des listes Core. Le sens affiché est celui de JMdict, en anglais : le premier sens, plus le second quand le premier est court. JMdict ne donne ni phrase d’exemple ni ordre à l’intérieur d’une tranche ; les mots y sont rangés par numéro d’entrée.</p>`:''}
      <p class="small">${HASAPKG?`États importés : ${Object.keys(CORE.init||{}).length} cartes déjà en révision dans Anki gardent leur échéance et leur intervalle. `:''}Répétition espacée : algorithme FSRS-4.5 avec ses paramètres par défaut, rétention visée 90 %. Un mot est « maîtrisé » quand son intervalle atteint ${MAT} jours, comme les cartes « matures » d’Anki.</p></details>`;
   wireResume();const msg=$('#vmsg');
@@ -10776,7 +10782,7 @@ function vCorpus(el,c){const now=Date.now(),ids=scopeIds({corpus:c}),o=cstats(id
      ${nl?`<button class="btn sec" id="vc-new">Apprendre la suite · ${stepLbl(nl)}</button>`:''}
      ${o.dif?`<button class="btn sec" id="vc-dif">Mots difficiles (${o.dif})</button>`:''}
      <a class="btn sec" href="#vocab-mots-${c}">Parcourir les mots</a></div><p class="small muted" id="vmsg" role="status" aria-live="polite"></p></div>
-   <h2 class="vh2">${c==='jm'?'Tranches de fréquence':'Étapes'}</h2>
+   <h2 class="vh2">${c==='jm'?'Tranches de fréquence':c==='kj'?'Paquets':'Étapes'}</h2>
    <div class="vlists">${listsOf(c).map(l=>{const s=cstats(l.ids,now);return `<a class="vlist" href="#vocab-${l.id}"><div class="vlt"><b>${stepLbl(l)}</b><span>${l.ids.length} mots</span></div>${vbar(s)}<div class="vls"><span>${s.p} % maîtrisés</span>${s.due?`<span class="r">${s.due} à réviser</span>`:''}${s.nw===s.n?'<span>non commencée</span>':''}</div></a>`;}).join('')}</div>
    ${builder({corpus:c})}`;
   wireResume();const msg=$('#vmsg');
@@ -10787,7 +10793,7 @@ function vCorpus(el,c){const now=Date.now(),ids=scopeIds({corpus:c}),o=cstats(id
 
 function vList(el,lid,sub){const l=CBYL[lid],c=l.corpus,now=Date.now(),sc=sub!=null?{list:lid,sub}:{list:lid},ids=scopeIds(sc),o=cstats(ids,now),nsub=Math.ceil(l.ids.length/50);
   el.innerHTML=`<p class="small"><a href="#vocab">Vocabulaire</a> / <a href="#vocab-${c}">${CORP[c].t}</a> / ${sub!=null?`<a href="#vocab-${lid}">${stepLbl(l)}</a> / mots ${sub*50+1}–${Math.min(l.ids.length,sub*50+50)}`:stepLbl(l)}</p>
-   <div class="vhead"><span class="vk jp" aria-hidden="true">${c==='jm'?'nf'+String(l.step).padStart(2,'0'):String(l.step).padStart(2,'0')}</span><div><h1>${stepLbl(l)}${sub!=null?` · ${sub*50+1}–${Math.min(l.ids.length,sub*50+50)}`:''}</h1><p class="muted">${esc(l.name)} · ${ids.length} mots${c==='jm'?' (absents du Core), par numéro d’entrée JMdict':', dans l’ordre du paquet'}.</p></div></div>
+   <div class="vhead"><span class="vk jp" aria-hidden="true">${c==='jm'?'nf'+String(l.step).padStart(2,'0'):c==='kj'?esc(l.name.replace(/^Kanjis\s*/,'')):String(l.step).padStart(2,'0')}</span><div><h1>${stepLbl(l)}${sub!=null?` · ${sub*50+1}–${Math.min(l.ids.length,sub*50+50)}`:''}</h1><p class="muted">${esc(l.name)} · ${ids.length} mots${c==='jm'?' (absents du Core), par numéro d’entrée JMdict':', dans l’ordre du paquet'}.</p></div></div>
    ${resumeBar()}
    <div class="card vsum">${vbar(o,1)}<div class="vpct"><b>${o.p} %</b> maîtrisés · réussite ${o.ok+o.ko?Math.round(o.ok/(o.ok+o.ko)*100)+' %':'—'}</div>${vcount(o)}</div>
    <h2 class="vh2">S’entraîner sur ${sub!=null?'ces mots':'cette étape'}</h2>
@@ -10856,18 +10862,19 @@ function vBrowse(el){const B=V.br;
 
 /* ---------- Fiche d'un mot ---------- */
 function xrefFr(w){if(typeof dic!=='function')return [];dic();const r=hira(w.kana);return (DIC.get(w.k)||[]).filter(e=>e.r&&hira(String(e.r).replace(/[^ぁ-ゖァ-ヺー]/g,''))===r).slice(0,2);}
+const mnH=w=>w.mn?`<div class="vmn"><small>Moyen mnémotechnique · votre paquet</small>${esc(w.mn)}</div>`:'';
 function xrefHtml(w){const X=xrefFr(w);return X.length?`<div class="vxref"><span class="small muted">Même graphie et même lecture ailleurs dans Kotonoha (le sens peut différer) :</span>${X.map(e=>`<span>« ${esc(e.g)} » <small>${esc(srcLabel(e))}</small></span>`).join('')}</div>`:'';}
 function wordCard(id){const w=cw(id),s=cst(id),now=Date.now(),D=CDUP.get(id)||[];let p=$('#vpop');
   if(!p){p=document.createElement('div');p.id='vpop';p.setAttribute('role','dialog');p.setAttribute('aria-modal','true');document.body.appendChild(p);p.onclick=e=>{if(e.target===p)p.classList.remove('on');};}
   p.innerHTML=`<div class="vpbox"><button class="x" aria-label="Fermer">×</button>
    <div class="vpw"><span class="jp big">${akRuby(w.f)}</span><span class="kana">${esc(w.kana)}</span></div>
-   <p><b>${esc(w.en)}</b> <span class="small muted">${esc(POSFR[w.pos]||w.pos)} · ${w.corpus==='jm'?'sens JMdict (anglais)':'sens de la source (anglais)'}</span></p>${xrefHtml(w)}
+   <p><b>${esc(w.en)}</b> <span class="small muted">${w.pos?esc(POSFR[w.pos]||w.pos)+' · ':''}${w.corpus==='kj'?'sens de votre paquet (français)':w.corpus==='jm'?'sens JMdict (anglais)':'sens de la source (anglais)'}</span></p>${w.corpus==='kj'?'':xrefHtml(w)}${mnH(w)}
    ${exH(w)}
    <div class="toolbar"><button class="btn sec" data-a="w">Écouter le mot</button><button class="btn sec" data-a="s">Écouter la phrase</button><button class="btn" data-a="r">Réviser ce mot</button>${s&&(s.s||s.ok||s.ko)?'<button class="btn sec" data-a="z">Remettre à zéro</button>':''}</div>
    <div class="small" id="vpmsg" role="status"></div>
    <h4>Ma progression</h4><p class="small">${isNew(s)&&!(s&&(s.ok||s.ko))?'Jamais étudié.':`${stLabel(s,now)} ${s.s?`Intervalle ${s.iv?s.iv+' j':'en apprentissage'} · prochaine révision ${s.due<=now?'maintenant':'dans '+fmtIv(s.due-now)} · stabilité ${(s.st||0).toFixed(1)} j · difficulté ${(s.df||0).toFixed(1)}/10 · ${s.r||0} révision${(s.r||0)>1?'s':''}, ${s.l||0} oubli${(s.l||0)>1?'s':''}`:''}${s.ok+s.ko?` · réponses justes ${s.ok}/${s.ok+s.ko}`:''}${s.h?` · dernières : <span class="vh">${[...s.h].map(c=>c==='1'?'<i class="o"></i>':'<i class="x"></i>').join('')}</span>`:''}${s.imp?' · état importé d’Anki':''}`}</p>
    ${D.length?`<h4>Même graphie et même lecture dans le Core</h4><ul class="small">${D.map(x=>{const y=cw(x);return `<li><a href="#" data-dup="${x}">${esc(y.k)}</a> « ${esc(y.en)} » · ${esc(y.notes)}</li>`;}).join('')}</ul>`:''}
-   ${w.corpus==='jm'?`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Source</dt><dd>JMdict (© EDRDG, CC BY-SA 4.0)</dd><dt>Entrée</dt><dd>${esc(w.notes)}</dd></dl></details>`:`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Fichier</dt><dd>${esc(CORE.src.file)}</dd><dt>Notes</dt><dd>${esc(w.notes)}</dd><dt>Core-Index</dt><dd>${w.ci}</dd><dt>Optimized-Voc-Index</dt><dd>${w.ovi}</dd><dt>Optimized-Sent-Index</dt><dd>${w.osi}</dd><dt>Note</dt><dd>${w.nid}</dd><dt>GUID</dt><dd>${esc(w.guid)}</dd><dt>Carte</dt><dd>${w.cid}</dd><dt>Phrase en kana</dt><dd class="jp">${akRuby(w.sk)}</dd><dt>Médias</dt><dd>${esc([mediaName(w.va),mediaName(w.sa),mediaName(w.si)].filter(Boolean).join(' · '))}</dd></dl></details>`}</div>`;
+   ${w.corpus==='kj'?`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Paquet</dt><dd>${esc(CBYL[w.list]?CBYL[w.list].name:'')}</dd><dt>GUID</dt><dd>${esc(w.guid)}</dd><dt>Note</dt><dd>${esc(String(w.nid||''))}</dd><dt>Verso</dt><dd class="jp">${esc(w.notes)}</dd></dl></details>`:w.corpus==='jm'?`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Source</dt><dd>JMdict (© EDRDG, CC BY-SA 4.0)</dd><dt>Entrée</dt><dd>${esc(w.notes)}</dd></dl></details>`:`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Fichier</dt><dd>${esc(CORE.src.file)}</dd><dt>Notes</dt><dd>${esc(w.notes)}</dd><dt>Core-Index</dt><dd>${w.ci}</dd><dt>Optimized-Voc-Index</dt><dd>${w.ovi}</dd><dt>Optimized-Sent-Index</dt><dd>${w.osi}</dd><dt>Note</dt><dd>${w.nid}</dd><dt>GUID</dt><dd>${esc(w.guid)}</dd><dt>Carte</dt><dd>${w.cid}</dd><dt>Phrase en kana</dt><dd class="jp">${akRuby(w.sk)}</dd><dt>Médias</dt><dd>${esc([mediaName(w.va),mediaName(w.sa),mediaName(w.si)].filter(Boolean).join(' · '))}</dd></dl></details>`}</div>`;
   p.classList.add('on');p.querySelector('.x').onclick=()=>p.classList.remove('on');p.querySelector('.x').focus();
   p.onkeydown=e=>{if(e.key==='Escape')p.classList.remove('on');};
   p.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;
@@ -10897,14 +10904,15 @@ function wirePlay(root,w){root.querySelectorAll('.vplay').forEach(b=>b.onclick=e
 
 function stStudy(st,w,c){
   st.innerHTML=`<div class="vcard study"><p class="eyebrow">Nouveau mot</p><div class="vw jp">${akRuby(w.f)}</div><div class="vkana">${esc(w.kana)}</div>
-   ${meanH(w,'fr')}
+   ${meanH(w,'fr')}${mnH(w)}
    ${exH(w)}<div class="vaud">${audioBtns(w)}</div>${imgSlot(w)}</div>
    <div class="vgrade one"><button class="btn big" id="vnext">Je retiens · suivant <kbd>Espace</kbd></button></div>`;
   wirePlay(st,w);fillImg(st,w);if(S.core.set.auto)coreSay(w,'w');
   $('#vnext').onclick=()=>{const sec=Math.min(60,Math.round((Date.now()-V.shown)/1000));c.ms=(c.ms||0)+sec*1000;coreDay().sec+=sec;advance();};$('#vnext').focus();}
 
 /* Sens affiché : français (vérifié ailleurs dans Kotonoha) quand il existe, sinon anglais de la source */
-function meanH(w,lang,big){const P=`<small>${esc(POSFR[w.pos]||w.pos)}</small>`;
+function meanH(w,lang,big){const P=w.pos?`<small>${esc(POSFR[w.pos]||w.pos)}</small>`:'';
+  if(w.corpus==='kj')return `<div class="vmean${big?' vq':''}"><b>${esc(w.en)}</b><small>français · ${esc(CBYL[w.list]?CBYL[w.list].name:'paquet Kanjis')}</small></div>`;
   if(lang==='fr'){const X=xrefFr(w);if(X.length)return `<div class="vmean${big?' vq':''}"><b>${esc(X[0].g)}</b><small>français · ${esc(srcLabel(X[0]))} · ${esc(POSFR[w.pos]||w.pos)}</small><span class="ven">${esc(w.en)} <i>(anglais, source)</i></span></div>`;
     return `<div class="vmean${big?' vq':''}"><b>${esc(w.en)}</b><small>anglais · pas de sens français vérifié pour ce mot · ${esc(POSFR[w.pos]||w.pos)}</small></div>`;}
   return `<div class="vmean${big?' vq':''}"><b>${esc(w.en)}</b>${P}</div>`;}
@@ -10913,9 +10921,9 @@ const toJp=d=>d==='fj'||d==='ej';
 function stCard(st,w,c,it){const dir=c.dir==='mx'?(['fj','jf','kl','ej'][(c.i+w.nid)%4]):c.dir,s=cst(w.id),now=Date.now(),lg=dirLang(dir);
   if(!isNew(s)&&S.core.set.write&&(toJp(dir)||w.k!==w.kana))return stRecall(st,w,c,it,dir);
   const front=toJp(dir)?meanH(w,lg,1):dir==='kl'?`<div class="vw jp">${esc(w.k)}</div>`:`<div class="vw jp">${akRuby(w.f)}</div>`;
-  let steps=toJp(dir)?[`<div class="vw jp">${akRuby(w.f)}</div><div class="vkana">${esc(w.kana)}</div>`,`${exH(w)}`]
-    :dir==='kl'?[`<div class="vkana">${esc(w.kana)}</div>`,meanH(w,'fr'),`${exH(w)}`]
-    :[meanH(w,lg),`${exH(w)}`];
+  let steps=toJp(dir)?[`<div class="vw jp">${akRuby(w.f)}</div><div class="vkana">${esc(w.kana)}</div>${mnH(w)}`,`${exH(w)}`]
+    :dir==='kl'?[`<div class="vkana">${esc(w.kana)}</div>`,meanH(w,'fr')+mnH(w),`${exH(w)}`]
+    :[meanH(w,lg)+mnH(w),`${exH(w)}`];
   for(let i=steps.length-1;i>=0;i--)if(!steps[i])steps.splice(i,1);
   const lbl=toJp(dir)?['Montrer le mot','Montrer l’exemple']:dir==='kl'?['Montrer la lecture','Montrer le sens','Montrer l’exemple']:['Montrer le sens','Montrer l’exemple'];
   const pv=gradePreview(s,w,now);
@@ -10943,10 +10951,10 @@ function stRecall(st,w,c,it,dir){const s=cst(w.id),now=Date.now(),set=S.core.set
    <div class="vgrade" id="vg"></div>`;
   const inp=$('#vti'),conv=v=>set.romaji&&/[a-z]/i.test(v)?toKana(v):v;inp.focus();let done=false;
   inp.oninput=()=>{const v=inp.value;$('#vtp').textContent=set.romaji&&/[a-z]/i.test(v)?'→ '+toKana(v):'';};
-  const check=(ans,skip)=>{if(done)return;done=true;const a=normA(conv(ans)),ok=!skip&&!!a&&(a===normA(w.kana)||(jp&&a===normA(w.k)));
+  const check=(ans,skip)=>{if(done)return;done=true;const a=normA(conv(ans)),ok=!skip&&ansOK(w,a,jp);
     inp.disabled=true;$('#vchk').remove();$('#vskip').remove();
     const box=$('#vans');box.hidden=false;box.classList.add('in');
-    box.innerHTML=`<div class="vfb ${ok?'ok':'ko'}"><b>${ok?'Juste.':skip?'Réponse :':'Pas tout à fait.'}</b>${!ok&&a?` <span class="small">vous : <span class="jp">${esc(conv(ans))}</span></span>`:''}</div><div class="vw jp">${akRuby(w.f)}</div><div class="vkana">${esc(w.kana)}</div>${jp?'':meanH(w,dirLang(dir))}${exH(w)}<div class="vaud">${audioBtns(w)}</div>`;
+    box.innerHTML=`<div class="vfb ${ok?'ok':'ko'}"><b>${ok?'Juste.':skip?'Réponse :':'Pas tout à fait.'}</b>${!ok&&a?` <span class="small">vous : <span class="jp">${esc(conv(ans))}</span></span>`:''}</div><div class="vw jp">${akRuby(w.f)}</div><div class="vkana">${esc(w.kana)}</div>${jp?'':meanH(w,dirLang(dir))}${mnH(w)}${exH(w)}<div class="vaud">${audioBtns(w)}</div>`;
     wirePlay(box,w);fillImg(st,w);if(set.auto)coreSay(w,'w');
     showGrades(w,c,pv,ok?3:1);$('#vg').insertAdjacentHTML('beforeend',`<p class="small muted">Note proposée selon votre réponse (Entrée) ; vous pouvez en choisir une autre.</p>`);};
   $('#vtf').onsubmit=e=>{e.preventDefault();if(done){const b=$('#vgb .sug');if(b)b.click();return;}if(!inp.value.trim())return;check(inp.value);};
@@ -10982,7 +10990,7 @@ function stType(st,w,c,it){const set=S.core.set;
   inp.oninput=()=>{const v=inp.value;$('#vtp').textContent=set.romaji&&/[a-z]/i.test(v)?'→ '+toKana(v):'';};
   let hints=0,done=false;
   $('#vhint').onclick=()=>{hints=Math.min(w.kana.length,hints+1);inp.placeholder=w.kana.slice(0,hints)+'…';inp.focus();};
-  const finish=(ans,skip)=>{if(done)return;done=true;const a=normA(conv(ans));const ok=!skip&&!!a&&(a===normA(w.kana)||a===normA(w.k));
+  const finish=(ans,skip)=>{if(done)return;done=true;const a=normA(conv(ans));const ok=!skip&&ansOK(w,a,true);
     const pre=S.core.c[w.id]?JSON.parse(JSON.stringify(S.core.c[w.id])):undefined,good=ok&&hints===0;coreAnswer(w.id,good,{});inp.disabled=true;
     if(c.mode==='learn'&&!good){c.err[w.id]=1;c.q.push({t:'saisie',id:w.id});}
     $('#vfb').innerHTML=`<div class="vfb ${good?'ok':'ko'}"><b>${good?'Juste.':ok?'Juste, avec indice (compté à revoir).':skip?'Réponse :':'Pas tout à fait.'}</b> <span class="jp">${akRuby(w.f)}</span> · ${esc(w.kana)}${!ok&&a?` <span class="small muted">(vous : ${esc(conv(ans))})</span>`:''}
@@ -11050,7 +11058,7 @@ function midb(){if(MIDB)return MIDB;MIDB=new Promise((res,rej)=>{try{const r=ind
 async function mget(k){const d=await midb();return new Promise((res,rej)=>{const q=d.transaction('m').objectStore('m').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
 async function mkeys(){const d=await midb();return new Promise((res,rej)=>{const q=d.transaction('m').objectStore('m').getAllKeys();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
 async function mputMany(items){const d=await midb();return new Promise((res,rej)=>{const tx=d.transaction('m','readwrite'),s=tx.objectStore('m');items.forEach(([k,v])=>s.put(v,k));tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-async function coreMediaCount(){V.media=0;try{const k=await mkeys();k=k.filter(x=>x!=='__coredata__');MHAS=new Set(k);V.media=k.length;}catch(e){MHAS=new Set();V.media=-1;}
+async function coreMediaCount(){V.media=0;try{const k=await mkeys();k=k.filter(x=>x!=='__coredata__'&&x!=='__kanjidata__');MHAS=new Set(k);V.media=k.length;}catch(e){MHAS=new Set();V.media=-1;}
   const c=$('#vmedia');if(c&&$('#v-vocab').classList.contains('on')&&location.hash==='#vocab')c.outerHTML=mediaCard(),wireMedia();}
 async function coreMediaHas(f){if(!MHAS){try{MHAS=new Set(await mkeys());}catch(e){MHAS=new Set();}}return MHAS.has(f);}
 async function coreMediaURL(f){if(MURL.has(f))return MURL.get(f);const b=await mget(f);if(!b)return null;const u=URL.createObjectURL(b);MURL.set(f,u);return u;}
@@ -11381,7 +11389,7 @@ async function parseCore(file,say){
   if(fr&&fr.length)fr.forEach(([nt,o,n])=>{(fieldsBy[nt]=fieldsBy[nt]||[])[o]=n;});
   else{const m=q('select models from col');if(m&&m[0]){const M=JSON.parse(m[0][0]);for(const id in M)fieldsBy[id]=M[id].flds.map(f=>f.name);}}
   const ntid=Object.keys(fieldsBy).find(k=>['Vocabulary-Kanji','Vocabulary-Kana','Notes','Core-Index'].every(n=>fieldsBy[k].includes(n)));
-  if(!ntid){db.close();throw new Error('notcore');}
+  if(!ntid){let k=null;try{k=parseKanjiDb(q,fieldsBy,file);}catch(e){}db.close();if(k)return {kind:'kanji',data:k};throw new Error('notcore');}
   const idx=CFIELDS.map(n=>fieldsBy[ntid].indexOf(n));
   const crt=(q('select crt from col')||[[0]])[0][0];
   const cards={};(q('select id,nid,type,queue,due,ivl,factor,reps,lapses,data from cards')||[]).forEach(r=>{cards[r[1]]=r;});
@@ -11401,32 +11409,78 @@ async function parseCore(file,say){
   const deck=((q("select name from decks")||[]).map(r=>r[0]).find(n=>n!=='Default'))||'';
   db.close();
   let media=0;try{media=z.ents.has('media')?Math.max(0,z.ents.size-3):0;}catch(e){}
-  return {z,data:{v:1,src:{file:file.name,bytes:file.size,deck,notetype:'Japanese',fields:CFIELDS,crt,imported:Date.now(),mediaFiles:media,local:1},lists,notes,other,init,rev,dups}};}
-function applyCore(d){CORE.src=d.src;CORE.init=d.init||{};CORE.rev=d.rev||[];CORE.dups=d.dups||[];CORE.other=d.other||[];
-  CORE.notes=d.notes.concat(CORE.notes.filter(n=>n[3]==='jm'));CORE.lists=d.lists.concat(CORE.lists.filter(l=>l.corpus==='jm'));
+  return {kind:'core',z,data:{v:1,src:{file:file.name,bytes:file.size,deck,notetype:'Japanese',fields:CFIELDS,crt,imported:Date.now(),mediaFiles:media,local:1},lists,notes,other,init,rev,dups}};}
+function applyCore(d){CORE.src=d.src;CORE.init=Object.assign(CORE.init||{},d.init||{});CORE.rev=d.rev||[];CORE.dups=d.dups||[];CORE.other=d.other||[];
+  CORE.notes=d.notes.concat(CORE.notes.filter(n=>n[3]!=='2k'&&n[3]!=='6k'));CORE.lists=d.lists.concat(CORE.lists.filter(l=>l.corpus!=='2k'&&l.corpus!=='6k'));
   HASAPKG=true;CW=null;CBYL={};CBYC={};CDUP=new Map();}
-async function importCoreFile(file,say){
+/* ---------- Paquets Kanjis N5–N1 (modèle basique : recto = sens, verso = « mot (lecture) », 3e champ = moyen mnémotechnique) ---------- */
+const KDATA_KEY='__kanjidata__';
+const LVORD={N5:1,N4:2,N3:3,N2:4,N1:5};
+const kjId=g=>'g'+[...String(g)].map(c=>c.charCodeAt(0).toString(16).padStart(2,'0')).join('');
+function deHtml(x){const t=document.createElement('textarea');t.innerHTML=String(x||'').replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,'');return t.value.replace(/\s+/g,' ').trim();}
+function splitJp(jp){const m=jp.match(/^(.*?)\s*[（(]\s*([^()（）]+?)\s*[)）]\s*$/);return m?[m[1].trim(),m[2].trim()]:[jp.trim(),''];}
+function kjRow(id,guid,cid,lv,num,apos,fr,jp,mn){const [w,r]=splitJp(jp);return [id,guid,cid,'kj',LVORD[lv],num,apos,w,w,r,fr,'','','','','','','','','','',jp,0,0,0,mn];}
+function parseKanjiDb(q,fieldsBy,file){
+  const notes=q('select id,guid,mid,flds from notes')||[];if(notes.length<20)return null;
+  const cnt={};notes.forEach(n=>cnt[n[2]]=(cnt[n[2]]||0)+1);const mid=Object.keys(cnt).sort((a,b)=>cnt[b]-cnt[a])[0];
+  const fl=(fieldsBy[mid]||[]).length;if(fl&&fl<2)return null;
+  const decks={};(q('select id,name from decks')||[]).forEach(([id,n])=>decks[id]=String(n).replace(/\x1f/g,'::'));
+  const crt=(q('select crt from col')||[[0]])[0][0];
+  const cards={};(q('select id,nid,did,type,queue,due,ivl,factor,reps,lapses,data from cards')||[]).forEach(r=>{if(!cards[r[1]])cards[r[1]]=r;});
+  const byLv={};let ok=0;
+  for(const [nid,guid,m,flds] of notes){if(String(m)!==String(mid))continue;const f=String(flds).split('\x1f'),cd=cards[nid]||[0,nid,0,0,0,0,0,0,0,0,''];
+    const dn=decks[cd[2]]||'',lm=(dn.match(/\bN([1-5])\b(?!.*\bN[1-5]\b)/)||String(file.name).match(/N([1-5])(?!.*N[1-5])/));if(!lm)continue;
+    const lv='N'+lm[1],fr=deHtml(f[0]),jp=deHtml(f[1]),mn=deHtml(f[2]||'');if(/[（(][^()（）]+[)）]\s*$/.test(jp))ok++;
+    (byLv[lv]=byLv[lv]||[]).push({nid,guid,cid:cd[0],fr,jp,mn,cd});}
+  const tot=Object.values(byLv).reduce((a,v)=>a+v.length,0);if(!tot||ok/tot<0.6)return null;
+  const out={};for(const lv in byLv){const L=byLv[lv].sort((a,b)=>a.nid-b.nid),init={};
+    const rows=L.map((n,i)=>{const id=kjId(n.guid),cd=n.cd;if(cd[3]!==0){let d={};try{d=JSON.parse(cd[10]||'{}');}catch(e){}init[id]=[cd[3],cd[4],cd[3]===2?(crt+cd[5]*86400)*1000:cd[5],cd[6],cd[7],cd[8],cd[9],(d.lrt||0)*1000];}
+      return kjRow(id,n.guid,cd[0],lv,i+1,cd[5],n.fr,n.jp,n.mn);});
+    out[lv]={rows,init,src:{file:file.name,imported:Date.now(),deck:decks[L[0].cd[2]]||''}};}
+  return out;}
+let KJSRC=null;
+function applyKanji(levels){KJSRC=levels;const lvs=Object.keys(levels).sort((a,b)=>LVORD[a]-LVORD[b]);
+  const rows=lvs.flatMap(lv=>levels[lv].rows),lists=lvs.map(lv=>({id:'kj-0'+LVORD[lv],corpus:'kj',step:LVORD[lv],name:'Kanjis '+lv,ids:levels[lv].rows.map(r=>r[0])}));
+  lvs.forEach(lv=>Object.assign(CORE.init,levels[lv].init||{}));
+  const core=CORE.notes.filter(n=>n[3]==='2k'||n[3]==='6k'),jm=CORE.notes.filter(n=>n[3]==='jm');CORE.notes=core.concat(rows,jm);
+  const cl=CORE.lists.filter(l=>l.corpus==='2k'||l.corpus==='6k'),jl=CORE.lists.filter(l=>l.corpus==='jm');CORE.lists=cl.concat(lists,jl);
+  CW=null;CBYL={};CBYC={};CDUP=new Map();}
+/* Version personnelle : les paquets intégrés au site (ANKID) apparaissent aussi dans Vocabulaire */
+function kanjiFromAnkid(){if(!(typeof ANKID!=='undefined'&&ANKID.decks&&ANKID.decks.length))return null;const out={};
+  ANKID.decks.forEach(d=>{const init={};const rows=d.notes.map((n,i)=>{const id=kjId(n[0]),a=ANKID.init[n[0]];
+    if(a&&a[0]!==0){const due=new Date(a[3]+'T00:00:00').getTime();init[id]=[a[0],a[0],a[0]===2?due:Date.now(),a[1],a[2],a[4],a[5],a[0]===2?due-a[1]*DAY:0];}
+    return kjRow(id,n[0],0,d.id,i+1,0,n[1],n[2],n[3]||'');});out[d.id]={rows,init,src:{file:'paquets intégrés',deck:d.name}};});return out;}
+async function importAnkiFiles(files,say){
   if(typeof fzstd==='undefined'){say('Décompression indisponible dans ce navigateur.');return;}
-  try{say('Ouverture du fichier…');const {z,data}=await parseCore(file,say);
-    await mputMany([[CDATA_KEY,JSON.stringify(data)]]);applyCore(data);
-    say(`${data.notes.length} mots importés (${data.lists.filter(l=>l.corpus==='2k').length} étapes Core 2K, ${data.lists.filter(l=>l.corpus==='6k').length} étapes Core 6K). Installation des enregistrements…`);
-    await importApkgMedia(file,t=>say(`${data.notes.length} mots importés. ${t}`),z);
-    renderBadge();if(location.hash.startsWith('#vocab'))viewVocab(location.hash.slice(1));}
-  catch(err){say(err&&err.message==='notcore'?'Ce paquet ne contient pas les listes Core 2k/6k (modèle « Japanese » avec Core-Index).':err&&err.message==='sqljs'?'Le lecteur de paquets n’a pas pu se charger : vérifiez la connexion puis réessayez.':err&&err.name==='QuotaExceededError'?'Espace de stockage insuffisant sur cet appareil.':'Ce fichier n’a pas pu être lu comme un paquet Anki (.apkg).');}}
-async function removeImportedCore(){const d=await midb();await new Promise((res,rej)=>{const tx=d.transaction('m','readwrite');tx.objectStore('m').clear();tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});location.reload();}
-/* Au démarrage : recharge le Core importé sur cet appareil */
-if(CONFIG.coreImport&&!HASAPKG&&'indexedDB' in window){(async()=>{try{const js=await mget(CDATA_KEY);if(!js)return;applyCore(JSON.parse(js));renderBadge();
-  if(location.hash.startsWith('#vocab'))viewVocab(location.hash.slice(1));}catch(e){}})();}
-function coreImportCard(){if(!CONFIG.coreImport)return '';
-  if(HASAPKG&&CORE.src&&CORE.src.local)return '';
-  if(HASAPKG)return '';
-  return `<div class="card vimport" id="vimport"><h3>Ajouter vos listes Core 2K et 6K</h3>
-   <p class="small">Vous avez le paquet Anki « Core 2k/6k Optimized Japanese Vocabulary » ? Choisissez votre fichier <b>.apkg</b> : ses 6 000 mots, leurs phrases d’exemple et, s’ils y sont, les enregistrements audio s’ajoutent ici, avec les mêmes modes et la même répétition espacée. Les cartes déjà étudiées dans Anki gardent leur échéance.</p>
-   <p class="small muted">Le fichier est lu sur cet appareil et n’est envoyé nulle part. Les mots restent dans le stockage de ce navigateur (à importer sur chaque appareil) ; votre progression, elle, suit votre compte. Ce paquet n’est pas fourni par Kotonoha.</p>
-   <label class="btn" for="vcorefile">Choisir le fichier .apkg</label><input type="file" id="vcorefile" accept=".apkg,.zip" hidden>
-   <div class="small" id="vcorest" role="status" aria-live="polite"></div></div>`;}
-function wireCoreImport(){const f=$('#vcorefile');if(f)f.onchange=()=>{const file=f.files[0];if(file)importCoreFile(file,t=>{const s=$('#vcorest');if(s)s.textContent=t;});};
-  const r=$('#vcorerm');if(r)r.onclick=()=>{$('#vcorermc').innerHTML='Retirer le Core et ses enregistrements de cet appareil ? Votre progression est conservée. <button class="btn" id="vcoreyes">Retirer</button>';$('#vcoreyes').onclick=removeImportedCore;};}
+  const msgs=[];let kj=KJSRC?Object.assign({},KJSRC):{};
+  for(const file of files){say(`${file.name} : ouverture…`);
+    try{const r=await parseCore(file,t=>say(`${file.name} : ${t}`));
+      if(r.kind==='core'){await mputMany([[CDATA_KEY,JSON.stringify(r.data)]]);applyCore(r.data);msgs.push(`${file.name} : ${r.data.notes.length} mots Core importés`);
+        await importApkgMedia(file,t=>say(`${file.name} : ${t}`));}
+      else{Object.assign(kj,r.data);msgs.push(`${file.name} : ${Object.keys(r.data).map(lv=>`${r.data[lv].rows.length} cartes ${lv}`).join(', ')}`);}}
+    catch(err){msgs.push(`${file.name} : ${err&&err.message==='notcore'?'ni paquet Core ni paquet Kanjis reconnu':err&&err.message==='sqljs'?'lecteur de paquets indisponible (connexion ?)':err&&err.name==='QuotaExceededError'?'espace de stockage insuffisant':'fichier illisible'}`);}}
+  if(Object.keys(kj).length&&kj!==KJSRC){try{await mputMany([[KDATA_KEY,JSON.stringify(kj)]]);}catch(e){}applyKanji(kj);}
+  renderBadge();say(msgs.join(' · '));if(location.hash.startsWith('#vocab'))setTimeout(()=>viewVocab(location.hash.slice(1)),50);}
+async function removeImported(what){const kj=what==='core'?await mget(KDATA_KEY):null;const d=await midb();await new Promise((res,rej)=>{const tx=d.transaction('m','readwrite');const st=tx.objectStore('m');
+  if(what==='core'){st.clear();if(kj)st.put(kj,KDATA_KEY);}else st.delete(KDATA_KEY);tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});location.reload();}
+/* Au démarrage */
+(function(){const k=kanjiFromAnkid();if(k){applyKanji(k);return;}})();
+if(CONFIG.coreImport&&'indexedDB' in window){(async()=>{try{let ch=false;
+  if(!HASAPKG){const js=await mget(CDATA_KEY);if(js){applyCore(JSON.parse(js));ch=true;}}
+  if(!KJSRC){const kj=await mget(KDATA_KEY);if(kj){applyKanji(JSON.parse(kj));ch=true;}}
+  if(ch){renderBadge();if(location.hash.startsWith('#vocab'))viewVocab(location.hash.slice(1));}}catch(e){}})();}
+function coreImportCard(){if(!CONFIG.coreImport)return '';const lv=KJSRC?Object.keys(KJSRC).sort((a,b)=>LVORD[a]-LVORD[b]):[];
+  const have=[HASAPKG?'Core 2K/6K':'',lv.length?'Kanjis '+lv.join(', '):''].filter(Boolean);
+  return `<div class="card vimport" id="vimport"><h3>Ajouter vos paquets Anki</h3>
+   <p class="small">Choisissez un ou plusieurs fichiers <b>.apkg</b> : le paquet « Core 2k/6k Optimized Japanese Vocabulary » et vos paquets de kanjis du N5 au N1 (recto : sens ; verso : « mot (lecture) » ; troisième champ : moyen mnémotechnique). Ils s’ajoutent ici avec les mêmes modes et la même répétition espacée ; les cartes déjà étudiées dans Anki gardent leur échéance.</p>
+   <p class="small muted">Les fichiers sont lus sur cet appareil et ne sont envoyés nulle part. Les cartes restent dans ce navigateur (à importer sur chaque appareil) ; votre progression, elle, suit votre compte. Kotonoha ne fournit pas ces paquets.</p>
+   ${have.length?`<p class="small"><b>Sur cet appareil :</b> ${esc(have.join(' · '))}. ${HASAPKG&&CORE.src&&CORE.src.local?'<button class="btn-ghost small" type="button" id="vrmcore">Retirer le Core</button>':''}${lv.length?'<button class="btn-ghost small" type="button" id="vrmkj">Retirer les paquets Kanjis</button>':''}</p>`:''}
+   <label class="btn" for="vankifile">Choisir des fichiers .apkg</label><input type="file" id="vankifile" accept=".apkg,.zip" multiple hidden>
+   <div class="small" id="vankist" role="status" aria-live="polite"></div></div>`;}
+function wireCoreImport(){const f=$('#vankifile');if(f)f.onchange=()=>{const fs=[...f.files];if(fs.length)importAnkiFiles(fs,t=>{const s=$('#vankist');if(s)s.textContent=t;});};
+  const a=$('#vrmcore');if(a)a.onclick=()=>{a.outerHTML='<span class="small">Retirer le Core et ses enregistrements de cet appareil ? <button class="btn" id="vrmcy">Retirer</button></span>';$('#vrmcy').onclick=()=>removeImported('core');};
+  const b=$('#vrmkj');if(b)b.onclick=()=>{b.outerHTML='<span class="small">Retirer les paquets Kanjis de cet appareil ? <button class="btn" id="vrmky">Retirer</button></span>';$('#vrmky').onclick=()=>removeImported('kj');};
+  const r=$('#vcorerm');if(r)r.onclick=()=>{$('#vcorermc').innerHTML='Retirer le Core et ses enregistrements de cet appareil ? Votre progression est conservée. <button class="btn" id="vcoreyes">Retirer</button>';$('#vcoreyes').onclick=()=>removeImported('core');};}
 
 /* =====================================================================
    CONCENTRATION : minuteur (50/10 par défaut), kitsune, ambiances sonores
