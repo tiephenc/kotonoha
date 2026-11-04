@@ -1,0 +1,35 @@
+import { test, expect } from '@playwright/test';
+import { isolate, onboard, noHorizontalOverflow } from './helpers.js';
+
+test('carnet : ajout, recherche, modification, suppression, persistance, échappement', async ({ page }) => {
+  const errors = await isolate(page);
+  await onboard(page);
+  await page.evaluate(() => { window.__pwn = 0; location.hash = 'profil'; });
+  await page.click('[data-xtile="carnet"]');
+  await expect(page.locator('#v-x-carnet h1')).toHaveText('Carnet');
+  await page.fill('#xcf [name=titre]', 'うちに et 間に');
+  await page.fill('#xcf [name=texte]', 'Demander la différence.\n<img src=x onerror="window.__pwn=1">');
+  await page.fill('#xcf [name=tags]', 'grammaire, questions');
+  await page.click('#xcf button[type=submit]');
+  await page.fill('#xcf [name=titre]', 'Phrase entendue');
+  await page.fill('#xcf [name=texte]', 'お疲れさまでした');
+  await page.click('#xcf button[type=submit]');
+  await expect(page.locator('.xnotes li')).toHaveCount(2);
+  await page.fill('#xcq', 'grammaire');
+  await expect(page.locator('.xnotes li')).toHaveCount(1);
+  await page.fill('#xcq', '');
+  await page.locator('[data-ed]').first().click();
+  await page.fill('#xcf [name=titre]', 'Phrase entendue au travail');
+  await page.click('#xcf button[type=submit]');
+  await expect(page.locator('.xnotes')).toContainText('Phrase entendue au travail');
+  expect(await page.evaluate(() => window.__pwn)).toBe(0);
+  await page.reload();
+  await expect(page.locator('.xnotes li')).toHaveCount(2);
+  await page.evaluate(() => { window.__pwn = 0; });
+  await page.locator('[data-del]').first().click();
+  await page.locator('.xnotes [data-y]').click();
+  await expect(page.locator('.xnotes li')).toHaveCount(1);
+  await noHorizontalOverflow(page);
+  expect(await page.evaluate(() => window.__pwn)).toBe(0);
+  expect(errors).toEqual([]);
+});

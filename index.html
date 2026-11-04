@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'none'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Kotonoha · réviser le JLPT du N4 au N2</title>
 <meta name="description" content="Kotonoha : un site gratuit pour préparer le JLPT du N4 au N2 en français. Parcours de 210 unités, révisions espacées, examens blancs, écriture des kanji et écoute.">
@@ -872,6 +873,7 @@ kbd{font:600 11px var(--sans);border:1px solid currentColor;border-radius:3px;pa
 .famb .chk{display:flex;gap:8px;align-items:center;font-size:13px}
 .vmn{margin-top:8px;font-size:14px;max-width:560px;color:var(--ink-2)}.vmn small{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}.vcard .vmn{color:#4B3D33}.vcard .vmn small{color:#7E6E62}
 </style>
+<link rel="stylesheet" href="app/plus.css">
 </head>
 <body>
 <header class="top"><div class="wrap">
@@ -9123,7 +9125,7 @@ MODULES.forEach(([a,b,name,lv,bil],mi)=>{if(!bil)return;const regs=[];for(let n=
 
 /* ===================== Utilitaires ===================== */
 const $ = (s,el=document)=>el.querySelector(s);
-const esc = s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const esc = s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const KANJI_RUN = /([々〆一-鿿ヶ]+)\{([^}]+)\}/g;
 const N5K = new Set('一二三四五六七八九十百千万円日月火水木金土曜年時分半午前後今毎週何先生学校大小中上下左右東西南北口目耳手足山川天気雨電車人男女子父母友名本休見行来出入食飲言話読書聞買会社店駅道国語外長高安新古白多少空花魚家朝昼夜体立');
 let KN=null, KNk='';
@@ -9140,7 +9142,17 @@ let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add
 /* ===================== État et sauvegarde ===================== */
 const LS_KEY='kotonoha.progress.v1';
 let S={v:6,units:{},srs:{},furi:'auto',err:{},reports:[],rate:0.92,updated:0};
-function normState(){S.v=6;S.units=S.units||{};S.srs=S.srs||{};S.err=S.err||{};S.g=Object.assign({xp:0,days:{},goal:40,jok:0,frz:[],badges:{},rv:0,jk7:0},S.g||{});S.rh=S.rh||{};S.decks=S.decks||{};coreState();if(!S.prof&&hasProgress(S))S.prof={sess:'2027-07',start:'N4',ok:1};}
+/* Types normalisés : une sauvegarde importée ou synchronisée ne peut pas glisser du HTML dans un champ numérique. Rien n'est supprimé. */
+function normNum(o,keys){if(!o||typeof o!=='object')return;for(const k of keys)if(o[k]!=null&&typeof o[k]!=='number'){const v=+o[k];o[k]=Number.isFinite(v)?v:0;}}
+function normTypes(){const num=v=>{v=+v;return Number.isFinite(v)?v:0;};normNum(S.g,['xp','goal','jok','rv','jk7']);
+  for(const k in S.rh)S.rh[k]=num(S.rh[k]);for(const k in (S.g.days||{}))normNum(S.g.days[k],['x','r','s','c','f']);
+  for(const n in S.units){const u=S.units[n];if(u&&typeof u==='object'){normNum(u,['best','at']);if(u.sc&&typeof u.sc==='object')for(const k in u.sc)u.sc[k]=num(u.sc[k]);}}
+  for(const id in S.srs)normNum(S.srs[id],['e','i','r','d','l','seen','hz','t']);
+  if(S.x&&typeof S.x==='object'){const x=S.x;if(x.plan&&typeof x.plan==='object'){x.plan.min=Math.min(240,Math.max(5,num(x.plan.min)||45));x.plan.days=Array.isArray(x.plan.days)?x.plan.days.map(num).filter(d=>d>=0&&d<=6):[1,2,3,4,5];}
+    if(x.t&&typeof x.t==='object')for(const k in x.t)x.t[k]=Array.isArray(x.t[k])?[num(x.t[k][0]),num(x.t[k][1])]:[0,0];
+    if(x.pauses&&!Array.isArray(x.pauses))x.pauses=[];if(Array.isArray(x.pauses))x.pauses=x.pauses.filter(p=>p&&typeof p==='object').map(p=>({from:String(p.from||''),to:String(p.to||''),label:String(p.label||'').slice(0,40)}));
+    if(x.cal&&typeof x.cal==='object')for(const k in x.cal)x.cal[k]=String(x.cal[k]);}}
+function normState(){S.v=6;S.units=S.units||{};S.srs=S.srs||{};S.err=S.err||{};S.g=Object.assign({xp:0,days:{},goal:40,jok:0,frz:[],badges:{},rv:0,jk7:0},S.g||{});S.rh=S.rh||{};S.decks=S.decks||{};coreState();normTypes();if(!S.prof&&hasProgress(S))S.prof={sess:'2027-07',start:'N4',ok:1};}
 const MIG={1:7,2:8,3:11,4:13,11:"n3-cause",23:"n2-concession"};
 function migrate(o){
   if(o&&(o.v===4||o.v===5||o.v===6))return Object.assign(o,{v:6});
@@ -9707,7 +9719,7 @@ function spark(vals,th){
 }
 function examCard(){
   return `<div class="card" style="margin-top:14px"><h3>Examens blancs</h3>
-   <p class="small muted">Trois parties chronométrées, furigana désactivés, une seule écoute. Deux formats : court (≈ 70 min) ou complet (durées de l'épreuve réelle). Le mode strict arrête chaque partie à la fin du temps. Chaque essai tire de nouvelles questions.</p>
+   <p class="small muted">Trois parties chronométrées, furigana désactivés, une seule écoute. Deux formats : court (≈ 70 min) ou complet (durées de l'épreuve réelle). Le mode strict arrête chaque partie à la fin du temps. Chaque essai tire de nouvelles questions. Examens rédigés pour KOTONOHA d’après le format du JLPT : ce ne sont pas des épreuves officielles, et le score n’est qu’une estimation.</p>
    <div class="est">${LVS.map(lv=>{const H=exHist(lv),last=H[H.length-1],best=H.length?Math.max(...H.map(e=>e.total)):null,n=examUnitOf(lv);
      return `<div class="estb"><div class="eyebrow">${lv} · unité ${n}</div>
       ${H.length?`<p class="small">Dernier : <b>${last.total} / 180</b> (${new Date(last.at).toLocaleDateString('fr-FR')})${last.long?' · complet':''} · meilleur : <b>${best}</b> · ${H.length} essai${H.length>1?'s':''}</p>${spark(H.slice(-12).map(e=>e.total),EXCFG[lv].pass)}`:'<p class="small muted">Aucun essai pour l’instant.</p>'}
@@ -9771,7 +9783,8 @@ function typeTable(res){const m={};res.forEach(r=>{const k=plain(r.lead||'').spl
 function defLv(){const v=validated().map(Number).sort((a,b)=>b-a)[0];return v?lvOf(v):'N4';}
 function sprintCard(){
   const o=S.spOpt||{lv:defLv(),sk:'grammaire',n:20,sc:'valid'}, H=(S.spr||[]).slice(-6).reverse();
-  const sel=(id,opts,v)=>`<select id="${id}" class="furisel">${opts.map(([k,t])=>`<option value="${k}"${String(v)===String(k)?' selected':''}>${t}</option>`).join('')}</select>`;
+  const SPL={'sp-lv':'Niveau','sp-sk':'Compétence','sp-n':'Nombre de questions','sp-sc':'Unités concernées'};
+  const sel=(id,opts,v)=>`<select id="${id}" class="furisel" aria-label="${SPL[id]||''}">${opts.map(([k,t])=>`<option value="${k}"${String(v)===String(k)?' selected':''}>${t}</option>`).join('')}</select>`;
   return `<div class="card" style="margin-top:14px" id="spr"><h3>Test chronométré par compétence</h3>
    <p class="small muted">Le temps est calculé au rythme de l'épreuve (environ 30 s par question de vocabulaire, 25 s de kanji, 45 à 60 s de grammaire ; lecture et écoute selon la longueur du texte ou de l'audio). À zéro, les questions restantes sont comptées fausses et rejoignent le carnet d'erreurs.</p>
    <div class="toolbar">${sel('sp-lv',LVS.map(l=>[l,l]),o.lv)}${sel('sp-sk',Object.entries(SKL),o.sk)}${sel('sp-n',[[10,'10 questions'],[20,'20 questions'],[30,'30 questions']],o.n)}${sel('sp-sc',[['valid','unités validées'],['all','tout le niveau']],o.sc)}
@@ -9903,9 +9916,16 @@ function dueCards(){const t=today(),site=siteCards(),ak=ankiCards();
   const all=rev.concat(fS,fA);all.rev=rev;all.fresh=fS.concat(fA);return all;}
 function newWaiting(){return siteCards().filter(c=>!isSeen(st(c.id))).length+ankiCards().filter(c=>!isSeen(st(c.id))).length;}
 function nextIv(s,q){if(q<3)return 0;if(s.r===0)return q===5?4:1;if(s.r===1)return q===3?3:q===4?6:8;return Math.max(s.i+1,Math.round(s.i*(q===3?1.2:q===4?s.e:s.e*1.3)));}
+/* Hésitation : délai (s) avant de retourner la carte. Au-delà du seuil, « Bien » compte comme « Difficile »
+   et « Facile » comme « Bien » pour l'intervalle (réglage S.hes, actif par défaut). */
+let CARD_T0=0,CARD_RT=null;
+const HES_LIMIT=id=>/^g|^gram/.test(id)?20:12;
+function hesitated(id,q){return S.hes!==false&&q>=4&&CARD_RT!=null&&CARD_RT>HES_LIMIT(id);}
 function grade(id,q){
   const s=S.srs[id]=Object.assign({},st(id)||{e:2.5,i:0,r:0,d:today()}), wasNew=!isSeen(s);
   if(wasNew){const nd=newToday();if(id[0]==='@')nd.a++;else nd.n++;}
+  if(CARD_RT!=null){s.t=Math.round(((s.t||CARD_RT)*0.6+CARD_RT*0.4)*10)/10;if(hesitated(id,q)){q=q===5?4:3;s.hz=(s.hz||0)+1;if(sess)sess.hz=(sess.hz||0)+1;}}
+  CARD_RT=null;
   s.seen=1; const iv=nextIv(s,q);
   if(q<3){s.r=0;s.i=1;s.l=(s.l||0)+(wasNew?0:1);} else {s.r+=1;s.i=iv;}
   s.e=Math.max(1.3,s.e+({1:-.2,3:-.15,4:0,5:.15}[q]||0));
@@ -9955,7 +9975,7 @@ function checkBadges(){const B=S.g.badges;let nw=null;badgeList().forEach(b=>{if
 /* --- en-tête : série et niveau --- */
 const ICF=`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3-1-3 0-6 1-9.5z"/></svg>`;
 function renderHud(){const h=$('#hud');if(!h)return;const L=lvl(),s=streak(),d=dayRec();
-  h.innerHTML=`<a href="#aujourdhui" class="chip-s${metDay(dayKey())?' on':''}" title="Série : jours consécutifs avec l'objectif atteint">${ICF}<b>${s}</b></a><a href="#aujourdhui" class="chip-l" title="Niveau ${L.L} · ${L.t} · ${S.g.xp} XP"><span class="jp">${L.k}</span><b>${L.L}</b></a>`;}
+  h.innerHTML=`<a href="#aujourdhui" class="chip-s${metDay(dayKey())?' on':''}" title="Série : jours consécutifs avec l'objectif atteint">${ICF}<b>${s}</b></a><a href="#aujourdhui" class="chip-l" title="Niveau ${L.L} · ${esc(L.t)} · ${esc(S.g.xp)} XP"><span class="jp">${L.k}</span><b>${L.L}</b></a>`;}
 function renderBadge(){const n=dueCards().length;$('#dueBadge').innerHTML=n?`<span class="pill go">${n}</span>`:'';const e=Object.keys(S.err||{}).length;$('#errBadge').innerHTML=e?`<span class="pill wait">${e}</span>`:'';
   const vb=$('#vocBadge');if(vb){const c=coreDueCount();vb.innerHTML=c?`<span class="pill go">${c}</span>`:'';}const nv=$('#navvocab');if(nv&&!HASCORE)nv.style.display='none';renderHud();}
 
@@ -10018,7 +10038,7 @@ function drawCard(){
     const t=today(),fut=[...siteCards(),...ankiCards()].map(c=>st(c.id)).filter(s=>isSeen(s)&&s.d>t).map(s=>s.d).sort((a,b)=>a-b),nxt=fut[0],tom=fut.filter(d=>d<=t+DAY).length;
     const gx=sess?S.g.xp-sess.x0:0;
     el.innerHTML=`<div class="eyebrow">Révisions</div><h1>${sess&&sess.n?'Séance terminée.':revMode==='difficiles'?'Aucune carte difficile.':'Rien à réviser maintenant.'}</h1>
-     <div class="card done-card">${sess&&sess.n?`<div class="kpis3"><div><b>${sess.n}</b><span>cartes</span></div><div><b>${Math.round(sess.ok/sess.n*100)} %</b><span>réussite</span></div><div><b>+${gx}</b><span>XP</span></div><div><b>${sess.best}</b><span>meilleur combo</span></div></div>`:''}
+     <div class="card done-card">${sess&&sess.n?`<div class="kpis3"><div><b>${sess.n}</b><span>cartes</span></div><div><b>${Math.round(sess.ok/sess.n*100)} %</b><span>réussite</span></div><div><b>+${gx}</b><span>XP</span></div><div><b>${sess.best}</b><span>meilleur combo</span></div></div>${sess.hz?`<p class="small muted">${sess.hz} réponse${sess.hz>1?'s':''} trouvée${sess.hz>1?'s':''} après une longue hésitation : leur prochain intervalle a été raccourci (réglable dans <a href="#maitrise">Maîtrise</a>).</p>`:''}`:''}
       <p class="muted">${tom?`Demain : ${tom} carte${tom>1?'s':''} à revoir.`:nxt?`Prochaine révision le ${new Date(nxt).toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}.`:''} ${newWaiting()} nouvelles cartes en attente (${S.newMax??20} du site et ${S.akNew??15} de vos paquets par jour, réglables dans <a href="#profil">Profil</a>).</p>
       <div class="toolbar" style="justify-content:center"><a class="btn big" href="#aujourdhui">Retour à l'accueil</a><a class="btn sec" href="#profil">Réglages des cartes</a></div></div>`;
     if(sess&&sess.n>=10)burst();renderBadge();sess=null;return;}
@@ -10031,7 +10051,8 @@ function drawCard(){
     <div class="face back"><div class="lab">${esc(F.lab)}</div>${F.back}</div></div></div>
    <div class="revcta"><button class="btn big" id="reveal">Retourner la carte <kbd>Espace</kbd></button></div>
    <div class="grades" id="back" hidden><button class="g1" data-q="1">À revoir<small>${iv(1)}</small><kbd>1</kbd></button><button data-q="3">Difficile<small>${iv(3)}</small><kbd>2</kbd></button><button class="g4" data-q="4">Bien<small>${iv(4)}</small><kbd>3</kbd></button><button data-q="5">Facile<small>${iv(5)}</small><kbd>4</kbd></button></div>`;
-  $('#reveal').onclick=()=>{$('#flip').classList.add('on');$('#back').hidden=false;$('#back').classList.add('on');$('#reveal').parentElement.style.display='none';};
+  CARD_T0=Date.now();CARD_RT=null;
+  $('#reveal').onclick=()=>{CARD_RT=(Date.now()-CARD_T0)/1000;$('#flip').classList.add('on');$('#back').hidden=false;$('#back').classList.add('on');$('#reveal').parentElement.style.display='none';};
   $('#back').onclick=e=>{const b=e.target.closest('button[data-q]');if(b)answerCard(+b.dataset.q);};
 }
 let stamping=false;
@@ -10249,33 +10270,63 @@ function dic(){if(DIC)return DIC;DIC=new Map();KJ=new Map();STEM=new Map();
     if(u.vocab)u.vocab.forEach((v,i)=>add(v[0],{k:'v',w:v[0],r:v[1],g:v[2],u:n,id:`v${n}-${i}`}));
     if(u.kanji)u.kanji.forEach((k,i)=>{if(!KJ.has(k[0]))KJ.set(k[0],{c:k[0],m:k[1],on:k[2],kun:k[3],ex:k[4],u:n,id:`k${n}-${i}`});});});
   Object.values(AKC).forEach(c=>{if(c.w&&c.w.length<=12&&!/[\s|\/]/.test(c.w))add(c.w,{k:'a',w:c.w,r:c.r,g:c.fr,mn:c.mn,deck:c.deck,id:c.id});});
+  /* Vocabulaire Core importé et JMdict (sens anglais d'origine, non traduits) */
+  (CORE.notes||[]).forEach(a=>{const w=a[7],kn=a[9];if(!w||w.length>12||/[\s|\/]/.test(w))return;add(w,{k:'c',w,r:kn,g:a[10],pos:a[12]&&a[12]!=='None'?a[12]:'',corpus:a[3],id:String(a[0])});});
   for(const w of DIC.keys()){if(w.length>=2&&/[うくすつぬふむゆるぐぶい]$/.test(w)&&/[一-鿿]/.test(w)){const s=w.slice(0,-1);if(!DIC.has(s)){let a=STEM.get(s);if(!a)STEM.set(s,a=[]);a.push(w);}}}
   return DIC;}
+/* Déflexion : forme conjuguée → formes de dictionnaire possibles (vérifiées ensuite dans DIC).
+   Couvre verbes godan/ichidan, する, 来る, 行く, adjectifs en い et いい. Ne prétend pas à une analyse complète. */
+const DEFL=(()=>{const R=[],G={く:'かきけこ',ぐ:'がぎげご',す:'さしせそ',つ:'たちてと',ぬ:'なにねの',ぶ:'ばびべぼ',む:'まみめも',る:'らりれろ',う:'わいえお'},
+  TE={く:['いて','いた'],ぐ:['いで','いだ'],す:['して','した'],つ:['って','った'],ぬ:['んで','んだ'],ぶ:['んで','んだ'],む:['んで','んだ'],る:['って','った'],う:['って','った']},
+  I=['ます','ました','ません','ませんでした','ましょう','たい','たかった','たくない','たくなかった','たくて','ながら','なさい','そう','に'],
+  A=['ない','なかった','なくて','なければ','なくちゃ','ず','れる','れた','れない','れます','せる','せた','せない','せます','される','された'],
+  E=['ば','る','た','ない','なかった','ます','ました','ません','て'],TA=['','ら','り'],TE2=['','いる','いた','いない','います','いました','る','た','おく','おいた','しまう','しまった','ください','も','は'],
+  IC=['ます','ました','ません','ませんでした','ましょう','たい','たかった','たくない','たくて','ない','なかった','なくて','なければ','ず','て','た','たら','たり','ている','ていた','ていない','ています','てる','てた','てください','ちゃう','ちゃった','られる','られた','られない','られます','させる','させた','させない','させられる','よう','れば','ろ','よ','ながら','なさい','そう'];
+  for(const b in G){const [a,i,e,o]=G[b];I.forEach(s=>R.push([i+s,b]));A.forEach(s=>R.push([a+s,b]));E.forEach(s=>R.push([e+s,b]));R.push([o+'う',b]);
+    const [te,ta]=TE[b];TE2.forEach(s=>R.push([te+s,b]));TA.forEach(s=>R.push([ta+s,b]));R.push([te.slice(0,-1)+(te.endsWith('で')?'じゃう':'ちゃう'),b]);R.push([ta.slice(0,-1)+(ta.endsWith('だ')?'じゃった':'ちゃった'),b]);}
+  IC.forEach(s=>R.push([s,'る']));
+  ['します','しました','しません','しませんでした','しましょう','して','した','しない','しなかった','しなくて','しなければ','したい','したくない','される','された','させる','させた','しよう','すれば','しろ','せず','している','していた','してる','しています','したら','したり','できる','できない','できた','できます'].forEach(s=>R.push([s,'する']));
+  ['きます','きました','きません','きて','きた','こない','こなかった','こられる','こよう','くれば','こい','きたい','きている','きてる','きたら'].forEach(s=>{R.push([s,'くる']);R.push(['来'+s.slice(1),'来る']);});
+  ['って','った','ったら','ったり','っている','ってる','っていた','ってください','っちゃう','っちゃった'].forEach(s=>R.push(['行'+s,'行く']));
+  ['く','かった','くない','くなかった','くて','ければ','さ','そう','すぎる','すぎた','くなる','くなった','くします','くする'].forEach(s=>R.push([s,'い']));
+  ['よく','よかった','よくない','よくなかった','よくて','よければ','よさそう'].forEach(s=>R.push([s,'いい']));
+  R.sort((x,y)=>y[0].length-x[0].length);return R;})();
+function deinflect(w){const out=[];for(const [s,b] of DEFL){if(w.length>s.length&&w.endsWith(s)){const c=w.slice(0,-s.length)+b;if(c!==w&&!out.includes(c))out.push(c);}else if(w===s&&(b==='する'||b==='くる')&&!out.includes(b))out.push(b);}return out;}
 function tokens(m){const T=[],re=/([々〆一-鿿ヶ]+)\{([^}]+)\}/y;let i=0;while(i<m.length){re.lastIndex=i;const x=re.exec(m);if(x){T.push([x[1],x[0]]);i=re.lastIndex;}else{T.push([m[i],m[i]]);i++;}}return T;}
 const isKanji=s=>/[一-鿿々]/.test(s);
+/* Segmentation des mots inconnus du dictionnaire : Intl.Segmenter (ICU, découpage par dictionnaire du navigateur). */
+const JSEG=(()=>{try{return typeof Intl!=='undefined'&&Intl.Segmenter?new Intl.Segmenter('ja',{granularity:'word'}):null;}catch(e){return null;}})();
+function segEnds(P){const ends=new Map();if(!JSEG)return ends;try{for(const s of JSEG.segment(P))if(s.isWordLike!==false)ends.set(s.index,s.index+s.segment.length);}catch(e){}return ends;}
 function linkW(m){dic();const T=tokens(m),pl=T.map(t=>t[0]);let out='',t=0;
+  const off=[];{let o=0;for(const p of pl){off.push(o);o+=p.length;}}const SE=segEnds(pl.join(''));
   while(t<T.length){let best=-1,bw=null,acc='';
     if(/^[\s、。「」『』（）・！？…,.!?：:；;]$/.test(pl[t])){out+=T[t][1];t++;continue;}
     for(let e=t;e<T.length&&acc.length<12;e++){acc+=pl[e];if(DIC.has(acc)&&(acc.length>1||isKanji(acc))){best=e;bw=acc;}}
+    /* Forme conjuguée plus longue que le mot trouvé : on garde la plus longue qui se ramène à une entrée. */
+    {let a2='';for(let e=t;e<T.length&&a2.length<14;e++){a2+=pl[e];if(e<=best||a2.length<2)continue;if(/[、。「」！？\s]/.test(pl[e]))break;const b=deinflect(a2).find(c=>DIC.has(c)&&(c.length>1||isKanji(c)));if(b){best=e;bw=b;}}}
     if(best<0){acc='';for(let e=t;e<T.length&&acc.length<10;e++){acc+=pl[e];if(STEM.has(acc)&&/^[ぁ-ゖ]$/.test(pl[e+1]||'')){best=e+1;bw=STEM.get(acc)[0];}}}
+    /* Mot inconnu (ou seul un kanji isolé reconnu) : la segmentation ICU donne le mot entier. */
+    if(isKanji(pl[t])&&SE.has(off[t])&&(best<0||pl.slice(t,best+1).join('').length===1)){const end=SE.get(off[t]);let e=t;while(e+1<T.length&&off[e+1]<end)e++;const s=pl.slice(t,e+1).join('');if(s.length>1){best=e;bw=s;}}
     if(best<0&&/^[一-鿿々]+$/.test(pl[t])&&[...pl[t]].some(c=>KJ.has(c))){best=t;bw=pl[t];}
     if(best>=0){out+=`\u0001${WREG.push(bw)-1}\u0002`+T.slice(t,best+1).map(x=>x[1]).join('')+'\u0003';t=best+1;}else{out+=T[t][1];t++;}}
   return out;}
 function rubyW(m){return ruby(linkW(m)).replace(/\u0001(\d+)\u0002/g,(a,i)=>`<span class="w" data-w="${esc(WREG[+i])}" tabindex="0" role="button">`).replace(/\u0003/g,'</span>');}
-function srcLabel(e){return e.k==='v'?`Unité ${e.u} · vocabulaire ${lvOf(e.u)}`:e.k==='a'?`Paquet ${DECKN[e.deck]}`:'';}
+function srcLabel(e){return e.k==='v'?`Unité ${e.u} · vocabulaire ${lvOf(e.u)}`:e.k==='a'?`Paquet ${DECKN[e.deck]}`:e.k==='c'?(e.corpus==='jm'?'JMdict · sens anglais d’origine':'Core · paquet importé')+(e.pos?' · '+e.pos:''):'';}
 function closePop(){const p=$('#wpop');if(p)p.classList.remove('on');}
 function wordPop(w,anchor){dic();const es=DIC.get(w)||[],chars=[...new Set([...w].filter(c=>KJ.has(c)))].map(c=>KJ.get(c));
   let p=$('#wpop');if(!p){p=document.createElement('div');p.id='wpop';p.setAttribute('role','dialog');p.setAttribute('aria-label','Mot');document.body.appendChild(p);}
   const reads=[...new Set(es.map(e=>e.r).filter(Boolean))];
-  const site=es.find(e=>e.k==='v'),ak=es.find(e=>e.k==='a');
+  const site=es.find(e=>e.k==='v'),ak=es.find(e=>e.k==='a'),cw=es.find(e=>e.k==='c');
   let add='';
   if(site){const s=S.srs[site.id];add=s&&isSeen(s)?'<span class="small muted">Déjà dans vos révisions.</span>':s?'<span class="small muted">Déjà prévue dans vos nouvelles cartes.</span>':`<button class="btn" data-add="${esc(site.id)}">Ajouter aux révisions</button>`;}
   else if(ak){add=deckOn(ak.deck)?`<span class="small muted">Déjà dans votre paquet ${esc(DECKN[ak.deck])}.</span>`:(S.mots&&S.mots['m:'+w])?'<span class="small muted">Déjà dans « Mes mots ».</span>':`<button class="btn" data-addm="${esc(w)}">Ajouter à « Mes mots »</button>`;}
+  else if(cw){add=(S.mots&&S.mots['m:'+w])?'<span class="small muted">Déjà dans « Mes mots ».</span>':`<button class="btn" data-addc="${esc(w)}">Ajouter à « Mes mots »</button>`;}
   else if(chars.length===1&&w.length===1){add=(S.mots&&S.mots['m:'+w])?'<span class="small muted">Déjà dans « Mes mots ».</span>':`<button class="btn" data-addk="${esc(w)}">Ajouter ce kanji à « Mes mots »</button>`;}
   p.innerHTML=`<button class="x" aria-label="Fermer">×</button>
    <div class="ph"><span class="pw jp">${esc(w)}</span>${reads.length?`<span class="pr">${esc(reads.join(' · '))}</span>`:''}</div>
    ${es.length?`<ul class="pg">${es.slice(0,4).map(e=>`<li><b>${esc(e.g)}</b><small>${esc(srcLabel(e))}</small>${e.mn?`<em>${esc(e.mn)}</em>`:''}</li>`).join('')}</ul>`:`<p class="small muted">Ce mot n’a pas d’entrée dans le dictionnaire du site : voici ses kanji.</p>`}
    ${chars.length?`<div class="pk">${chars.map(k=>`<div><span class="jp">${k.c}</span><span><b>${esc(k.m)}</b><small>${esc(k.on)}${k.kun&&k.kun!=='—'?' · '+esc(k.kun):''} · unité ${k.u}</small></span></div>`).join('')}</div>`:''}
+   ${es.length?'':`<p class="small"><a href="https://jisho.org/search/${encodeURIComponent(w)}" target="_blank" rel="noopener noreferrer">Chercher « ${esc(w)} » sur Jisho</a> <span class="muted">(site externe, dictionnaire JMdict en anglais)</span></p>`}
    <div class="toolbar">${add}<button class="btn sec" data-say="${esc(reads[0]?reads[0].split(/[\/・ ]/)[0]:w)}">Écouter</button>${[...w].find(c=>KVG[c])?`<a class="btn sec" href="#ecrire-${encodeURIComponent([...w].find(c=>KVG[c]))}">Tracer</a>`:''}</div>`;
   p.classList.add('on');
   const r=anchor.getBoundingClientRect(),W=Math.min(360,innerWidth-24);p.style.width=W+'px';
@@ -10284,6 +10335,7 @@ function wordPop(w,anchor){dic();const es=DIC.get(w)||[],chars=[...new Set([...w
   p.querySelector('.x').onclick=closePop;
   p.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{S.srs[b.dataset.add]={e:2.5,i:0,r:0,d:today()};save();renderBadge();b.outerHTML='<span class="small" style="color:var(--good)">Ajouté : la carte arrive avec vos nouvelles cartes.</span>';});
   p.querySelectorAll('[data-addm]').forEach(b=>b.onclick=()=>{S.mots=S.mots||{};S.mots['m:'+w]={w,r:ak.r,g:ak.fr||ak.g,src:'Paquet '+DECKN[ak.deck]};S.srs['m:'+w]={e:2.5,i:0,r:0,d:today()};save();renderBadge();b.outerHTML='<span class="small" style="color:var(--good)">Ajouté à « Mes mots ».</span>';});
+  p.querySelectorAll('[data-addc]').forEach(b=>b.onclick=()=>{S.mots=S.mots||{};S.mots['m:'+w]={w,r:cw.r,g:cw.g,src:srcLabel(cw)};S.srs['m:'+w]={e:2.5,i:0,r:0,d:today()};save();renderBadge();b.outerHTML='<span class="small" style="color:var(--good)">Ajouté à « Mes mots ».</span>';});
   p.querySelectorAll('[data-addk]').forEach(b=>b.onclick=()=>{const k=KJ.get(w);S.mots=S.mots||{};S.mots['m:'+w]={w,r:k.on+(k.kun&&k.kun!=='—'?' · '+k.kun:''),g:k.m,src:'Kanji · unité '+k.u};S.srs['m:'+w]={e:2.5,i:0,r:0,d:today()};save();renderBadge();b.outerHTML='<span class="small" style="color:var(--good)">Ajouté à « Mes mots ».</span>';});
   p.querySelectorAll('[data-say]').forEach(b=>b.onclick=()=>sayText(b.dataset.say));
 }
@@ -10498,13 +10550,13 @@ function dataCard(){const n=Object.values(S.srs).filter(isSeen).length,rep=(S.re
 function wireData(){const msg=$('#dmsg');
   const bkb=$('#dbk');if(bkb)bkb.onclick=async()=>{let bk=null;try{bk=localStorage.getItem('kotonoha.sauvegarde.avant-core');}catch(e){}if(!bk)return;const o=JSON.parse(bk);
     const r=await saveFile('kotonoha-copie-avant-core.json',JSON.stringify({app:'kotonoha',format:2,exported:new Date(o.at).toISOString(),state:o.state},null,1),'application/json');msg.textContent=r==='ok'?'Copie enregistrée : elle s’importe comme une sauvegarde.':'Téléchargement impossible ici.';};
-  $('#dexp').onclick=async()=>{const data=JSON.stringify({app:'kotonoha',format:2,exported:new Date().toISOString(),state:S},null,1);
+  $('#dexp').onclick=async()=>{const data=JSON.stringify({app:'kotonoha',format:2,exported:new Date().toISOString(),state:S,plus:window.KX?KX.exportLocal():undefined},null,1);
     const r=await saveFile(`kotonoha-sauvegarde-${dayKey()}.json`,data,'application/json');msg.textContent=r==='ok'?'Sauvegarde enregistrée.':r==='declined'?'Téléchargement annulé.':'Téléchargement impossible ici.';};
   $('#dimp').onchange=async e=>{const f=e.target.files[0];if(!f)return;let o;try{o=JSON.parse(await f.text());}catch(x){msg.textContent='Fichier illisible : ce n’est pas une sauvegarde Kotonoha.';return;}
     const st0=o&&o.app==='kotonoha'?o.state:o;if(!st0||typeof st0!=='object'||!st0.units||!st0.srs||!(st0.v>=1)){msg.textContent='Fichier non reconnu : il manque la progression Kotonoha.';return;}
     const n=Object.keys(st0.units).length;msg.innerHTML=`Sauvegarde du ${o.exported?new Date(o.exported).toLocaleDateString('fr-FR'):'?'} : ${n} unités ouvertes. Elle remplacera la progression actuelle. <button class="btn" id="dok">Remplacer</button> <button class="btn sec" id="dno">Annuler</button>`;
     $('#dno').onclick=()=>{msg.textContent='Import annulé.';};
-    $('#dok').onclick=()=>{const m=migrate(JSON.parse(JSON.stringify(st0)));S=Object.assign({v:6,units:{},srs:{},furi:'auto',err:{},reports:[],rate:0.92,updated:0},m);normState();save();applyFuri();renderBadge();msg.textContent='Progression restaurée.';setTimeout(route,600);};};
+    $('#dok').onclick=()=>{if(o&&o.plus&&window.KX)KX.importLocal(o.plus);const m=migrate(JSON.parse(JSON.stringify(st0)));S=Object.assign({v:6,units:{},srs:{},furi:'auto',err:{},reports:[],rate:0.92,updated:0},m);normState();save();applyFuri();renderBadge();msg.textContent='Progression restaurée.';setTimeout(route,600);};};
   $('#drst').onclick=()=>{msg.innerHTML=`Effacer toute la progression de cet appareil et de votre espace ? Exportez d’abord une copie si besoin. <button class="btn" id="dyes">Effacer</button> <button class="btn sec" id="dno2">Annuler</button>`;
     $('#dno2').onclick=()=>{msg.textContent='';};
     $('#dyes').onclick=()=>{const keep={theme:S.theme,furi:S.furi};S={v:6,units:{},srs:{},furi:keep.furi||'auto',err:{},reports:[],rate:0.92,updated:0,theme:keep.theme};normState();save();renderBadge();msg.textContent='Progression effacée.';setTimeout(route,600);};};}
@@ -10519,7 +10571,7 @@ function palSearch(){dic();const q=$('#palq').value.trim().toLowerCase();const R
   const gs=[];Object.keys(UNITS).forEach(n=>{const u=UNITS[n];if(u.grammar)u.grammar.forEach(g=>{if(gs.length<8&&(plain(g.pat).includes(q)||g.mean.toLowerCase().includes(q)))gs.push(`<button data-go="h" data-h="#unite-${n}/grammaire"><span class="jp">${esc(plain(g.pat))}</span><span>${esc(g.mean)}</span><small>Unité ${n} · grammaire</small></button>`);});});
   const sup=CONFIG.supportUrl&&/soutien|soutenir|ko-?fi|don/.test(q)?['<button data-go="h" data-h="#soutenir"><span>♥</span><span>Soutenir KOTONOHA</span><small>Ko-fi</small></button>']:[];
   const us=Object.keys(SYL).filter(n=>(SYL[n].t||'').toLowerCase().includes(q)||String(n)===q).slice(0,6).map(n=>`<button data-go="h" data-h="#unite-${n}"><span>Unité ${n}</span><span>${esc(SYL[n].t)}</span><small>${SYL[n].lv}</small></button>`);
-  const cs=[];if(HASCORE){coreIdx();const qh=hira(q);for(const w of CW.values()){if(cs.length>=6)break;if(w.k.includes(q)||w.kana.includes(qh)||w.en.toLowerCase().includes(q))cs.push(`<button data-go="c" data-id="${w.id}"><span class="jp">${esc(w.k)}</span><span>${esc(w.kana)} · ${esc(w.en)}</span><small>${CORP[w.corpus].t} · ${stepLbl(CBYL[w.list])}</small></button>`);}}
+  const cs=[];if(HASCORE){coreIdx();const qh=hira(q);for(const w of CW.values()){if(cs.length>=6)break;if(w.k.includes(q)||w.kana.includes(qh)||w.en.toLowerCase().includes(q))cs.push(`<button data-go="c" data-id="${esc(w.id)}"><span class="jp">${esc(w.k)}</span><span>${esc(w.kana)} · ${esc(w.en)}</span><small>${CORP[w.corpus].t} · ${stepLbl(CBYL[w.list])}</small></button>`);}}
   R.innerHTML=(out.length?`<h4>Mots</h4>${out.join('')}`:'')+(gs.length?`<h4>Grammaire</h4>${gs.join('')}`:'')+(cs.length?`<h4>Vocabulaire</h4>${cs.join('')}`:'')+(us.length?`<h4>Unités</h4>${us.join('')}`:'')+(sup.length?`<h4>Site</h4>${sup.join('')}`:'')||'<p class="small muted">Aucun résultat dans le contenu du site.</p>';
   R.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>{if(b.dataset.go==='c'){closePal();wordCard(b.dataset.id);return;}if(b.dataset.go==='h'){closePal();location.hash=b.dataset.h;}else{closePal();wordPop(b.dataset.w,$('#palbtn')||document.body);}});}
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPal();}
@@ -10874,7 +10926,7 @@ function wordCard(id){const w=cw(id),s=cst(id),now=Date.now(),D=CDUP.get(id)||[]
    <div class="small" id="vpmsg" role="status"></div>
    <h4>Ma progression</h4><p class="small">${isNew(s)&&!(s&&(s.ok||s.ko))?'Jamais étudié.':`${stLabel(s,now)} ${s.s?`Intervalle ${s.iv?s.iv+' j':'en apprentissage'} · prochaine révision ${s.due<=now?'maintenant':'dans '+fmtIv(s.due-now)} · stabilité ${(s.st||0).toFixed(1)} j · difficulté ${(s.df||0).toFixed(1)}/10 · ${s.r||0} révision${(s.r||0)>1?'s':''}, ${s.l||0} oubli${(s.l||0)>1?'s':''}`:''}${s.ok+s.ko?` · réponses justes ${s.ok}/${s.ok+s.ko}`:''}${s.h?` · dernières : <span class="vh">${[...s.h].map(c=>c==='1'?'<i class="o"></i>':'<i class="x"></i>').join('')}</span>`:''}${s.imp?' · état importé d’Anki':''}`}</p>
    ${D.length?`<h4>Même graphie et même lecture dans le Core</h4><ul class="small">${D.map(x=>{const y=cw(x);return `<li><a href="#" data-dup="${x}">${esc(y.k)}</a> « ${esc(y.en)} » · ${esc(y.notes)}</li>`;}).join('')}</ul>`:''}
-   ${w.corpus==='kj'?`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Paquet</dt><dd>${esc(CBYL[w.list]?CBYL[w.list].name:'')}</dd><dt>GUID</dt><dd>${esc(w.guid)}</dd><dt>Note</dt><dd>${esc(String(w.nid||''))}</dd><dt>Verso</dt><dd class="jp">${esc(w.notes)}</dd></dl></details>`:w.corpus==='jm'?`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Source</dt><dd>JMdict (© EDRDG, CC BY-SA 4.0)</dd><dt>Entrée</dt><dd>${esc(w.notes)}</dd></dl></details>`:`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Fichier</dt><dd>${esc(CORE.src.file)}</dd><dt>Notes</dt><dd>${esc(w.notes)}</dd><dt>Core-Index</dt><dd>${w.ci}</dd><dt>Optimized-Voc-Index</dt><dd>${w.ovi}</dd><dt>Optimized-Sent-Index</dt><dd>${w.osi}</dd><dt>Note</dt><dd>${w.nid}</dd><dt>GUID</dt><dd>${esc(w.guid)}</dd><dt>Carte</dt><dd>${w.cid}</dd><dt>Phrase en kana</dt><dd class="jp">${akRuby(w.sk)}</dd><dt>Médias</dt><dd>${esc([mediaName(w.va),mediaName(w.sa),mediaName(w.si)].filter(Boolean).join(' · '))}</dd></dl></details>`}</div>`;
+   ${w.corpus==='kj'?`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Paquet</dt><dd>${esc(CBYL[w.list]?CBYL[w.list].name:'')}</dd><dt>GUID</dt><dd>${esc(w.guid)}</dd><dt>Note</dt><dd>${esc(String(w.nid||''))}</dd><dt>Verso</dt><dd class="jp">${esc(w.notes)}</dd></dl></details>`:w.corpus==='jm'?`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Source</dt><dd>JMdict (© EDRDG, CC BY-SA 4.0)</dd><dt>Entrée</dt><dd>${esc(w.notes)}</dd></dl></details>`:`<details class="small"><summary>Provenance</summary><dl class="vprov"><dt>Fichier</dt><dd>${esc(CORE.src.file)}</dd><dt>Notes</dt><dd>${esc(w.notes)}</dd><dt>Core-Index</dt><dd>${w.ci}</dd><dt>Optimized-Voc-Index</dt><dd>${w.ovi}</dd><dt>Optimized-Sent-Index</dt><dd>${w.osi}</dd><dt>Note</dt><dd>${esc(w.nid)}</dd><dt>GUID</dt><dd>${esc(w.guid)}</dd><dt>Carte</dt><dd>${esc(w.cid)}</dd><dt>Phrase en kana</dt><dd class="jp">${akRuby(w.sk)}</dd><dt>Médias</dt><dd>${esc([mediaName(w.va),mediaName(w.sa),mediaName(w.si)].filter(Boolean).join(' · '))}</dd></dl></details>`}</div>`;
   p.classList.add('on');p.querySelector('.x').onclick=()=>p.classList.remove('on');p.querySelector('.x').focus();
   p.onkeydown=e=>{if(e.key==='Escape')p.classList.remove('on');};
   p.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const a=b.dataset.a;
@@ -10970,7 +11022,7 @@ function stChoice(st,w,c,it){const kind=it.t,now=Date.now();
     :meanH(w,dirLang(S.core.set.dir),1);
   const lab=kind==='qcm'?'Quel est le sens de ce mot ?':kind==='ecoute'?'Quel mot entendez-vous ?':'Quel mot japonais correspond ?';
   st.innerHTML=`<div class="vcard ch"><p class="eyebrow">${esc(lab)}</p>${prompt}</div>
-   <div class="vopts">${O.map((x,i)=>`<button class="opt vo" data-id="${x.id}"><kbd>${i+1}</kbd>${kind==='qcm'?esc(x.en):`<span class="jp">${esc(x.k)}</span>`}</button>`).join('')}</div><div id="vfb" role="status" aria-live="polite"></div>`;
+   <div class="vopts">${O.map((x,i)=>`<button class="opt vo" data-id="${esc(x.id)}"><kbd>${i+1}</kbd>${kind==='qcm'?esc(x.en):`<span class="jp">${esc(x.k)}</span>`}</button>`).join('')}</div><div id="vfb" role="status" aria-live="polite"></div>`;
   if(kind==='ecoute'&&canHear){$('#vhear').onclick=()=>coreSay(w,'w');coreSay(w,'w');}else if(kind==='qcm'&&S.core.set.auto)coreSay(w,'w');
   let done=false;
   const choose=id=>{if(done)return;done=true;const ok=id===w.id;coreAnswer(w.id,ok,{learnStep:c.mode==='learn'});
@@ -11012,11 +11064,11 @@ function vEnd(el){const c=S.core.cur,r=c.res,acc=r.n?Math.round(r.ok/r.n*100):0,
   const learned=(c.lr||[]).map(cw);const bad=r.bad.map(cw).filter(Boolean);
   const next=Object.keys(S.core.c).map(id=>S.core.c[id]).filter(s=>s.s&&s.due>now).sort((a,b)=>a.due-b.due)[0];
   el.innerHTML=`<div class="bighead sm"><span class="k">${acc>=90?'見事':acc>=70?'良し':'継続'}</span><h2>Session terminée</h2><p>${esc(CMODES[c.mode].t)} · ${esc(c.lbl)}</p></div>
-   <div class="fiche vend"><div><b>${r.n}</b><span>réponses</span></div><div><b>${acc} %</b><span>justes</span></div><div><b>${Math.max(1,Math.round(c.ms/60000))} min</b><span>d’étude</span></div><div><b>${r.nw}</b><span>nouveaux mots</span></div></div>
+   <div class="fiche vend"><div><b>${+r.n||0}</b><span>réponses</span></div><div><b>${acc} %</b><span>justes</span></div><div><b>${Math.max(1,Math.round(c.ms/60000))} min</b><span>d’étude</span></div><div><b>${+r.nw||0}</b><span>nouveaux mots</span></div></div>
    ${learned.length?`<div class="card"><h3>Mots appris</h3><p class="small muted">Première révision : ${learned.map(w=>{const s=cst(w.id);return `${esc(w.k)} (${fmtIv(s.due-now)})`;}).join(' · ')}</p></div>`:''}
-   ${bad.length?`<div class="card"><h3>À retravailler (${bad.length})</h3><ul class="vbad">${bad.map(w=>`<li><a href="#" data-w="${w.id}"><span class="jp">${esc(w.k)}</span> ${esc(w.kana)}</a> · ${esc(w.en)}</li>`).join('')}</ul><button class="btn sec" id="vre-bad">${bad.length>1?`Revoir ces ${bad.length} mots`:'Revoir ce mot'}</button></div>`:''}
+   ${bad.length?`<div class="card"><h3>À retravailler (${bad.length})</h3><ul class="vbad">${bad.map(w=>`<li><a href="#" data-w="${esc(w.id)}"><span class="jp">${esc(w.k)}</span> ${esc(w.kana)}</a> · ${esc(w.en)}</li>`).join('')}</ul><button class="btn sec" id="vre-bad">${bad.length>1?`Revoir ces ${bad.length} mots`:'Revoir ce mot'}</button></div>`:''}
    <p class="small muted">${next?`Prochaine révision de vocabulaire : dans ${fmtIv(next.due-now)}.`:''}</p>
-   <div class="toolbar"><button class="btn" id="vagain">Nouvelle session identique</button><a class="btn sec" href="#vocab${c.sc.list?'-'+c.sc.list:c.sc.corpus?'-'+c.sc.corpus:''}" id="vback">Retour</a><a class="btn sec" href="#vocab-stats">Tableau de bord</a></div><p class="small" id="vmsg" role="status"></p>`;
+   <div class="toolbar"><button class="btn" id="vagain">Nouvelle session identique</button><a class="btn sec" href="#vocab${esc(c.sc.list?'-'+c.sc.list:c.sc.corpus?'-'+c.sc.corpus:'')}" id="vback">Retour</a><a class="btn sec" href="#vocab-stats">Tableau de bord</a></div><p class="small" id="vmsg" role="status"></p>`;
   const snap={mode:c.mode,sc:c.sc,src:c.src,dir:c.dir,n:c.mode==='learn'?10:Math.max(10,c.q.filter(x=>!x.re).length),bad:r.bad.slice()};
   endSession();if(r.n>=5&&acc>=80)burst();
   el.querySelectorAll('[data-w]').forEach(a=>a.onclick=e=>{e.preventDefault();wordCard(a.dataset.w);});
@@ -11058,7 +11110,7 @@ function midb(){if(MIDB)return MIDB;MIDB=new Promise((res,rej)=>{try{const r=ind
 async function mget(k){const d=await midb();return new Promise((res,rej)=>{const q=d.transaction('m').objectStore('m').get(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
 async function mkeys(){const d=await midb();return new Promise((res,rej)=>{const q=d.transaction('m').objectStore('m').getAllKeys();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
 async function mputMany(items){const d=await midb();return new Promise((res,rej)=>{const tx=d.transaction('m','readwrite'),s=tx.objectStore('m');items.forEach(([k,v])=>s.put(v,k));tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-async function coreMediaCount(){V.media=0;try{const k=await mkeys();k=k.filter(x=>x!=='__coredata__'&&x!=='__kanjidata__');MHAS=new Set(k);V.media=k.length;}catch(e){MHAS=new Set();V.media=-1;}
+async function coreMediaCount(){V.media=0;try{let k=await mkeys();k=k.filter(x=>x!=='__coredata__'&&x!=='__kanjidata__');MHAS=new Set(k);V.media=k.length;}catch(e){MHAS=new Set();V.media=-1;}
   const c=$('#vmedia');if(c&&$('#v-vocab').classList.contains('on')&&location.hash==='#vocab')c.outerHTML=mediaCard(),wireMedia();}
 async function coreMediaHas(f){if(!MHAS){try{MHAS=new Set(await mkeys());}catch(e){MHAS=new Set();}}return MHAS.has(f);}
 async function coreMediaURL(f){if(MURL.has(f))return MURL.get(f);const b=await mget(f);if(!b)return null;const u=URL.createObjectURL(b);MURL.set(f,u);return u;}
@@ -11557,6 +11609,7 @@ function focPanelHtml(){const f=focState(),s=f.set,c=f.cur,[t,d]=focPhaseTxt(),k
     ${c.ph==='idle'||c.ph==='bdone'?'<button class="btn big" id="fgo">Commencer le bloc</button>':''}
     ${c.ph==='wdone'?'<button class="btn big" id="fbrk">Lancer la pause</button><button class="btn sec" id="fgo">Enchaîner un bloc</button>':''}
     ${c.ph==='work'||c.ph==='brk'?`<button class="btn" id="fpause">${c.rest!=null?'Reprendre':'Pause'}</button>${c.ph==='brk'?'<button class="btn sec" id="fgo">Passer la pause</button>':''}<button class="btn-ghost small" id="fstop">Arrêter</button>`:''}
+    ${c.ph==='brk'||c.ph==='wdone'?'<a class="btn-ghost small" href="#detente" id="fdet">Salle de détente</a>':''}
    </div>
    <p class="small muted fstat">Aujourd’hui : ${td.m} min de concentration, ${td.n} bloc${td.n>1?'s':''} terminé${td.n>1?'s':''}.</p>
    <details class="fset"><summary>Durées, son et notifications</summary>
@@ -11697,15 +11750,28 @@ function route(){
   else if(h==='progres'){ $('#v-progres').classList.add('on'); viewProgres(); }
   else if(h==='profil'){ $('#v-profil').classList.add('on'); viewProfil(); }
   else if(h==='erreurs'){ $('#v-erreurs').classList.add('on'); viewErrors(); view='entrainer'; }
+  else if(window.KX&&KX.match(h)){ view=KX.show(h); }
   else { view='parcours'; curUnit=null; $('#v-parcours').classList.add('on'); viewParcours(); }
   document.querySelectorAll('nav.main a').forEach(a=>{if(a.dataset.nav===(m?'none':view))a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
   if(typeof setRails==='function')setRails(m?'parcours':view);
   renderBadge();
+  if(window.KX)KX.after(h,view);
   if(!m&&!h.startsWith('lv-')) window.scrollTo(0,0);
 }
 window.addEventListener('hashchange',route);
-initStore(); route();
+/* Premier rendu après le chargement des modules (app/*.js) : un rendu synchrone ici faisait aussi planter WebKit. */
+initStore(); if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(route,0),{once:true}); else setTimeout(route,0);
 if('speechSynthesis' in window) speechSynthesis.getVoices();
 </script>
+<!-- Espaces complémentaires (fichiers séparés, mis en cache par sw.js) -->
+<script src="app/plus.js"></script>
+<script src="app/temps.js"></script>
+<script src="app/detente.js"></script>
+<script src="app/lecture.js"></script>
+<script src="app/atelier-data.js"></script>
+<script src="app/atelier.js"></script>
+<script src="app/carte.js"></script>
+<script src="app/culture.js"></script>
+<script src="app/carnet.js"></script>
 </body>
 </html>

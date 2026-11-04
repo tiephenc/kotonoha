@@ -1,0 +1,16 @@
+{
+  "name": "kotonoha",
+  "private": true,
+  "description": "Outils de développement de KOTONOHA (le site lui-même n'a aucune dépendance npm).",
+  "type": "module",
+  "scripts": {
+    "serve": "node tools/serve.mjs 8765",
+    "test": "playwright test",
+    "test:chromium": "playwright test --project=chromium",
+    "check": "node tools/check.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1"
+  }
+}
