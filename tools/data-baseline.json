@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-04T15:27:49.298Z",
+  "fichier": ".\\index.html",
+  "volumes": {
+    "unites": 210,
+    "pointsDeGrammaire": 628,
+    "exemplesDeGrammaire": 1884,
+    "vocabulaireDesUnites": 2355,
+    "kanjiDesUnites": 785,
+    "exercicesSort": 1884,
+    "modules": 32,
+    "jmvNotes": 8188,
+    "jmvListes": 24,
+    "kanjiVG": 2189,
+    "ankiPaquets": 0,
+    "ankiNotes": 0,
+    "jmvIdentifiantsUniques": 8188
+  },
+  "empreintes": {
+    "LEVELS": "1cc98ff9018e1683500b6467e6e43c44e233ecfd451b01be43ddfb843be727d5",
+    "PHASES": "fc99f020dead1a4f1e2e8abfec917664d8cb1e45d8c0384d4af48fb2ea99e6b3",
+    "MODULES": "ecaad72ba660b536203abe8f1568cec574f6c17da2983e56273be5bfcf27710f",
+    "N3": "fc590d75a3e75e3444d0eba69c7bb4cbbee4dcf71c50bad4a51300e7eb2712bb",
+    "N4": "cd72c5660f39bd1f251107fbd40e4cbb408febe733e0fe89c6bdccd249032d73",
+    "N2": "eed1effc18edc0696f4b58a371d5d759a9b714a9b9cceea69b50fb0c3d817634",
+    "SYL": "1f611030c1cf4cfd159235bba25a0fec6ae47c45c92fa1c1dd8cbb5c06342104",
+    "UNITS": "41371410947b94aa306018f3f1329e79cdb74889aed604cde524ce67f73fb8dc",
+    "ANKI": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "KDECK": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+    "SORT": "93576842b3d90f0966fbf2c4a02e5df33d3a009d72cdd8fe1a3e7653aa1d61be",
+    "GLOSES": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "JMV": "93c4f491f096ccafdc78156cff28e62078d79a2329b4587a3b4374f8e275a743",
+    "ANKID": "dd1b83719e1d6c5018fa7172c1ed8882e780ea3e2971a6ac452cb63a03f2618d",
+    "KVG": "2e71da5b28c8d4c2d513af982c6f63de340c969632b78e461e8f169dd9e95489",
+    "jmvIdentifiants": "d004150993633bbb47bf874f0ee2bae23d33d29b934ad464c3470d780d43292e"
+  }
+}
