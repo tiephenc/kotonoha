@@ -66,42 +66,16 @@
     return out.filter((e) => e.k >= a && e.k <= b).sort((p, q) => p.k.localeCompare(q.k) || (p.t === 'shuku' ? -1 : 1));
   }
 
-  /* ---------- Kamon historiques ---------- */
-  const KAMON = [
-    { id: 'hishi', j: '四{よ}つ割菱{わりびし}', r: 'yotsuwari-bishi', who: 'Clan Takeda (武田氏), province de Kai', f: 'Losange partagé en quatre, emblème des Takeda (« Takeda-bishi »).', w: '武田菱', need: 'Valider un module complet', test: (m) => m.mods >= 1,
-      svg: '<g transform="rotate(45 50 50)"><rect x="24" y="24" width="24" height="24"/><rect x="52" y="24" width="24" height="24"/><rect x="24" y="52" width="24" height="24"/><rect x="52" y="52" width="24" height="24"/></g>' },
-    { id: 'rokumon', j: '六文銭{ろくもんせん}', r: 'rokumonsen', who: 'Clan Sanada (真田氏)', f: 'Six pièces de monnaie : le prix du passage du fleuve des morts selon la tradition bouddhique.', w: '六文銭', need: 'Valider six modules', test: (m) => m.mods >= 6,
-      svg: [0, 1].map((r) => [0, 1, 2].map((c) => { const x = 22 + c * 28, y = 36 + r * 28; return `<circle cx="${x}" cy="${y}" r="12"/><rect x="${x - 4}" y="${y - 4}" width="8" height="8" class="hole"/>`; }).join('')).join('') },
-    { id: 'kuyo', j: '九曜{くよう}', r: 'kuyō', who: 'Clan Hosokawa (細川氏), entre autres', f: 'Neuf astres : un grand disque entouré de huit plus petits.', w: '九曜紋', need: 'Valider neuf modules', test: (m) => m.mods >= 9,
-      svg: '<circle cx="50" cy="50" r="15"/>' + [...Array(8)].map((_, i) => { const a = i * Math.PI / 4; return `<circle cx="${(50 + Math.cos(a) * 33).toFixed(1)}" cy="${(50 + Math.sin(a) * 33).toFixed(1)}" r="10"/>`; }).join('') },
-    { id: 'jumonji', j: '丸{まる}に十字{じゅうじ}', r: 'maru ni jūji', who: 'Clan Shimazu (島津氏), province de Satsuma', f: 'Une croix inscrite dans un cercle.', w: '島津氏', need: 'Valider tout le N4', test: (m) => m.N4,
-      svg: '<circle cx="50" cy="50" r="40" class="ring"/><rect x="45" y="18" width="10" height="64"/><rect x="18" y="45" width="64" height="10"/>' },
-    { id: 'kikyo', j: '桔梗紋{ききょうもん}', r: 'kikyō-mon', who: 'Clan Toki et Akechi Mitsuhide (明智光秀)', f: 'Fleur de campanule à cinq pétales.', w: '桔梗紋', need: 'Valider tout le N3', test: (m) => m.N3,
-      svg: [...Array(5)].map((_, i) => `<path d="M50 50 L40 22 Q50 10 60 22 Z" transform="rotate(${i * 72} 50 50)"/>`).join('') + '<circle cx="50" cy="50" r="6" class="hole"/>' },
-    { id: 'tomoe', j: '三{みっ}つ巴{どもえ}', r: 'mitsudomoe', who: 'Nombreux sanctuaires (Hachiman) et familles', f: 'Trois virgules tournoyantes, motif très répandu, associé à l’eau et au tonnerre.', w: '巴紋', need: 'Valider tout le N2', test: (m) => m.N2,
-      svg: [0, 120, 240].map((a) => `<path d="M50 50 m0 -30 a11 11 0 1 1 -0.1 0 Z M39 20 A30 30 0 0 0 26 64 A26 26 0 0 1 39 20 Z" transform="rotate(${a} 50 50)"/>`).join('') },
-  ];
-  function milestones() {
-    const val = new Set(validated());
-    const mods = MODULES.filter((m) => { const U = []; for (let n = m[0]; n <= m[1]; n++) if (UNITS[n] && UNITS[n].vocab && SYL[n] && !SYL[n].preview) U.push(n); return U.length && U.every((n) => val.has(String(n))); }).length;
-    const lvDone = (lv) => { const R = regularOf(lv); return R.length > 0 && R.every((n) => val.has(String(n))); };
-    return { mods, N4: lvDone('N4'), N3: lvDone('N3'), N2: lvDone('N2') };
-  }
-  const monSvg = (k, ok) => `<svg viewBox="0 0 100 100" class="xmon${ok ? ' ok' : ''}" aria-hidden="true">${k.svg}</svg>`;
 
   function render(el) {
-    const now = Date.now(), up = events(now, 60), year = events(now, 365), M = milestones();
+    const now = Date.now(), up = events(now, 60), year = events(now, 365);
     const row = (e) => { const d = new Date(e.k + 'T00:00:00'); return `<li class="t-${e.t}"><time datetime="${e.k}">${d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })}</time>
       <span class="jp">${ruby(e.j)}</span><span class="tag">${e.t === 'shuku' ? '祝日 · férié' : '行事 · coutume'}</span><span class="d">${ruby(e.f)}</span>
       <a class="small" href="${esc(e.src[1])}" target="_blank" rel="noopener noreferrer">${esc(e.src[0])}</a></li>`; };
     el.innerHTML = `<div class="eyebrow">Culture</div><h1>Le Japon au fil de l’année</h1>
       <p class="muted">Jours fériés et coutumes, avec leurs sources. Les jours fériés suivent la loi japonaise (reports du dimanche compris) ; les dates d’équinoxe sont celles publiées par l’Observatoire national ; certaines coutumes varient selon les régions.</p>
       <div class="card panel"><h2>Dans les deux prochains mois</h2>${up.length ? `<ul class="xcult">${up.map(row).join('')}</ul>` : '<p class="small muted">Rien de particulier.</p>'}</div>
-      <details class="card panel"><summary><h2>Toute l’année à venir</h2></summary><ul class="xcult">${year.map(row).join('')}</ul></details>
-      <div class="card panel" id="kamon"><h2>Kamon historiques</h2>
-        <p class="small muted">Six blasons de familles et d’institutions réelles, documentés. Dessins simplifiés réalisés pour KOTONOHA d’après ces motifs : ce ne sont pas des reproductions exactes. Ils accompagnent les grandes étapes du parcours (${M.mods} module${M.mods > 1 ? 's' : ''} validé${M.mods > 1 ? 's' : ''} pour l’instant). Les blasons de la page Progrès sont, eux, des créations originales générées.</p>
-        <div class="xmons">${KAMON.map((k) => { const ok = !!k.test(M); const [st, url] = SRC.wiki(k.w); return `<figure class="xmonc${ok ? ' ok' : ''}">${monSvg(k, ok)}<figcaption><b class="jp">${ruby(k.j)}</b><span class="small muted">${esc(k.r)}</span>
-          <span class="small">${esc(k.who)}. ${esc(k.f)}</span><span class="small ${ok ? 'got' : 'muted'}">${ok ? 'Obtenu' : esc(k.need)}</span><a class="small" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${esc(st)}</a></figcaption></figure>`; }).join('')}</div></div>`;
+      <details class="card panel"><summary><h2>Toute l’année à venir</h2></summary><ul class="xcult">${year.map(row).join('')}</ul></details>`;
   }
 
   K.view({ name: 'culture', title: 'Culture', nav: 'aujourdhui', match: (h) => h === 'culture', render });
@@ -114,9 +88,7 @@
     el.appendChild(box);
   });
   K.on('progres', (el) => {
-    K.tile(el, { id: 'culture', grid: '[data-xhub]', href: '#culture', kj: '紋', title: 'Culture et kamon', text: 'Calendrier japonais sourcé et kamon historiques liés aux grandes étapes.' });
-    const kg = el.querySelector('.kamons');
-    if (kg && !el.querySelector('[data-xkn]')) { const p = document.createElement('p'); p.className = 'small muted'; p.dataset.xkn = '1'; p.innerHTML = 'Ces blasons sont des créations originales générées pour KOTONOHA. Les <a href="#culture">kamon historiques documentés</a> sont présentés à part.'; kg.after(p); }
+    K.tile(el, { id: 'culture', grid: '[data-xhub]', href: '#culture', kj: '暦', title: 'Culture', text: 'Fêtes, jours fériés et saisons du Japon, avec leurs sources.' });
   });
   K.culture = { holidays, events };
 })();

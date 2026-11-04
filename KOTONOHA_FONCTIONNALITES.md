@@ -1,6 +1,6 @@
 # KOTONOHA — fonctionnalités
 
-État réel au 4 novembre 2026.
+État réel au 4 novembre 2026, après la refonte « carnet de voyage » (mission 3). Le détail de la refonte est dans `KOTONOHA_REFONTE.md`.
 
 Légende :
 - ✅ **Opérationnel et testé** ;
@@ -17,8 +17,8 @@ Ces fonctionnalités ont été conservées sans refonte :
 - examens blancs, diagnostic et tests chronométrés ;
 - carnet d'erreurs ;
 - écriture des kanji (KanjiVG) et laboratoire d'écoute ;
-- XP et badges ;
-- minuteur Focus (renard, ambiances, Spotify et YouTube sur demande) ;
+- XP (les badges sont remplacés à l'écran par la collection de kamon ; les anciens badges restent enregistrés tels quels) ;
+- minuteur Focus (refait : voir plus bas ; Spotify et YouTube toujours sur demande) ;
 - comptes Firebase et Supabase, sauvegarde, recherche Ctrl+K.
 
 Vérification : `smoke.spec.js` parcourt 13 écrans et contrôle la persistance.
@@ -37,13 +37,20 @@ Vérification : `smoke.spec.js` parcourt 13 écrans et contrôle la persistance.
 | Expression écrite (`#atelier`) | 🟡 | 12 sujets N4 à N2 (consigne, longueur, points visés reliés aux unités, aide facultative), brouillon automatique, historique. Vérifications de forme : longueur, registre, ponctuation, espaces, particule doublée, points visés, mots hors dictionnaire. | Correction détaillée ⛔ : par Claude seulement dans un artefact claude.ai (`window.claude.complete`) ; sinon, consigne prête à copier puis correction recollée et conservée. | `atelier.spec.js` |
 | Conversation guidée | ✅ | 6 scénarios (restaurant, notes de cours, retard au travail, médecin, entretien d'embauche, débat), 4 tours chacun. Réponses proposées ou libres ; explications après chaque réplique (facultatives) ; bilan ; lecture à voix haute facultative ; dictée vocale si le navigateur la propose. | Contenu relu par l'agent linguiste. La dictée de Chrome envoie l'audio à Google (signalé dans l'interface). | `atelier.spec.js` |
 | Conversation libre | ⛔ | Avec Claude dans un artefact claude.ai ; sinon, consigne de jeu de rôle à copier. | Aucune clé d'API dans le site. | `atelier.spec.js` (consigne) |
-| Carte du parcours (`#carte`) | ✅ | Niveaux, modules et unités colorés par maîtrise, fil des prérequis. Vue d'une unité : grammaire et kanji (état des cartes, difficultés), unités avant et après, kanji partagés, contrastes tirés des notes de nuance. Version texte. | Contrastes repérés automatiquement dans les notes. | `carte-culture.spec.js` |
-| Salle de détente (`#detente`) | ✅ | Durées au choix, 5 expériences (sable, carillon, rizières, lucioles, souffle), fin en trois choix, ressenti facultatif, aucun son automatique, renard discret. Accès par l'en-tête et pendant la pause Focus. | Voir `KOTONOHA_PAUSES_ET_MINIJEUX.md`. | `detente.spec.js` |
+| Carte du parcours (`#carte`) | ✅ | Zoom, déplacement et sélection (souris, tactile, clavier). Niveaux, modules et unités colorés par maîtrise, fil des prérequis. Vue d'une unité : grammaire et kanji (état des cartes, difficultés), unités avant et après, kanji partagés, contrastes tirés des notes de nuance. Version texte. | Contrastes repérés automatiquement dans les notes. | `carte-culture.spec.js` |
+| Salle de détente (`#detente`) | ✅ | Durées de 30 s à 9 min, 8 expériences sans japonais ni score (étang aux koi, jardin de sable, atelier musical, pinceau, ricochets, rizières, lucioles, souffle), fin en trois choix, ressenti facultatif, aucun son automatique, sortie immédiate (Échap). Accès par l'en-tête et pendant la pause Focus. | Voir `KOTONOHA_PAUSES_ET_MINIJEUX.md`. | `detente.spec.js` |
 | Culture (`#culture`) | ✅ | Jours fériés calculés selon la loi (lundis mobiles, reports, jour chômé intercalé), équinoxes publiées, 8 coutumes avec sources ; annonce discrète sur l'Accueil. | Coutumes aux dates usuelles (お盆 varie selon les régions). Équinoxes renseignées jusqu'en 2028. | `carte-culture.spec.js` |
-| Kamon historiques | ✅ | 6 blasons documentés (Takeda, Sanada, Hosokawa, Shimazu, Toki/Akechi, mitsudomoe), dessins simplifiés et sourcés, obtenus aux grandes étapes. Les blasons générés de Progrès sont signalés comme créations originales. | Dessins schématiques, pas des reproductions. | `carte-culture.spec.js` |
+| Collection de kamon (`#kamon`) | ✅ | 24 blasons remplacent les badges. Fiche : nom japonais, représentation, signification, contexte historique, récit, sources ; faits, traditions et interprétations distingués. Apparition en sceau. Migration : chaque ancien badge donne le kamon correspondant avec sa date d'origine ; `S.g.badges` n'est pas modifié. | Dessins schématiques, pas des reproductions d'armoiries précises. | `refonte.spec.js` |
+| Carnet du jour (Accueil) | ✅ | Renard selon le moment, trois étapes du jour, journal de la semaine, aperçu du voyage. | — | `refonte.spec.js` |
+| Journal de la semaine | ✅ | Remplace les soirées d'étude : états terminée, en cours, repos, reportée, libre, non réalisée ; durées réelles (temps actif) ; le repos n'est jamais un échec ; navigation semaine par semaine. | Temps actif mesuré depuis le 4/11/2026. | `refonte.spec.js` |
+| Voyage au Japon (`#voyage`) | ✅ | Carte illustrée (géographie réelle simplifiée), 8 régions, 14 destinations (Tokyo → Sapporo) avec récit, culture, souvenir et sources ; trajets en train, bateau, à pied ou par la route, animés. Points de voyage calculés sur l'activité réelle, la maîtrise comptant davantage. | Les points ne mesurent pas le niveau de japonais ; rien de pédagogique n'est bloqué ; aucune perte de points en cas de pause. | `refonte.spec.js` |
+| Renard (`KX.fox`) | ✅ | Six poses (accueil, étude, repos, sommeil, célébration, focus), animations discrètes coupées par `prefers-reduced-motion`. | — | `refonte.spec.js` |
+| Focus refait | ✅ | Panneau de nuit, lanternes de progression, renard animé, ambiances activables une à une (jamais automatiques), pause/reprise, accès à la détente, bouton « Retour à la séance », transitions d'entrée et de sortie. | — | `refonte.spec.js` |
+| Leçons prolongées | ✅ | Panneau « Prolonger la leçon » dans chaque unité : écoute, sujet d'écriture tiré de l'unité, conversation du niveau, lecture, carte de l'unité, tracé des kanji. | Les laboratoires restent aussi accessibles séparément. | `refonte.spec.js` |
+| Visualisations (Progrès) | ✅ | Révisions et temps actif sur 30 jours, révisions prévues sur 14 jours, maîtrise par niveau, réussite par compétence ; toutes sur les données réelles, avec un message quand il n'y en a pas encore. | — | `refonte.spec.js` |
 | Carnet (`#carnet`) | ✅ | Notes libres datées, étiquettes, recherche, modification, suppression confirmée ; tuile dans Profil. | Sur l'appareil (inclus dans l'export). | `carnet.spec.js` |
 | Hors connexion | ✅ | Page et modules mis en cache par le service worker. | Non testable sous Firefox et WebKit avec Playwright. | `pwa-a11y.spec.js` |
-| Accessibilité | 🟡 | Clavier partout dans les nouveaux espaces, focus visible, `prefers-reduced-motion`, version texte de la carte. Contrastes du thème clair corrigés. | Reste un contraste préexistant sur l'Accueil (`.bighead p`). | `pwa-a11y.spec.js` |
+| Accessibilité | 🟡 | Clavier partout dans les nouveaux espaces, focus visible, `prefers-reduced-motion`, version texte de la carte. Contrastes du thème clair corrigés. | Aucune violation axe-core sur les écrans audités ; Safari réel non vérifié. | `pwa-a11y.spec.js` |
 
 ## Demandé mais non réalisé (ou partiel)
 

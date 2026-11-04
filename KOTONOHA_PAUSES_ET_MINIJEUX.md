@@ -73,7 +73,10 @@ Revue systématique et méta-analyse (PRISMA, PROSPERO CRD42021242961), 22 écha
 | Expérience | Registre | Durées conseillées | Description |
 |---|---|---|---|
 | Jardin de sable | Contemplation, création | toutes | Râteau à cinq dents, pierres avec cercles concentriques, « Lisser » pour recommencer |
-| Carillon | Musique, rythme | 30 s – 6 min | Sept tiges en gamme pentatonique (aucune fausse note) ; option « Brise » |
+| Étang aux koi | Contemplation | toutes | Ronds dans l'eau, granulés ; les carpes viennent doucement |
+| Atelier musical | Création musicale | 30 s – 9 min | Boucle de cloches pentatoniques et de taiko, toutes les notes s'accordent ; lecture seulement sur demande |
+| Pinceau | Dessin | toutes | Encres, lavis, ensō, sceau ; l'image peut être enregistrée (PNG) |
+| Ricochets | Adresse douce | 30 s – 6 min | Galets lancés sur un lac, rebonds comptés pour le plaisir, rien n'est conservé |
 | Rizières | Logique légère | 2 – 9 min | Grilles 4×4 à 6×6 toujours solubles (arbre couvrant), sans compteur ; « Un coup de pouce » |
 | Lucioles | Exploration, adresse douce | toutes | Une lanterne attire les lucioles quand on reste immobile |
 | Souffle | Détente | 30 s – 6 min | Cercle 4·4, 4·6, 5·5 ou carré ; « ce n'est pas un exercice médical » |

@@ -27,17 +27,18 @@ WEBKIT=1 npx playwright test --project=webkit
 |---|---|
 | `smoke.spec.js` | Accueil, 13 écrans existants sans erreur JS ni défilement horizontal, persistance au rechargement |
 | `temps.spec.js` | Temps actif (horloge simulée), calendrier (jours, pause, repos, persistance), maîtrise, hésitation en révision |
-| `detente.spec.js` | Salon, 5 expériences, fin de pause et ses 3 choix, prolongation, ressenti, retour à la séance, rizières toujours solubles, clavier, aucun son sans action |
+| `detente.spec.js` | Salon, 8 expériences, fin de pause et ses 3 choix, prolongation, ressenti, retour à la séance, rizières toujours solubles, clavier, aucun son sans action |
 | `lecture.spec.js` | Textes du parcours, lecture personnelle (analyse, mot conjugué → forme de dictionnaire, popup, résumé, persistance, suppression), injections |
 | `atelier.spec.js` | Sujets, vérifications de forme, brouillon, correction collée, conversation guidée complète, réponse libre (registre, échappement) |
 | `carte-culture.spec.js` | Carte (toutes les unités, accès par Progrès), vue d'une unité (grammaire, kanji, avant/après, popup), jours fériés 2026–2027 (reports, jour chômé intercalé), sources, kamon |
 | `carnet.spec.js` | Ajout, recherche, modification, suppression, persistance, échappement |
 | `securite.spec.js` | Sauvegarde piégée importée par l'interface (aucune exécution, types normalisés, adresse neutralisée), en-tête CSP |
-| `pwa-a11y.spec.js` | Hors connexion (service worker, réseau coupé), audit axe-core WCAG 2 A/AA sur 17 écrans |
+| `refonte.spec.js` | Carnet du jour, voyage (points réels, déblocage, trajet animé, souvenir, persistance), migration des badges en kamon sans perte et fiche sourcée, journal et visualisations, zoom de la carte, Focus, panneau de leçon |
+| `pwa-a11y.spec.js` | Hors connexion (service worker, réseau coupé), audit axe-core WCAG 2 A/AA sur les écrans principaux, y compris voyage, kamon, fiche de kamon, atelier musical, pinceau et carnet |
 
 ## Résultats
 
-Campagne finale (4 novembre 2026) : 6 configurations × 30 tests, avec une nouvelle tentative autorisée.
+Campagne finale de la refonte (4 novembre 2026) : 6 configurations × 39 tests, avec une nouvelle tentative autorisée.
 
 | Configuration | Moteur | Résultat |
 |---|---|---|
@@ -48,11 +49,11 @@ Campagne finale (4 novembre 2026) : 6 configurations × 30 tests, avec une nouve
 | mobile | Chromium, émulation Pixel 7 | tout réussi |
 | tablette-chromium | Chromium, émulation Galaxy Tab S4 | tout réussi |
 
-**Bilan :** 179 réussis, 1 sauté, 0 échec, 0 instable. Le test « fin de durée » (détente), qui repose sur une horloge simulée, a pu échouer sous forte charge parallèle lors d'une campagne précédente.
+**Bilan :** 233 réussis, 1 sauté (hors connexion sous Firefox), 0 échec. Lors de la campagne, l'audit d'accessibilité a révélé sur mobile et tablette une liste du journal qui défilait sans être atteignable au clavier ; elle a été corrigée (`tabindex`, libellé), puis l'audit et les tests de la refonte ont été relancés sur les 6 configurations : 47 réussis, 1 sauté.
 
 **Accessibilité (axe-core) :**
 - Plus aucune violation dans les nouveaux espaces.
-- Une violation préexistante reste : le contraste d'un paragraphe de l'en-tête de l'Accueil (`.bighead p`).
+- Après la refonte (mission 3), plus aucune violation sur les écrans audités : l'ancien défaut de contraste de l'Accueil (`.bighead p`) a disparu avec la nouvelle page d'accueil.
 - Les contrastes du thème clair ont été corrigés : plusieurs centaines d'éléments en défaut auparavant.
 
 **Données :** `tools/data-integrity.mjs` confirme des empreintes identiques à la référence prise avant tout changement :
@@ -74,5 +75,5 @@ Campagne finale (4 novembre 2026) : 6 configurations × 30 tests, avec une nouve
 - **Hors connexion sous Firefox** : Firefox piloté par Playwright ne laisse pas le service worker répondre quand le réseau est coupé (`NS_ERROR_OFFLINE`).
 - **Synthèse et dictée vocales** : non vérifiées automatiquement (la voix dépend du système).
 - **Comptes Firebase et Supabase** : non testés, pour ne pas écrire dans des services réels.
-- **Performance** : pas de mesure Lighthouse. Le chargement est dominé par `index.html` (5,7 Mo), et les modules ajoutent environ 190 Ko non compressés.
+- **Performance** : pas de mesure Lighthouse. Le chargement est dominé par `index.html` (5,7 Mo). Les modules `app/` pèsent environ 400 Ko non compressés (123 Ko en gzip). Mesure locale (Chromium, serveur local) : `DOMContentLoaded` vers 590 ms, environ 100 ms de tâches longues.
 - **Défilement horizontal** vu en mission 1 vers 930 px : non reproduit (largeurs testées de 360 à 1 280 px). Il venait du cadre du navigateur de test.

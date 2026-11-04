@@ -1,20 +1,31 @@
 # KOTONOHA — architecture
 
-État au 4 novembre 2026, après la mission 2.
+État au 4 novembre 2026, après la mission 3 (refonte « carnet de voyage », détaillée dans `KOTONOHA_REFONTE.md`).
 
 ## Vue d'ensemble
 
 ```
 index.html            site complet (HTML, CSS, script classique, données pédagogiques) ~5,7 Mo
 app/plus.css          styles des espaces complémentaires (+ correctifs de contraste du thème clair)
-app/plus.js           noyau KX : registre de vues, crochets de rendu, stockage local, utilitaires
+app/plus.js           noyau KX : registre de vues, crochets de rendu (KX.on, KX.onMatch), stockage local, KX.panzoom, utilitaires
+app/theme.css         système visuel de la refonte (chargé en dernier) : couleurs, typographies, carnet, voyage, kamon, focus, animations
+app/fox.js           renard en six poses (KX.fox), remplace window.kitsune
+app/home.js          Accueil « Carnet du jour » et journal de la semaine (remplace heat et viewTodayAffiche)
+app/kamon-data.js    24 fiches de kamon (dessins, textes, sources) — données rédigées
+app/kamon.js         collection, migration des badges, révélation en sceau (remplace checkBadges et badgeGrid)
+app/voyage-data.js   régions, destinations, trajets (coordonnées réelles projetées) — données rédigées
+app/voyage.js        carte du Japon, points de voyage, trajets animés, souvenirs
+app/focus.js         habillage du Focus (lanternes, retour à la séance), autour de focOpen/focClose/focRender
+app/lecons.js        panneau « Prolonger la leçon » dans chaque unité
+app/visu.js          visualisations de Progrès
+app/jeux.js          quatre expériences de détente (étang, musique, pinceau, ricochets)
 app/temps.js          temps actif, calendrier adaptatif, maîtrise
-app/detente.js        salle de détente et cinq expériences
+app/detente.js        salle de détente, registre des expériences, son (KX.detAudio)
 app/lecture.js        espace Lire (textes du parcours, lectures personnelles, actualités)
 app/atelier-data.js   contenus de l'atelier (sujets, scénarios) — données rédigées
 app/atelier.js        rédaction et conversation
 app/carte.js          carte du parcours
-app/culture.js        calendrier culturel et kamon historiques
+app/culture.js        calendrier culturel (les kamon sont passés dans app/kamon.js)
 app/carnet.js         carnet personnel
 sw.js                 service worker (hors connexion)
 manifest.webmanifest, icon-*.png, sons/, vendor/sql-wasm.*   inchangés
@@ -33,7 +44,10 @@ Le routeur de `index.html` (`route()`) délègue aux modules :
 - `KX.view({ name, match(h), render(el, h), nav, title })` déclare un écran. Le routeur crée `<section id="v-x-NAME">` et y appelle `render`. `nav` choisit l'onglet surligné.
 - `KX.on(ecran, fn)` est appelé après le rendu d'un écran existant (`entrainer`, `progres`, `aujourdhui`) pour y ajouter des tuiles (`KX.tile`).
 
-Ainsi les modifications de `index.html` restent minimes et localisées.
+- `KX.onMatch(regex, fn)` fait de même pour les écrans à paramètre (`unite-56`).
+- Quelques fonctions globales du script principal sont remplacées par les modules (même nom, même rôle) : `kitsune`, `checkBadges`, `badgeGrid`, `heat`, `viewTodayAffiche`. `focOpen`, `focClose` et `focRender` sont enveloppées.
+
+Ainsi les modifications de `index.html` restent minimes et localisées (refonte : une ligne de police et les balises `<link>`/`<script>` des nouveaux modules).
 
 ## Données
 
@@ -43,8 +57,12 @@ Ainsi les modifications de `index.html` restent minimes et localisées.
 | Petites données nouvelles (`S.x` : temps actif, plan, calendrier, pauses ; `S.hes`) | même objet `S` | oui | oui |
 | Mesures d'hésitation par carte (`S.srs[id].t`, `.hz`) | `S.srs` | **non** (le format compact des fragments Firestore ne les transporte pas) | oui |
 | Textes longs (lectures, rédactions, brouillons, conversations, ressentis) | `localStorage['kotonoha.plus.v1']` via `KX.local` | non (sur l'appareil) | oui (`plus` dans le fichier d'export, fusion prudente à l'import) |
+| Kamon obtenus (`S.g.kamon` : identifiant → date ; `S.g.kamonInit`) | `S.g` | oui | oui |
+| Voyage (`S.x.voyage` : lieu actuel, lieux visités) | `S.x` | oui | oui |
 | Préférences d'affichage (durée de pause, mode de conversation…) | `localStorage['kotonoha.detente.*']`, `kotonoha.atelier.*` | non | non |
 | Corpus Anki importé | IndexedDB / `CORE`, `ANKID` (vides dans la version publique) | selon le code existant | inchangé |
+
+Les points de voyage ne sont pas stockés : ils sont recalculés à partir des données existantes (révisions, étapes d'unités, maîtrise, examens, temps actif, écrits, conversations, lectures). Les anciens badges (`S.g.badges`) ne sont jamais modifiés par la migration vers les kamon.
 
 Toutes les données importées ou synchronisées passent par `normTypes()` (dans `normState()`) : les champs numériques sont convertis en nombres. Rien n'est supprimé.
 
@@ -71,6 +89,6 @@ Toutes les données importées ou synchronisées passent par `normTypes()` (dans
 
 ## Service worker
 
-La version est `kotonoha-2026-11-04-plus`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
+La version est `kotonoha-2026-11-04-carnet`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
 
 **À chaque publication, changer `VERSION` dans `sw.js`.**

@@ -12,6 +12,15 @@
   const redacs = () => K.local.get('redactions', []);
   const saveRedacs = (L) => K.local.set('redactions', L.slice(-200));
   const LV = ['N4', 'N3', 'N2'];
+  /* Sujet d'écriture tiré d'une unité : ses points de grammaire deviennent les points visés. */
+  function unitSujet(id) {
+    const m = /^unite-(\d+)$/.exec(id || ''); if (!m) return null; const n = +m[1], u = UNITS[n]; if (!u || !u.grammar || !u.vocab) return null;
+    const cores = [];
+    u.grammar.forEach((g) => plain(g.pat).replace(/[（(][^)）]*[)）]/g, '').split(/[\/／・、,\s]+/).forEach((p) => { const c = p.replace(/[〜～…]/g, '').trim(); if (c.length >= 2 && /[ぁ-ん]/.test(c) && !cores.includes(c)) cores.push(c); }));
+    const g = cores.slice(0, 3), lv = lvOf(n);
+    return { id: 'unite-' + n, lv, t: `Écrire avec l’unité ${n}`, c: `Écrivez un court texte (cinq phrases ou plus) en employant les points de grammaire de l’unité ${n} : ${SYL[n] ? SYL[n].t : ''}.`, g, m: g.map((x) => [x]), u: g.map(() => n), len: lv === 'N4' ? [120, 250] : lv === 'N3' ? [200, 400] : [300, 600] };
+  }
+  const sujetOf = (id) => D.sujets.find((s) => s.id === id) || unitSujet(id);
 
   /* ---------- Vérifications locales ---------- */
   const POLI = /(です|ます|ました|ません|でした|ましょう|ませんでした|ください|でしょう)$/;
@@ -93,7 +102,7 @@ ${text}`;
   /* ---------- Rédaction ---------- */
   function renderRedaction(el, h) {
     const [sid, rid] = h.slice(10).split('~');
-    const suj = D.sujets.find((s) => s.id === sid) || null;
+    const suj = sujetOf(sid) || null;
     const L = redacs(); const prev = rid ? L.find((r) => r.id === rid) : null;
     const draftKey = 'brouillon-' + (suj ? suj.id : 'libre');
     const lv = suj ? suj.lv : curLv();
@@ -249,7 +258,7 @@ ${text}`;
   }
 
   K.view({ name: 'atelier', title: 'Atelier', nav: 'entrainer', match: (h) => h === 'atelier', render: renderHub });
-  K.view({ name: 'redaction', title: 'Écrire', nav: 'entrainer', match: (h) => /^redaction-[a-z0-9-]+(~[a-z0-9]+)?$/.test(h) && (h.slice(10).split('~')[0] === 'libre' || D.sujets.some((s) => s.id === h.slice(10).split('~')[0])), render: renderRedaction });
+  K.view({ name: 'redaction', title: 'Écrire', nav: 'entrainer', match: (h) => /^redaction-[a-z0-9-]+(~[a-z0-9]+)?$/.test(h) && (h.slice(10).split('~')[0] === 'libre' || !!sujetOf(h.slice(10).split('~')[0])), render: renderRedaction });
   K.view({ name: 'conversation', title: 'Converser', nav: 'entrainer', match: (h) => D.scenarios.some((s) => h === 'conversation-' + s.id), render: renderConversation });
   K.view({ name: 'conversation-libre', title: 'Conversation libre', nav: 'entrainer', match: (h) => h === 'conversation-libre', render: renderLibre });
   K.on('entrainer', (el) => {

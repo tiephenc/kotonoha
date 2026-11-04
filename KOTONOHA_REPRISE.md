@@ -1,22 +1,18 @@
 # KOTONOHA — reprise du travail
 
-Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refaire les audits déjà réalisés. Rédigé le 4 novembre 2026, à la fin de la mission 2.
+Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refaire les audits déjà réalisés. Mis à jour le 4 novembre 2026, à la fin de la mission 3 (refonte « carnet de voyage »).
 
 ## 1. Ouvrir la bonne session
 
 - Ouvrir Claude Code **dans le dossier** `C:\Users\tieph\Documents\DEV\KOTONOHA\kotonoha`. Sinon, les agents `kotonoha-*`, les skills du projet et `CLAUDE.md` ne sont pas chargés.
-- Lire dans l'ordre : `CLAUDE.md`, ce fichier, `KOTONOHA_ARCHITECTURE.md`, puis `KOTONOHA_FONCTIONNALITES.md`.
+- Lire dans l'ordre : `CLAUDE.md`, ce fichier, `KOTONOHA_ARCHITECTURE.md`, `KOTONOHA_REFONTE.md`, puis `KOTONOHA_FONCTIONNALITES.md`.
 
-## 2. État Git (rien n'a été commité)
+## 2. État Git et publication
 
-- Branche : `audit/pre-claude`, au commit `34b6cd5`, identique à `main` et `origin/main`.
-- Fichiers modifiés : `index.html` (environ 110 lignes, listées dans `KOTONOHA_ARCHITECTURE.md`), `sw.js`, `README.md`.
-- Fichiers nouveaux :
-  - code : `app/`, `tests/`, `tools/`, `.claude/` (sauf `settings.local.json`, ignoré) ;
-  - configuration : `.gitignore`, `package.json`, `package-lock.json`, `playwright.config.js`, `CLAUDE.md` ;
-  - documentation : les `KOTONOHA_*.md`.
-- Sauvegarde d'avant les travaux, hors Git : `backups/2026-11-04-avant-mission2/`. Elle contient les fichiers d'origine, `SHA256SUMS.txt` et un bundle Git complet.
-- **Avant toute publication :** l'accord de l'utilisateur pour le commit et le push, puis le changement de `VERSION` dans `sw.js` (déjà fait pour cette version : `kotonoha-2026-11-04-plus`).
+- Mission 2 : branche `audit/pre-claude`, fusionnée dans `main` (PR n° 1, commit `edb9790`).
+- Mission 3 : branche `refonte/carnet-de-voyage`, fusionnée en avance rapide dans `main` et poussée sans forçage, sur autorisation explicite de l'utilisateur. Le site public est https://tiephenc.github.io/kotonoha/ (GitHub Pages, branche `main`).
+- Version du service worker : `kotonoha-2026-11-04-carnet`. **À changer à chaque publication.**
+- Sauvegarde d'avant la mission 2, hors Git : `backups/2026-11-04-avant-mission2/` (fichiers d'origine, `SHA256SUMS.txt`, bundle Git complet).
 
 ## 3. Audits déjà faits (ne pas recommencer)
 
@@ -25,7 +21,7 @@ Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refa
 | Environnement (outils, MCP, plugins, Strix) | Fait | `KOTONOHA_OUTILS_ET_ENVIRONNEMENT.md` |
 | Données : volumes et empreintes | Référence prise avant tout changement | `tools/data-baseline.json` ; vérifier avec `npm run check` |
 | Sécurité (revue de code) | Corrigé ou documenté | `KOTONOHA_SECURITE.md` |
-| Accessibilité (axe-core) | Une violation préexistante reste | `KOTONOHA_TESTS.md` |
+| Accessibilité (axe-core) | Aucune violation sur les écrans audités après la refonte | `KOTONOHA_TESTS.md` |
 | Langue (atelier) | Relu par l'agent linguiste, corrections appliquées | `app/atelier-data.js` |
 | Recherche sur les pauses | Faite | `KOTONOHA_PAUSES_ET_MINIJEUX.md` |
 | Plantages WebKit sous Windows | Deux causes trouvées ; le reste est attribué au portage | `KOTONOHA_TESTS.md` |
@@ -41,8 +37,8 @@ Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refa
 
 ## 5. Prochaines étapes conseillées (par priorité)
 
-1. Faire relire et valider les changements par l'utilisateur dans le navigateur (`npm run serve`), puis commit et push **sur son accord**.
-2. Tester sur un vrai Safari (iPhone, iPad ou Mac). Les tests WebKit sous Windows ne sont pas concluants.
+1. Tester sur un vrai Safari (iPhone, iPad ou Mac). Les tests WebKit sous Windows ne sont pas concluants.
+2. Faire relire les fiches de kamon et de destinations par l'agent `kotonoha-linguiste` ou une personne compétente, et ajouter des sources institutionnelles (offices de tourisme, musées, bases héraldiques) à côté de Wikipédia.
 3. Sécurité restante, côté consoles et hors dépôt :
    - App Check Firebase ;
    - restriction de la clé d'API par référent ;
@@ -53,7 +49,6 @@ Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refa
    - un test de positionnement adaptatif ;
    - la synchronisation des textes longs (aujourd'hui sur l'appareil, inclus dans l'export).
 6. Si l'utilisateur fournit une clé et Docker : lancer Strix en local (voir `KOTONOHA_SECURITE.md`).
-7. Corriger le dernier contraste (`.bighead p` sur l'Accueil).
 
 ## 6. Commandes
 

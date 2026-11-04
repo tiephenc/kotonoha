@@ -92,8 +92,10 @@
     el.innerHTML = `<div class="eyebrow">Progrès</div><h1>Carte du parcours</h1>
       <p class="muted">Trois niveaux, ${MODULES.length} modules, ${order().length} unités. La couleur indique la maîtrise réelle ; le fil relie les modules dans l’ordre des prérequis. Touchez une unité pour voir ses liens.</p>
       ${legend()}
-      <div class="xmap"><svg viewBox="-2 -2 ${W + 4} ${y + 4}" width="100%" role="group" aria-label="Carte des modules et des unités"><path d="${line}" class="thread"/>${svg}</svg></div>
+      <div class="xmaptools rel" role="toolbar" aria-label="Zoom"><button type="button" class="btn-ghost" data-z="in" aria-label="Zoomer">＋</button><button type="button" class="btn-ghost" data-z="out" aria-label="Dézoomer">－</button><button type="button" class="btn-ghost" data-z="reset">Vue entière</button><span class="small muted">Glisser pour se déplacer · molette ou pincement pour zoomer</span></div><div class="xmap"><svg viewBox="-2 -2 ${W + 4} ${y + 4}" width="100%" role="group" aria-label="Carte des modules et des unités"><path d="${line}" class="thread"/>${svg}</svg></div>
       <details class="card panel"><summary>Version texte de la carte</summary><ul class="small xmaplist">${list}</ul></details>`;
+
+    { const sv = el.querySelector('.xmap svg'); sv.setAttribute('tabindex', '0'); const pz = K.panzoom(sv, { max: 5 }); el.querySelectorAll('[data-z]').forEach((b) => b.onclick = () => pz[{ in: 'zoomIn', out: 'zoomOut', reset: 'reset' }[b.dataset.z]]()); }
   }
   function legend() {
     return `<div class="xlegend">${MS.map((m, i) => `<span class="xl"><i class="m${i}"></i>${m}</span>`).join('')}<span class="xl"><i class="hard"></i>Difficile</span></div>`;
@@ -127,7 +129,7 @@
       <div class="eyebrow">Carte · ${lvOf(n)} · unité ${n}</div><h1>${esc(SYL[n] ? SYL[n].t : 'Unité ' + n)}</h1>
       ${legend()}
       <div class="xedges small"><span class="e-g">— grammaire</span><span class="e-k">— kanji</span><span class="e-p">— avant / après</span><span class="e-s">— kanji partagés</span><span class="e-c">— contrastes</span></div>
-      <div class="xmap xfocus"><svg viewBox="0 0 ${W} ${H}" width="100%" role="group" aria-label="Liens de l’unité ${n}">${edges}${nodes}</svg></div>
+      <div class="xmaptools rel" role="toolbar" aria-label="Zoom"><button type="button" class="btn-ghost" data-z="in" aria-label="Zoomer">＋</button><button type="button" class="btn-ghost" data-z="out" aria-label="Dézoomer">－</button><button type="button" class="btn-ghost" data-z="reset">Vue entière</button><span class="small muted">Glisser pour se déplacer · molette ou pincement pour zoomer</span></div><div class="xmap xfocus"><svg viewBox="0 0 ${W} ${H}" width="100%" role="group" aria-label="Liens de l’unité ${n}">${edges}${nodes}</svg></div>
       <div class="grid2">
         <div class="card panel"><h2>Grammaire</h2><ul class="small">${G.map((x) => `<li><span class="jp">${ruby(x.g.pat)}</span> · ${esc(x.g.mean || '')} <span class="muted">(${x.st.t})</span></li>`).join('')}</ul>
           <h2>Kanji</h2><p class="small">${KJ2.map((x) => `<span class="w jp" data-w="${esc(x.k[0])}" tabindex="0" role="button">${esc(x.k[0])}</span> ${esc(x.k[1])}${x.st.hard ? ' (difficile)' : ''}`).join(' · ')}</p></div>
@@ -137,6 +139,8 @@
           ${R.shared.map((x) => `<li>Kanji partagés (${esc(x.ks.join(''))}) : <a href="#carte-${x.n}">unité ${x.n}</a> · ${esc(SYL[x.n].t)}</li>`).join('')}
           ${R.contrast.map((x) => `<li>Contraste (〜${esc(x.via.join('、〜'))}) : <a href="#carte-${x.n}">unité ${x.n}</a> · ${esc(SYL[x.n].t)}</li>`).join('') || '<li class="muted">Aucun contraste repéré dans les notes de nuance.</li>'}
         </ul></div></div>`;
+
+    { const sv = el.querySelector('.xmap svg'); sv.setAttribute('tabindex', '0'); const pz = K.panzoom(sv, { max: 5 }); el.querySelectorAll('[data-z]').forEach((b) => b.onclick = () => pz[{ in: 'zoomIn', out: 'zoomOut', reset: 'reset' }[b.dataset.z]]()); }
   }
 
   K.view({ name: 'carte', title: 'Carte du parcours', nav: 'progres', match: (h) => h === 'carte', render: renderOverview });

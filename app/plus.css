@@ -3,8 +3,6 @@
 /* Contrastes WCAG AA (4,5:1) pour les petits textes du thème clair : mêmes teintes, un peu plus sombres.
    Le gris --ink-3 (#7E6E62, 4,0:1 sur le papier) passe à #66574B ; le rouge et le vert des petits libellés
    prennent une variante foncée. Le rouge des aplats (en-tête, boutons) ne change pas. */
-:root:not([data-theme="nuit"]) { --ink-3: #66574B; --accent-text: #A3192F; --good-text: #245C40; }
-:root[data-theme="nuit"] { --accent-text: var(--accent); --good-text: var(--good); }
 :root:not([data-theme="nuit"]) .eyebrow, :root:not([data-theme="nuit"]) .tag, :root:not([data-theme="nuit"]) .footsup,
 :root:not([data-theme="nuit"]) .gp .form, :root:not([data-theme="nuit"]) .xcult li.t-shuku .tag { color: var(--accent-text); }
 :root:not([data-theme="nuit"]) .lv-N4 .tag, :root:not([data-theme="nuit"]) .xcult li.t-gyoji .tag { color: var(--good-text); }

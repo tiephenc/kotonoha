@@ -16,14 +16,14 @@ test.describe('hors connexion', () => {
     await page.reload();
     await expect(page.locator('#v-aujourdhui')).toHaveClass(/\bon\b/);
     await page.evaluate(() => { location.hash = 'detente'; });
-    await expect(page.locator('#v-x-detente .xgame')).toHaveCount(5);
+    await expect(page.locator('#v-x-detente .xgame')).toHaveCount(8);
     await page.evaluate(() => { location.hash = 'calendrier'; });
     await expect(page.locator('#v-x-calendrier h1')).toHaveText('Calendrier');
     await context.setOffline(false);
   });
 });
 
-const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture'];
+const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture', 'voyage', 'kamon', 'kamon-katabami', 'detente-musique', 'detente-pinceau', 'carnet'];
 
 test('accessibilité (axe-core, WCAG 2 A/AA) : écrans principaux et nouveaux espaces', async ({ page }) => {
   test.setTimeout(180_000);
@@ -39,6 +39,6 @@ test('accessibilité (axe-core, WCAG 2 A/AA) : écrans principaux et nouveaux es
   console.log('AXE\n' + (report.join('\n') || 'aucune violation'));
   test.info().annotations.push({ type: 'axe', description: report.join(' | ') || 'aucune violation' });
   // Les violations des nouveaux espaces (préfixe v-x-) doivent être nulles ; celles de l'existant sont rapportées.
-  const mine = report.filter((l) => /^(calendrier|maitrise|detente|lire|atelier|redaction|conversation|carte|culture)/.test(l));
+  const mine = report.filter((l) => /^(aujourdhui|calendrier|maitrise|detente|lire|atelier|redaction|conversation|carte|culture|voyage|kamon|carnet|progres)/.test(l));
   expect(mine, mine.join('\n')).toEqual([]);
 });

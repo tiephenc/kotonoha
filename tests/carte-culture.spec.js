@@ -33,7 +33,7 @@ test('carte d’une unité : grammaire, kanji, prérequis, liens, popup kanji', 
   expect(errors).toEqual([]);
 });
 
-test('culture : jours fériés calculés selon la loi, sources, kamon', async ({ page }) => {
+test('culture : jours fériés calculés selon la loi, sources', async ({ page }) => {
   const errors = await isolate(page);
   await onboard(page);
   const h = await page.evaluate(() => {
@@ -50,13 +50,9 @@ test('culture : jours fériés calculés selon la loi, sources, kamon', async ({
   expect(h.n26).toBe(18);
   await page.evaluate(() => { location.hash = 'culture'; });
   await expect(page.locator('#v-x-culture h1')).toBeVisible();
-  await expect(page.locator('.xmonc')).toHaveCount(6);
   const links = await page.locator('#v-x-culture a[target=_blank]').evaluateAll((as) => as.map((a) => a.rel));
   expect(links.length).toBeGreaterThan(6);
   links.forEach((r) => expect(r).toContain('noopener'));
   await noHorizontalOverflow(page);
-  // mention « créations originales » sous les blasons de Progrès
-  await page.evaluate(() => { location.hash = 'progres'; });
-  await expect(page.locator('[data-xkn]')).toContainText('créations originales');
   expect(errors).toEqual([]);
 });

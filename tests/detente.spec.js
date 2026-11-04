@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { isolate, onboard, noHorizontalOverflow } from './helpers.js';
 
-const GAMES = ['sable', 'carillon', 'rizieres', 'lucioles', 'souffle'];
+const GAMES = ['etang', 'sable', 'musique', 'pinceau', 'ricochets', 'rizieres', 'lucioles', 'souffle'];
 
-test('salon : accès depuis l’en-tête, durées, cinq expériences', async ({ page }) => {
+test('salon : accès depuis l’en-tête, durées, huit expériences', async ({ page }) => {
   const errors = await isolate(page);
   await onboard(page);
   await page.click('#xdetbtn');
   await expect(page.locator('#v-x-detente h1')).toHaveText('Faire une vraie pause');
-  await expect(page.locator('.xgame')).toHaveCount(5);
+  await expect(page.locator('.xgame')).toHaveCount(8);
   await page.click('label:has(input[name=xdur][value=micro])');
   await expect(page.locator('input[name=xdur][value=micro]')).toBeChecked();
   expect(await page.evaluate(() => localStorage.getItem('kotonoha.detente.dur'))).toBe('"micro"');
@@ -26,7 +26,10 @@ for (const g of GAMES) {
     const box = await stage.boundingBox();
     expect(box.height).toBeGreaterThan(300);
     if (g === 'sable') { await page.mouse.move(box.x + 100, box.y + 200); await page.mouse.down(); await page.mouse.move(box.x + 300, box.y + 260, { steps: 8 }); await page.mouse.up(); }
-    if (g === 'carillon') { await page.click('.xrod[data-i="3"]'); await expect(page.locator('.xrod[data-i="3"]')).toHaveClass(/swing/); }
+    if (g === 'musique') { const c = page.locator('.xcellm[data-r="0"][data-c="1"]'); await c.click(); await expect(c).toHaveAttribute('aria-pressed', 'true'); await page.click('#xplay'); await expect(page.locator('#xplay')).toHaveAttribute('aria-pressed', 'true'); await page.click('#xplay'); }
+    if (g === 'pinceau') { await page.click('#xenso'); await page.mouse.move(box.x + 120, box.y + 220); await page.mouse.down(); await page.mouse.move(box.x + 320, box.y + 260, { steps: 6 }); await page.mouse.up(); }
+    if (g === 'etang') { await page.mouse.click(box.x + 200, box.y + 200); }
+    if (g === 'ricochets') { await page.locator('#xstage').focus(); await page.keyboard.press('Space'); }
     if (g === 'souffle') { await expect(page.locator('.xphase')).not.toHaveText(''); }
     await noHorizontalOverflow(page);
     await page.keyboard.press('Escape');

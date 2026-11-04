@@ -11,8 +11,11 @@
     { id: 'long', label: '7 à 9 min', sec: 540 },
   ];
   const GAMES = [
+    { id: 'etang', kj: '鯉', name: 'Étang aux koi', kind: 'Contemplation · aquarium', text: 'Nourrissez les carpes, faites des ronds dans l’eau, regardez-les venir.' },
     { id: 'sable', kj: '砂', name: 'Jardin de sable', kind: 'Contemplation · création', text: 'Tracez des sillons au râteau, posez des pierres, lissez, recommencez.' },
-    { id: 'carillon', kj: '鈴', name: 'Carillon', kind: 'Musique · rythme', text: 'Sept tiges accordées ensemble : aucune fausse note possible.' },
+    { id: 'musique', kj: '音', name: 'Atelier musical', kind: 'Création musicale · rythme', text: 'Composez une boucle de cloches et de taiko : toutes les notes s’accordent.' },
+    { id: 'pinceau', kj: '墨', name: 'Pinceau', kind: 'Dessin', text: 'Encre, lavis et sceau : peignez librement, gardez votre image si vous voulez.' },
+    { id: 'ricochets', kj: '石', name: 'Ricochets', kind: 'Adresse douce', text: 'Lancez des galets sur le lac et comptez les rebonds, pour le plaisir.' },
     { id: 'rizieres', kj: '田', name: 'Rizières', kind: 'Logique légère', text: 'Tournez les canaux pour amener l’eau à chaque parcelle, sans chrono ni compteur.' },
     { id: 'lucioles', kj: '蛍', name: 'Lucioles', kind: 'Exploration · adresse douce', text: 'Promenez une lanterne dans un champ la nuit ; les lucioles la suivent.' },
     { id: 'souffle', kj: '息', name: 'Souffle', kind: 'Détente', text: 'Un cercle qui grandit et diminue, au rythme que vous choisissez.' },
@@ -53,7 +56,7 @@
       <div class="xdet-head">
         <div><div class="eyebrow">休憩室 · salle de détente</div><h1>Faire une vraie pause</h1>
         <p>Ici, pas de japonais, rien à réussir et rien à perdre. Choisissez une durée, puis une expérience ; vous pouvez partir à tout moment.</p></div>
-        <div class="xdet-fox" aria-hidden="true">${typeof kitsune === 'function' ? kitsune('calme') : ''}</div>
+        <div class="xdet-fox" aria-hidden="true">${K.fox ? K.fox('sommeil') : ''}</div>
       </div>
       <fieldset class="xdur"><legend>Durée indicative</legend>
         ${DUR.map((d) => `<label><input type="radio" name="xdur" value="${d.id}" ${d.id === cur ? 'checked' : ''}><span>${d.label}</span></label>`).join('')}
@@ -76,7 +79,7 @@
     stopRun();
     const g = GAMES.find((x) => 'detente-' + x.id === h);
     const d = DUR.find((x) => x.id === pref.get('dur', 'court')) || DUR[1];
-    const soundDefault = g.id === 'carillon';
+    const soundDefault = g.id === 'carillon' || g.id === 'musique';
     const run = RUN = { alive: true, total: d.sec, left: d.sec, sound: pref.get('snd-' + g.id, soundDefault), cleanup: null, timer: null };
     el.innerHTML = `<div class="xplay xplay-${g.id}">
       <div class="xbar">
@@ -115,7 +118,7 @@
     el.querySelector('#xback').onclick = (e) => { e.preventDefault(); location.hash = backTo(); };
     stage.tabIndex = 0;
     const api = { run, stage, sound: () => run.sound, reduced: K.reduced(), theme: document.documentElement.dataset.theme };
-    ({ sable: gameSable, carillon: gameCarillon, rizieres: gameRizieres, lucioles: gameLucioles, souffle: gameSouffle })[g.id](api);
+    (({ sable: gameSable, carillon: gameCarillon, rizieres: gameRizieres, lucioles: gameLucioles, souffle: gameSouffle })[g.id] || K.detenteGames[g.id])(api);
     setTimeout(() => stage.focus({ preventScroll: true }), 30);
   }
 
@@ -376,6 +379,10 @@
     raf = requestAnimationFrame(frame);
     run.cleanup = () => cancelAnimationFrame(raf);
   }
+
+  /* ---------- Registre ouvert aux jeux de app/jeux.js ---------- */
+  K.detenteGames = K.detenteGames || {};
+  K.detAudio = { audio, bell, softTone, master: () => MASTER, canvas };
 
   /* ---------- Branchements ---------- */
   K.view({ name: 'detente', title: 'Salle de détente', nav: 'detente', match: (h) => h === 'detente', render: (el) => { stopRun(); renderHub(el); } });
