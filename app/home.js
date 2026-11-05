@@ -188,7 +188,7 @@
             <span class="xstate">${x.ok ? '<span lang="ja" aria-hidden="true">済</span> Fait' : x === cur ? 'En cours' : 'Ensuite'}</span></div>
           <h2><span class="xsr">Étape ${x.i + 1} : </span>${esc(x.t)}<span class="min num">${hm(x.min)}</span></h2>
           ${x.chain ? `<ul class="xchain">${x.chain.slice(0, 6).map((c) => `<li class="${c.ok ? 'ok' : ''}"><a href="#unite-${c.n}/${c.sec}">Unité ${c.n} · ${esc(c.secT)}</a><span class="num">${c.m} min</span></li>`).join('')}${x.chain.length > 6 ? `<li class="more">et ${x.chain.length - 6} section${x.chain.length - 6 > 1 ? 's' : ''} de plus</li>` : ''}</ul>
-            <p class="xpan-sum">${x.done} / ${x.chain.length} section${x.chain.length > 1 ? 's' : ''} faite${x.done > 1 ? 's' : ''}</p>`
+            <p class="xpan-sum">${x.done} / ${x.chain.length} section${x.chain.length > 1 ? 's' : ''} faite${x.chain.length > 1 ? 's' : ''}</p>`
           : `<ul class="xitems">${x.items.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`}
           <div class="xprog" role="progressbar" aria-label="Avancement : ${esc(x.t)}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(Math.min(1, x.pct) * 100)}"><i></i></div>
           <a class="xpan-go" href="${x.href}">${esc(x.cta)} <span aria-hidden="true">→</span></a>
