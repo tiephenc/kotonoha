@@ -3,15 +3,49 @@ import { isolate, onboard, noHorizontalOverflow } from './helpers.js';
 
 const GAMES = ['etang', 'sable', 'musique', 'pinceau', 'ricochets', 'rizieres', 'lucioles', 'souffle'];
 
-test('salon : accès depuis l’en-tête, durées, huit expériences', async ({ page }) => {
+test('salle lofi : écran principal, scène, séquenceur, lecture et sauvegarde, sans son automatique', async ({ page }) => {
   const errors = await isolate(page);
+  await page.addInitScript(() => { window.__ac = 0; const C = window.AudioContext; if (C) window.AudioContext = class extends C { constructor(...a) { super(...a); window.__ac++; } }; });
   await onboard(page);
   await page.click('nav.main a[data-tab="detente"]');
-  await expect(page.locator('#v-x-detente h1')).toHaveText('Faire une vraie pause');
-  await expect(page.locator('.xgame')).toHaveCount(8);
-  await page.click('label:has(input[name=xdur][value=micro])');
-  await expect(page.locator('input[name=xdur][value=micro]')).toBeChecked();
-  expect(await page.evaluate(() => localStorage.getItem('kotonoha.detente.dur'))).toBe('"micro"');
+  await expect(page.locator('#v-x-detente .xlofi-over h1')).toContainText('Salle lofi');
+  await expect(page.locator('.xlofi-scene canvas')).toBeVisible();
+  await expect(page.locator('.xlcell')).toHaveCount(13 * 16);
+  expect(await page.evaluate(() => window.__ac)).toBe(0);
+  const c = page.locator('.xlcell[data-r="m0"][data-s="1"]');
+  await c.click();
+  await expect(c).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.evaluate(() => KX.lofi.state().cur.grid.m0[1])).toBe(1);
+  await page.click('#xlplay');
+  await expect(page.locator('#xlplay')).toHaveAttribute('aria-pressed', 'true');
+  await expect.poll(() => page.evaluate(() => document.querySelectorAll('.xlcell.now').length)).toBeGreaterThan(0);
+  await page.click('#xlplay');
+  await expect(page.locator('#xlplay')).toHaveAttribute('aria-pressed', 'false');
+  await page.locator('#v-x-detente [data-bar="0"]').selectOption('Am7');
+  await page.click('[data-save="1"]');
+  await page.click('#xlclear');
+  await expect(page.locator('.xlcell[aria-pressed="true"]')).toHaveCount(0);
+  await page.click('[data-load="1"]');
+  await expect(page.locator('.xlcell[data-r="m0"][data-s="1"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('#v-x-detente [data-bar="0"]')).toHaveValue('Am7');
+  await page.reload();
+  await expect(page.locator('.xlcell[data-r="m0"][data-s="1"]')).toHaveAttribute('aria-pressed', 'true');
+  await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
+
+test('jeux : un hub simple, sans durée ni chronomètre', async ({ page }) => {
+  const errors = await isolate(page);
+  await onboard(page);
+  await page.evaluate(() => { location.hash = 'detente'; });
+  await page.click('section.view.on > .xsub a[href="#detente-jeux"]');
+  await expect(page.locator('#v-x-detente-jeux .xgame')).toHaveCount(8);
+  await expect(page.locator('input[name=xdur]')).toHaveCount(0);
+  await page.click('.xgame[data-g="souffle"]');
+  await expect(page.locator('#xstage')).toBeVisible();
+  await expect(page.locator('.xclock, .xend')).toHaveCount(0);
+  await page.click('.xquit');
+  await expect(page.locator('#v-x-detente-jeux')).toHaveClass(/\bon\b/);
   await noHorizontalOverflow(page);
   expect(errors).toEqual([]);
 });
@@ -33,35 +67,10 @@ for (const g of GAMES) {
     if (g === 'souffle') { await expect(page.locator('.xphase')).not.toHaveText(''); }
     await noHorizontalOverflow(page);
     await page.keyboard.press('Escape');
-    await expect(page.locator('#v-x-detente')).toHaveClass(/\bon\b/);
+    await expect(page.locator('#v-x-detente-jeux')).toHaveClass(/\bon\b/);
     expect(errors).toEqual([]);
   });
 }
-
-test('fin de durée : trois choix, prolonger, ressenti facultatif, retour à la séance', async ({ page }) => {
-  test.setTimeout(120_000); // deux fois 61 s d'horloge simulée sur une animation : long sous forte charge
-  await page.clock.install();
-  const errors = await isolate(page);
-  await onboard(page);
-  await page.evaluate(() => { location.hash = 'unite-1'; });
-  await expect(page.locator('#v-unite')).toHaveClass(/\bon\b/);
-  await page.evaluate(() => { localStorage.setItem('kotonoha.detente.dur', '"micro"'); location.hash = 'detente'; });
-  await page.click('.xgame[data-g="souffle"]');
-  await expect(page.locator('.xend')).toBeHidden();
-  await page.clock.runFor(61_000);
-  await expect(page.locator('.xend')).toBeVisible();
-  await expect(page.locator('.xend')).toContainText('Retour à la séance');
-  await expect(page.locator('.xend')).toContainText('Prolonger la pause');
-  await expect(page.locator('.xend')).toContainText('Quitter');
-  await page.click('#xmore');
-  await expect(page.locator('.xend')).toBeHidden();
-  await page.clock.runFor(61_000);
-  await page.click('[data-feel="mieux"]');
-  expect((await page.evaluate(() => KX.local.get('ressenti', []))).length).toBe(1);
-  await page.click('#xback');
-  await expect(page.locator('#v-unite')).toHaveClass(/\bon\b/);
-  expect(errors).toEqual([]);
-});
 
 test('rizières : chaque grille générée est soluble (coups de pouce)', async ({ page }) => {
   const errors = await isolate(page);
@@ -86,6 +95,7 @@ test('aucun son ne démarre sans action', async ({ page }) => {
   await isolate(page);
   await page.addInitScript(() => { window.__ac = 0; const C = window.AudioContext; if (C) window.AudioContext = class extends C { constructor(...a) { super(...a); window.__ac++; } }; });
   await onboard(page);
+  await page.evaluate(() => { location.hash = 'detente'; }); await page.waitForTimeout(400);
   for (const g of GAMES) { await page.evaluate((x) => { location.hash = 'detente-' + x; }, g); await page.waitForTimeout(300); }
   expect(await page.evaluate(() => window.__ac)).toBe(0);
 });

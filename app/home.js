@@ -167,7 +167,7 @@
       <h1 id="xopen-t" class="xopen-type" aria-label="Kotonoha"><span aria-hidden="true">KOTO</span><span aria-hidden="true">NOHA</span></h1>
       <div class="xopen-v" lang="ja" aria-hidden="true">言の葉</div>
       <div class="xopen-fox">${K.fox(cur ? (hr >= 23 || hr < 5 ? 'sommeil' : 'accueil') : 'celebration', { label: 'Kitsune, le renard guide de KOTONOHA' })}</div>
-      <div class="xopen-cta"><p>${cur ? `Aujourd’hui : ${esc(cur.t.toLowerCase())} d’abord, ${hm(p.T)} au programme.` : 'La séance du jour est faite. Otsukaresama.'}</p>
+      <div class="xopen-cta"><p>${cur ? `Aujourd’hui : ${esc(cur.t.toLowerCase())} d’abord, ${hm(p.T).replace(/ /g, ' ')} au programme.` : 'La séance du jour est faite. Otsukaresama.'}</p>
         <a class="xopen-go" href="#xsess">Voir la séance du jour <span aria-hidden="true">↓</span></a></div>
       <dl class="xopen-facts">${facts.map(([a, b, c]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}<small>${esc(c)}</small></dd></div>`).join('')}</dl>
     </section>`;

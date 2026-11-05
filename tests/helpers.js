@@ -34,6 +34,8 @@ export async function onboard(page) {
 }
 
 export async function noHorizontalOverflow(page) {
-  const over = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  // La page coupe le débordement horizontal (overflow-x: clip) ; on le lève le temps de mesurer la mise en page réelle.
+  const over = await page.evaluate(() => { const d = document.documentElement, b = document.body, o = [d.style.overflowX, b.style.overflowX];
+    d.style.overflowX = 'visible'; b.style.overflowX = 'visible'; const v = d.scrollWidth - d.clientWidth; d.style.overflowX = o[0]; b.style.overflowX = o[1]; return v; });
   expect(over, 'défilement horizontal').toBeLessThanOrEqual(1);
 }

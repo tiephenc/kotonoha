@@ -11,7 +11,7 @@
     apprendre: { k: '学', t: 'Apprendre', big: '学ぶ', sub: [['parcours', 'Parcours'], ['vocab', 'Vocabulaire'], ['lire', 'Lire'], ['carte', 'Carte du parcours']] },
     pratiquer: { k: '練', t: 'Pratiquer', big: '練習', sub: [['revision', 'Réviser'], ['entrainer', 'S’entraîner'], ['atelier', 'Atelier'], ['examens', 'Examens blancs'], ['erreurs', 'Carnet d’erreurs']] },
     voyager: { k: '旅', t: 'Voyager', big: '旅', sub: [['voyage', 'Carte du voyage'], ['kamon', 'Kamon'], ['culture', 'Culture']] },
-    detente: { k: '憩', t: 'Détente', big: '憩い' },
+    detente: { k: '憩', t: 'Détente', big: '憩い', sub: [['detente', 'Salle lofi'], ['detente-jeux', 'Jeux']] },
     profil: { k: '私', t: 'Profil', big: '私', sub: [['profil', 'Profil'], ['progres', 'Progrès'], ['maitrise', 'Maîtrise'], ['calendrier', 'Calendrier'], ['carnet', 'Carnet']] },
   };
   function tabOf(h, view) {
@@ -23,7 +23,7 @@
     if (/^(profil|progres|maitrise|calendrier|carnet|apropos|soutenir|mentions|export)/.test(h)) return 'profil';
     return ({ parcours: 'apprendre', vocab: 'apprendre', revision: 'pratiquer', entrainer: 'pratiquer', progres: 'profil', profil: 'profil' })[view] || 'apprendre';
   }
-  const SUBOF = (h) => (h === 'examens' ? 'examens' : h.replace(/[-/].*$/, '').replace(/^unite$/, 'parcours').replace(/^revision$/, 'revision'));
+  const SUBOF = (h) => (h === 'examens' ? 'examens' : /^detente-/.test(h) ? 'detente-jeux' : h.replace(/[-/].*$/, '').replace(/^unite$/, 'parcours').replace(/^revision$/, 'revision'));
 
   function paint(h, view) {
     const tab = tabOf(h, view), T = TABS[tab];
@@ -127,5 +127,8 @@
       });
     });
   }, { passive: true });
+  // Largeur de la barre de défilement : les sections pleine largeur (100vw) la retranchent, pour ne jamais déborder.
+  const sbw = () => document.documentElement.style.setProperty('--sbw', Math.max(0, innerWidth - document.documentElement.clientWidth) + 'px');
+  sbw(); addEventListener('resize', sbw, { passive: true }); new ResizeObserver(sbw).observe(document.body);
   K.shell = { tabOf, TABS };
 })();

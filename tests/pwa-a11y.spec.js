@@ -15,15 +15,17 @@ test.describe('hors connexion', () => {
     await context.setOffline(true);
     await page.reload();
     await expect(page.locator('#v-aujourdhui')).toHaveClass(/\bon\b/);
+    await page.evaluate(() => { location.hash = 'detente-jeux'; });
+    await expect(page.locator('#v-x-detente-jeux .xgame')).toHaveCount(8);
     await page.evaluate(() => { location.hash = 'detente'; });
-    await expect(page.locator('#v-x-detente .xgame')).toHaveCount(8);
+    await expect(page.locator('#v-x-detente .xlofi-scene canvas')).toBeVisible();
     await page.evaluate(() => { location.hash = 'calendrier'; });
     await expect(page.locator('#v-x-calendrier h1')).toHaveText('Calendrier');
     await context.setOffline(false);
   });
 });
 
-const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture', 'voyage', 'kamon', 'kamon-katabami', 'detente-musique', 'detente-pinceau', 'carnet', 'profil', 'calendrier'];
+const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-jeux', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture', 'voyage', 'kamon', 'kamon-katabami', 'detente-musique', 'detente-pinceau', 'carnet', 'profil', 'calendrier'];
 
 test('accessibilité (axe-core, WCAG 2 A/AA) : écrans principaux et nouveaux espaces', async ({ page }) => {
   test.setTimeout(360_000);

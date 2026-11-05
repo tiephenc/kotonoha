@@ -740,7 +740,7 @@ nav.main a .nk, .brand .jp, .xpan .jp, .station .kjb, .xresume > span:first-chil
 .xmap, .xkmart, .xvleg, .xsouv, .xcellm, #focpanel .fbox button:not(.x), #focpanel .fbox input { border-radius: var(--r-sm) !important; }
 
 /* ---------- Page d'ouverture : l'affiche de l'izakaya ---------- */
-.xopen { --field: #A3302A; --type: #F4EAD6; --acc: #241A13; position: relative; isolation: isolate; overflow: hidden; margin: 0 calc(50% - 50vw) 34px; min-height: min(86vh, 820px);
+.xopen { --field: #A3302A; --type: #F4EAD6; --acc: #241A13; position: relative; isolation: isolate; overflow: hidden; margin: 0 calc(50% - (100vw - var(--sbw, 0px)) / 2) 34px; min-height: min(86vh, 820px);
   display: grid; grid-template-columns: 1fr minmax(0, 1180px) 1fr; grid-template-rows: auto 1fr auto; color: var(--type); background: var(--field) var(--cloth); }
 :root[data-theme="nuit"] .xopen { --field: #1B2640; --acc: #F6B451; }
 .xopen > * { grid-column: 2; }
@@ -787,10 +787,6 @@ nav.main a .nk, .brand .jp, .xpan .jp, .station .kjb, .xresume > span:first-chil
   .xopen-facts > div:last-child { grid-column: 1 / -1; }
 }
 
-/* ---------- Décor de fond : l'intérieur de l'izakaya, en filigrane ---------- */
-.xdecor { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; z-index: -1; pointer-events: none; opacity: .06; }
-:root[data-theme="nuit"] .xdecor { opacity: .1; }
-body { background: transparent !important; }
 
 /* ---------- Voyager : la carte ancienne en relief (3D) ---------- */
 .xm3d { display: flex; flex-direction: column; }
@@ -860,3 +856,101 @@ body { background: transparent !important; }
 }
 .xregion, .xm-peak span { font-family: var(--display) !important; font-weight: 800 !important; }
 @keyframes xslide { from { transform: translateY(18px); } }
+
+/* Carte du Japon : plus grande, plus lisible (pleine largeur, cibles de 44 px, repères et noms agrandis) */
+.xvoy:has(.xm3d) { grid-template-columns: minmax(0, 1fr); }
+.xvoy:has(.xm3d) .xvside { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .xvoy:has(.xm3d) .xvside { grid-template-columns: minmax(0, 1fr); } }
+.xm-stage { height: clamp(520px, 80vh, 860px); background: #A9BBAE; }
+.xseabg { fill: #A9BBAE !important; }
+.xm-plane { width: 680px; height: 725px; margin: -362px 0 0 -340px; }
+.xland path { fill: #F6ECD3 !important; stroke: #20170F !important; stroke-width: 3 !important; }
+:root[data-theme="nuit"] .xland path { fill: #3A2C1F !important; stroke: #F2E1BC !important; }
+.xregion { font-size: 30px !important; opacity: .7 !important; }
+.xroute { stroke-width: 4.5; } .xroute.open { opacity: 1; }
+.xplace .pin-head { width: 34px; height: 40px; }
+.xplace.here .pin-head { width: 44px; height: 44px; }
+.xplace .pin-stem { height: 18px; width: 3px; }
+.xplace .pin-lbl { font-size: 15px; padding: 5px 10px; border: 2px solid #20170F; }
+.xplace .pin-lbl small { font-size: 12px; }
+.xplace .pin-base { width: 26px; height: 14px; }
+.xplace::after { content: ""; position: absolute; left: -24px; top: -64px; width: 48px; height: 70px; }
+.xm3d .xmaptools { gap: 10px; padding: 10px 12px; }
+.xmt-g { display: inline-flex; border: 1.5px solid var(--line-2); border-radius: 3px; overflow: hidden; }
+.xmt-g .btn-ghost { border: 0 !important; border-radius: 0 !important; }
+.xmt-g .btn-ghost + .btn-ghost { border-left: 1.5px solid var(--line-2) !important; }
+.xm3d .xmaptools .btn-ghost { min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; font-size: 14.5px; }
+.xm3d .xmaptools .btn-ghost svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.xm-hud { font-size: 15px; padding: 12px 16px; } .xm-hud b { font-size: 22px; }
+@media (max-width: 760px) { .xm-stage { height: 520px; } .xm-plane { width: 420px; height: 448px; margin: -224px 0 0 -210px; } .xregion { font-size: 24px !important; } }
+
+/* Ouverture sur grand écran : pas de défilement horizontal, texte d'appel lisible sur une carte pleine */
+html, body { overflow-x: clip; }
+.xopen-cta { background: #F4EAD6; color: #241A13; padding: 16px 18px 18px; border-radius: 2px; box-shadow: 0 18px 30px -18px rgba(0, 0, 0, .55); max-width: 320px; }
+.xopen-cta p { color: #241A13; }
+.xopen-go { background: #A3302A; color: #FBF3E4 !important; }
+:root[data-theme="nuit"] .xopen-cta { background: #201811; } :root[data-theme="nuit"] .xopen-cta p { color: #F2E5CB; }
+:root[data-theme="nuit"] .xopen-go { background: #F6B451; color: #241A13 !important; }
+.xopen-type { font-size: clamp(110px, min(21vw, 38vh), 300px) !important; }
+.xopen-fox { width: clamp(220px, min(30vw, 46vh), 400px); }
+@media (min-width: 1400px) { .xopen-cta { left: max(24px, calc(50% - 640px)); } }
+@media (max-width: 760px) { .xopen-cta { max-width: none; box-shadow: none; border-radius: 0; } }
+
+/* ---------- Détente : la salle lofi ---------- */
+.xlofi { display: grid; gap: 18px; }
+.xlofi-scene { position: relative; border: 3px solid #20170F; border-radius: var(--r); overflow: hidden; background: #0E1430; box-shadow: var(--shadow-lift); }
+.xlofi-scene canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; image-rendering: pixelated; }
+.xlofi-over { position: absolute; left: 18px; top: 16px; max-width: min(440px, 60%); color: #F4EAD6; text-shadow: 0 2px 0 rgba(0, 0, 0, .45); }
+.xlofi-over h1 { color: #F4EAD6 !important; margin: 0 0 6px; display: flex; flex-direction: column; font-size: clamp(26px, 3.6vw, 44px) !important; }
+.xlofi-over h1 span { font: 400 clamp(14px, 1.5vw, 19px) var(--mon-k); color: var(--lamp); letter-spacing: .2em; }
+.xlofi-over p { margin: 0; font-size: 14.5px; line-height: 1.5; background: rgba(20, 14, 10, .55); padding: 8px 10px; border-radius: 2px; }
+.xlofi-transport { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 12px 16px; background: linear-gradient(transparent, rgba(16, 11, 8, .82) 30%); color: #F4EAD6; }
+.xlofi-play { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px 0 14px; border: 0; border-radius: 3px; background: var(--lamp); color: #241A13; font: 800 16px var(--sans); cursor: pointer; box-shadow: 0 10px 20px -10px var(--lamp); }
+.xlofi-play svg { width: 22px; height: 22px; fill: currentColor; } .xlofi-play .pa { display: none; }
+.xlofi-play[aria-pressed="true"] .pl { display: none; } .xlofi-play[aria-pressed="true"] .pa { display: inline; }
+.xlofi-tog { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 1.5px solid rgba(244, 234, 214, .5); border-radius: 3px; cursor: pointer; font-weight: 700; font-size: 14px; }
+.xlofi-tog input { width: 18px; height: 18px; accent-color: var(--lamp); }
+.xlofi-vol { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; margin-left: auto; }
+.xlofi-vol input { accent-color: var(--lamp); }
+.xlofi-studio { background: #2A1D13 var(--cloth); color: #F2E5CB; border-radius: var(--r); padding: 18px 18px 14px; border: 3px solid #1A110A; }
+.xlofi-studio h2 { color: #F2E5CB !important; margin: 0; }
+.xlofi-studio .small.muted { color: #D8C6A3 !important; } .xlofi-studio a { color: var(--lamp); }
+.xlofi-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 20px; margin-bottom: 12px; }
+.xlofi-knobs { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 14px; font-weight: 700; }
+.xlofi-knobs label { display: inline-flex; align-items: center; gap: 8px; } .xlofi-knobs input { accent-color: var(--lamp); }
+.xlofi-prog { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.xlofi-prog label { display: grid; gap: 4px; font-size: 12.5px; font-weight: 700; color: #D8C6A3; }
+.xlofi-prog select { background: #1A110A; color: #F2E5CB; border-color: #6B5236; min-height: 40px; }
+.xlofi-grid { display: grid; gap: 4px; overflow-x: auto; padding: 2px 2px 8px; }
+.xlrow { display: grid; grid-template-columns: 118px repeat(16, minmax(26px, 1fr)); gap: 4px; align-items: center; min-width: 620px; }
+.xllab { font-size: 12.5px; font-weight: 700; color: #D8C6A3; white-space: nowrap; }
+.xlcell { height: 30px; border: 0; border-radius: 2px; background: #3A2A1D; cursor: pointer; transition: background .12s, transform .12s; }
+.xlcell.b { background: #47331F; }
+.xlcell:hover { background: #5A4128; }
+.xlcell[aria-pressed="true"] { background: var(--lamp); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .25); }
+.r-chord .xlcell[aria-pressed="true"], .r-bass .xlcell[aria-pressed="true"] { background: #E0604A; }
+.r-kick .xlcell[aria-pressed="true"], .r-snare .xlcell[aria-pressed="true"], .r-hat .xlcell[aria-pressed="true"] { background: #9EBB72; }
+.xlcell.now { outline: 2px solid #F4EAD6; outline-offset: -2px; }
+.xlcell:focus-visible { outline: 3px solid #F4EAD6; outline-offset: 1px; }
+.r-chord { margin-top: 8px; } .r-kick { margin-top: 8px; }
+.xlofi-tools { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin: 12px 0 6px; }
+.xlofi-tools .btn-ghost { color: #F2E5CB !important; border: 1.5px solid #6B5236 !important; min-height: 40px; padding: 0 12px; }
+.xlofi-tools .btn-ghost:hover { background: #3A2A1D !important; }
+.xlofi-tools .btn-ghost:disabled { opacity: .45; cursor: not-allowed; }
+.xlslots { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-left: auto; }
+.xlslot { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+@media (prefers-reduced-motion: no-preference) { .xlcell[aria-pressed="true"].now { transform: scale(1.08); } }
+@media (max-width: 760px) {
+  .xlofi-over { position: static; max-width: none; padding: 12px 14px; background: #1A110A; text-shadow: none; }
+  .xlofi-over p { background: none; padding: 0; }
+  .xlofi-transport { position: static; background: #1A110A; }
+  .xlofi-vol { margin-left: 0; }
+  .xlofi-prog { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .xlslots { margin-left: 0; }
+}
+.xdet-back { margin: 14px 0 0; } .xdet-back a { color: var(--lamp); font-weight: 700; }
+.xback-s { color: var(--room-ink, #F1E8D2); font-weight: 700; font-size: 14px; }
+.xlofi-over h1 span { font-family: var(--display) !important; font-weight: 800; }
+.xlofi-over h1 { background: rgba(20, 14, 10, .62); padding: 6px 10px 8px; border-radius: 2px; width: fit-content; }
+.xvinfo .xvart { display: grid; grid-template-columns: 140px 1fr; gap: 14px; align-items: center; } .xvinfo .xvart .xsouv { width: 140px; height: auto; }
+.xlofi { grid-template-columns: minmax(0, 1fr); } .xlofi-studio { min-width: 0; }

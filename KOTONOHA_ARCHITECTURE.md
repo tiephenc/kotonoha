@@ -9,7 +9,7 @@ index.html            site complet (HTML, CSS, script classique, données pédag
 app/plus.css          styles des espaces complémentaires (+ correctifs de contraste du thème clair)
 app/plus.js           noyau KX : registre de vues, crochets de rendu (KX.on, KX.onMatch), stockage local, KX.panzoom, utilitaires
 app/theme.css         système visuel izakaya (chargé en dernier) : jetons jour/nuit, onglets en noren, séance, renard, espaces, mouvement
-app/decor.js          décor de fond : intérieur d'izakaya en pixel art (canvas), jour et nuit
+app/lofi.js           salle lofi : scène d'izakaya en pixel art (canvas) et séquenceur de musique (Web Audio)
 app/shell.js          coque : six onglets, sous-rubriques, ambiance selon l'heure et lanterne, reprise, transitions et parallaxe
 app/fox.js           renard d'origine en six poses (KX.fox), remplace window.kitsune
 app/home.js          Aujourd'hui : séance de 4 h (KX.seance), frise, jardin ; journal de la semaine (remplace heat et viewTodayAffiche)
@@ -94,6 +94,6 @@ Toutes les données importées ou synchronisées passent par `normTypes()` (dans
 
 ## Service worker
 
-La version est `kotonoha-2026-11-05-ouverture`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
+La version est `kotonoha-2026-11-05-lofi`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
 
 **À chaque publication, changer `VERSION` dans `sw.js`.**

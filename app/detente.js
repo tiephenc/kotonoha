@@ -1,15 +1,9 @@
 /* KOTONOHA · salle de détente.
    Principes (voir KOTONOHA_PAUSES_ET_MINIJEUX.md) : aucune activité de japonais, aucun score, aucune série,
-   aucune pénalité ; durée choisie librement (chronomètre indicatif) ; sortie à tout moment ; aucun son automatique. */
+   aucune pénalité, aucun chronomètre ; sortie à tout moment ; aucun son automatique. L'écran principal est la salle lofi (app/lofi.js). */
 (function () {
   'use strict';
   const K = window.KX, esc = K.esc;
-  const DUR = [
-    { id: 'micro', label: '30 s à 1 min', sec: 60 },
-    { id: 'court', label: '2 à 3 min', sec: 180 },
-    { id: 'moyen', label: '4 à 6 min', sec: 300 },
-    { id: 'long', label: '7 à 9 min', sec: 540 },
-  ];
   const GAMES = [
     { id: 'etang', kj: '鯉', name: 'Étang aux koi', kind: 'Contemplation · aquarium', text: 'Nourrissez les carpes, faites des ronds dans l’eau, regardez-les venir.' },
     { id: 'sable', kj: '砂', name: 'Jardin de sable', kind: 'Contemplation · création', text: 'Tracez des sillons au râteau, posez des pierres, lissez, recommencez.' },
@@ -49,24 +43,20 @@
   }
   function stopAudio() { if (AC && AC.state === 'running') AC.suspend(); }
 
-  /* ---------- Salon ---------- */
+  /* ---------- Hub de jeux (la salle lofi, app/lofi.js, est l'écran principal de Détente) ---------- */
   function renderHub(el) {
-    const cur = pref.get('dur', 'court');
     el.innerHTML = `<div class="xdet">
       <div class="xdet-head">
-        <div><h1>Faire une vraie pause</h1>
-        <p>Ici, pas de japonais, rien à réussir et rien à perdre. Choisissez une durée, puis une expérience ; vous pouvez partir à tout moment.</p></div>
-        <div class="xdet-fox" aria-hidden="true">${K.fox ? K.fox('sommeil') : ''}</div>
+        <div><h1>Jeux pour passer le temps</h1>
+        <p>Pas de japonais, rien à réussir, rien à perdre, pas de chronomètre. Jouez le temps que vous voulez et partez quand vous voulez.</p></div>
+        <div class="xdet-fox" aria-hidden="true">${K.fox ? K.fox('repos') : ''}</div>
       </div>
-      <fieldset class="xdur"><legend>Durée indicative</legend>
-        ${DUR.map((d) => `<label><input type="radio" name="xdur" value="${d.id}" ${d.id === cur ? 'checked' : ''}><span>${d.label}</span></label>`).join('')}
-      </fieldset>
       <div class="xgames">${GAMES.map((g) => `<a class="xgame" href="#detente-${g.id}" data-g="${g.id}"><span class="xgk" aria-hidden="true">${g.kj}</span><span class="nm">${g.name}</span><span class="kd">${g.kind}</span><span class="tx">${g.text}</span></a>`).join('')}</div>
+      <p class="xdet-back"><a href="#detente">← Retour à la salle lofi</a></p>
       <details class="xwhy"><summary>Pourquoi ces pauses, et ce qu’elles ne promettent pas</summary>
-        <p>Une méta-analyse de 22 études (Albulescu et al., 2022) associe les micro-pauses de moins de 10 minutes à un peu plus de vitalité et un peu moins de fatigue ressenties ; l’effet sur la performance n’y est pas significatif, sauf pour certaines tâches et avec des pauses plus longues. Ces expériences sont conçues pour être agréables et sans pression, pas pour améliorer la mémoire ou l’attention : aucun effet n’est promis.</p>
+        <p>Une méta-analyse de 22 études (Albulescu et al., 2022) associe les micro-pauses de moins de 10 minutes à un peu plus de vitalité et un peu moins de fatigue ressenties ; l’effet sur la performance n’y est pas significatif en général. Ces jeux ne promettent donc rien d’autre qu’un moment agréable.</p>
         <p class="small muted">Détails et références : document KOTONOHA_PAUSES_ET_MINIJEUX.md du dépôt.</p></details>
     </div>`;
-    el.querySelectorAll('input[name=xdur]').forEach((r) => r.onchange = () => pref.set('dur', r.value));
     try { sessionStorage.setItem('kotonoha.detente.from', K.lastLearning || 'aujourdhui'); } catch (e) {}
   }
 
@@ -78,44 +68,23 @@
   function renderGame(el, h) {
     stopRun();
     const g = GAMES.find((x) => 'detente-' + x.id === h);
-    const d = DUR.find((x) => x.id === pref.get('dur', 'court')) || DUR[1];
     const soundDefault = g.id === 'carillon' || g.id === 'musique';
-    const run = RUN = { alive: true, total: d.sec, left: d.sec, sound: pref.get('snd-' + g.id, soundDefault), cleanup: null, timer: null };
+    const run = RUN = { alive: true, sound: pref.get('snd-' + g.id, soundDefault), cleanup: null, timer: null };
     el.innerHTML = `<div class="xplay xplay-${g.id}">
       <div class="xbar">
-        <a class="xquit" href="#detente">← Quitter</a>
+        <a class="xquit" href="#detente-jeux">← Tous les jeux</a>
         <h1>${g.name}</h1>
         <div class="xbar-r">
           <button type="button" class="xsnd" aria-pressed="${run.sound}">${run.sound ? 'Son activé' : 'Son coupé'}</button>
-          <span class="xclock" title="Durée indicative" aria-label="Temps indicatif restant"><svg viewBox="0 0 36 36" aria-hidden="true"><circle cx="18" cy="18" r="15"/><circle cx="18" cy="18" r="15" class="p"/></svg><span class="t"></span></span>
+          <a class="xback-s" id="xback" href="#aujourdhui">Retour à la séance</a>
         </div>
       </div>
-      <div class="xstage" id="xstage"></div>
-      <div class="xend" hidden role="dialog" aria-modal="false" aria-labelledby="xendt">
-        <h2 id="xendt">La pause choisie est écoulée.</h2>
-        <p class="muted">Rien ne presse : restez autant que vous voulez.</p>
-        <div class="toolbar"><a class="btn" id="xback" href="#aujourdhui">Retour à la séance</a><button class="btn sec" type="button" id="xmore">Prolonger la pause</button><a class="btn-ghost" href="#detente">Quitter</a></div>
-        <div class="xfeel"><span class="small muted">Comment vous sentez-vous ? Facultatif, pour vous seulement ; ce n’est pas une mesure.</span>
-          <div class="toolbar"><button type="button" class="btn-ghost small" data-feel="mieux">Plus détendu·e</button><button type="button" class="btn-ghost small" data-feel="pareil">Pareil</button><button type="button" class="btn-ghost small" data-feel="moins">Moins détendu·e</button></div></div>
-      </div></div>`;
+      <div class="xstage" id="xstage"></div></div>`;
     const stage = el.querySelector('#xstage');
     const sndBtn = el.querySelector('.xsnd');
     sndBtn.onclick = () => { run.sound = !run.sound; pref.set('snd-' + g.id, run.sound); sndBtn.setAttribute('aria-pressed', run.sound); sndBtn.textContent = run.sound ? 'Son activé' : 'Son coupé'; if (run.sound) audio(); else stopAudio(); };
-    const clock = el.querySelector('.xclock'), ring = clock.querySelector('.p'), tt = clock.querySelector('.t');
-    const paint = () => { const p = 1 - run.left / run.total; ring.style.strokeDasharray = `${(94.25 * p).toFixed(1)} 94.25`; tt.textContent = `${Math.floor(run.left / 60)}:${String(run.left % 60).padStart(2, '0')}`; };
-    paint();
-    run.timer = setInterval(() => {
-      if (!run.alive || document.visibilityState !== 'visible') return;
-      if (run.left > 0) { run.left--; paint(); if (run.left === 0) showEnd(); }
-    }, 1000);
-    const end = el.querySelector('.xend');
-    function showEnd() { end.hidden = false; el.querySelector('#xback').setAttribute('href', backTo()); }
-    el.querySelector('#xmore').onclick = () => { run.left = d.sec; run.total = d.sec; end.hidden = true; paint(); stage.focus(); };
-    el.querySelectorAll('[data-feel]').forEach((b) => b.onclick = () => {
-      const L = K.local.get('ressenti', []); L.push({ id: K.uid(), at: Date.now(), jeu: g.id, v: b.dataset.feel }); K.local.set('ressenti', L.slice(-300));
-      el.querySelector('.xfeel').innerHTML = '<span class="small muted">Noté, merci.</span>';
-    });
-    el.querySelector('#xback').onclick = (e) => { e.preventDefault(); location.hash = backTo(); };
+    const back = el.querySelector('#xback'); back.setAttribute('href', backTo());
+    back.onclick = (e) => { e.preventDefault(); location.hash = backTo(); };
     stage.tabIndex = 0;
     const api = { run, stage, sound: () => run.sound, reduced: K.reduced(), theme: document.documentElement.dataset.theme };
     (({ sable: gameSable, carillon: gameCarillon, rizieres: gameRizieres, lucioles: gameLucioles, souffle: gameSouffle })[g.id] || K.detenteGames[g.id])(api);
@@ -385,7 +354,8 @@
   K.detAudio = { audio, bell, softTone, master: () => MASTER, canvas };
 
   /* ---------- Branchements ---------- */
-  K.view({ name: 'detente', title: 'Salle de détente', nav: 'detente', match: (h) => h === 'detente', render: (el) => { stopRun(); renderHub(el); } });
+  K.view({ name: 'detente', title: 'Salle lofi', nav: 'detente', match: (h) => h === 'detente', render: (el) => { stopRun(); try { sessionStorage.setItem('kotonoha.detente.from', K.lastLearning || 'aujourdhui'); } catch (e) {} if (K.lofi) K.lofi.render(el); else renderHub(el); } });
+  K.view({ name: 'detente-jeux', title: 'Jeux', nav: 'detente', match: (h) => h === 'detente-jeux', render: (el) => { stopRun(); renderHub(el); } });
   K.view({ name: 'detente-jeu', title: 'Pause', nav: 'detente', match: (h) => GAMES.some((g) => h === 'detente-' + g.id), render: renderGame });
   addEventListener('hashchange', () => { const h = location.hash.slice(1); if (!h.startsWith('detente-')) stopRun(); if (!h.startsWith('detente')) K.lastLearning = h || 'aujourdhui'; });
   K.lastLearning = location.hash.slice(1) || 'aujourdhui';
@@ -402,7 +372,7 @@
   }
   headerBtn();
   // Échap quitte l'expérience, où que soit le focus.
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && RUN && location.hash.startsWith('#detente-') && !document.querySelector('#focpanel.on, #wpop.on')) location.hash = '#detente'; });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && RUN && location.hash.startsWith('#detente-') && !document.querySelector('#focpanel.on, #wpop.on')) location.hash = '#detente-jeux'; });
   // Depuis le minuteur Focus (pendant la pause), le lien ferme le panneau.
   document.addEventListener('click', (e) => { if (e.target.closest('#fdet') && typeof focClose === 'function') focClose(); });
 })();

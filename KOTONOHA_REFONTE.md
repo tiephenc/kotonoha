@@ -1,5 +1,31 @@
 # KOTONOHA — refontes visuelles
 
+## Mission 6 : salle lofi, carte plus lisible, grand écran (5 novembre 2026)
+
+- **Salle lofi** (`app/lofi.js`) : c'est désormais l'écran principal de Détente (`#detente`).
+  - Scène en pixel art : un izakaya perdu dans la campagne.
+    - Le décor : rizières en terrasses, montagnes, cèdres, guirlande de lanternes, noren, tonneaux de saké, cheminée qui fume.
+    - De jour : nuages et oiseaux. De nuit : étoiles, lucioles, portes éclairées.
+    - Pluie en option.
+    - Les lanternes battent la mesure quand la musique joue.
+  - Atelier de composition : séquenceur de 16 pas.
+    - Pistes : mélodie pentatonique sur 8 lignes, accords, basse, grosse caisse, caisse claire, charleston.
+    - Accords choisis pour chacune des 4 mesures ; tempo et swing réglables.
+    - Pluie et crépitement de vinyle en option, 3 emplacements de sauvegarde.
+    - Tout le son est synthétisé par Web Audio ; rien ne démarre sans un geste.
+    - La musique, la pluie et le vinyle s'arrêtent quand on quitte la salle.
+- **Jeux** (`#detente-jeux`) : un simple hub, sans choix de durée, sans chronomètre ni fin imposée ; « Retour à la séance » reste visible dans chaque jeu.
+- **Décor de fond retiré** : le filigrane d'izakaya derrière le site est supprimé (`app/decor.js` retiré). L'ouverture animée KOTO/NOHA est conservée.
+- **Carte du Japon plus lisible** (méthodes ui-ux-pro-max et Impeccable) :
+  - pleine largeur, panneau d'information et itinéraire en dessous ;
+  - contours d'encre plus épais, noms de régions agrandis, repères et étiquettes plus grands ;
+  - boutons de caméra de 44 px avec icônes et libellés accessibles.
+- **Grand écran** :
+  - l'ouverture débordait horizontalement, parce que `100vw` compte la barre de défilement ; la largeur de cette barre est désormais retranchée ;
+  - le texte d'appel est posé sur une carte pleine, lisible même par-dessus les lettres ;
+  - vérifié à 1920 × 928.
+- **Tests** : la vérification du défilement horizontal mesure la mise en page réelle, même quand la page coupe le débordement. Elle a révélé un débordement de l'atelier lofi sur mobile, corrigé.
+
 ## Mission 5 : ouverture, décor, carte en relief (5 novembre 2026)
 
 - **Page d'ouverture** (Aujourd'hui), inspirée d'une affiche :

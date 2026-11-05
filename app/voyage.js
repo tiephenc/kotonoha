@@ -68,7 +68,7 @@
      Le plan (SVG : mer, îles en relief, routes) est incliné en perspective ; les destinations, le Fuji et le renard
      sont des éléments HTML debout sur ce plan (ils compensent la rotation pour toujours faire face). Caméra pilotable
      à la souris, au doigt et au clavier ; vue 2D sur demande ; tout reste utilisable sans animation. */
-  const CAM0 = { rx: 50, rz: -10, s: 1.3, tx: 0, ty: 0 };
+  const CAM0 = { rx: 48, rz: -10, s: matchMedia('(max-width: 760px)').matches ? 1.25 : 1.55, tx: 0, ty: 0 };
   let cam = Object.assign({}, CAM0), mode3d = true, unfolded = false, framed = false;
   try { mode3d = localStorage.getItem('kotonoha.voyage.3d') !== '0'; } catch (e) {}
   const PCT = (lat, lon) => { const [x, y] = P(lat, lon); return [(x / 900 * 100).toFixed(2), (y / 960 * 100).toFixed(2)]; };
@@ -112,9 +112,9 @@
           <div class="xm-hud"><div><b>${pts.toLocaleString('fr-FR')}</b> points de voyage · <b>${nSeen}</b> / ${V.places.length} destinations</div>
             ${next ? `<div class="xm-next"><span>Prochaine : ${esc(next.name)}</span><span class="bar"><i style="width:${Math.min(100, pts / next.pts * 100)}%"></i></span><span>${(next.pts - pts).toLocaleString('fr-FR')} pts</span></div>` : '<div>Toutes les destinations sont ouvertes.</div>'}</div>
           <div class="xmaptools" role="toolbar" aria-label="Caméra de la carte">
-            <button type="button" class="btn-ghost" data-cam="left" aria-label="Pivoter vers la gauche">⟲</button><button type="button" class="btn-ghost" data-cam="right" aria-label="Pivoter vers la droite">⟳</button>
-            <button type="button" class="btn-ghost" data-cam="up" aria-label="Incliner davantage">⤒</button><button type="button" class="btn-ghost" data-cam="down" aria-label="Redresser">⤓</button>
-            <button type="button" class="btn-ghost" data-z="in" aria-label="Rapprocher">＋</button><button type="button" class="btn-ghost" data-z="out" aria-label="Éloigner">－</button>
+            <span class="xmt-g" role="group" aria-label="Rotation"><button type="button" class="btn-ghost" data-cam="left" aria-label="Pivoter vers la gauche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button><button type="button" class="btn-ghost" data-cam="right" aria-label="Pivoter vers la droite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg></button></span>
+            <span class="xmt-g" role="group" aria-label="Inclinaison"><button type="button" class="btn-ghost" data-cam="up" aria-label="Incliner davantage"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button><button type="button" class="btn-ghost" data-cam="down" aria-label="Redresser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button></span>
+            <span class="xmt-g" role="group" aria-label="Distance"><button type="button" class="btn-ghost" data-z="in" aria-label="Rapprocher"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" class="btn-ghost" data-z="out" aria-label="Éloigner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button></span>
             <button type="button" class="btn-ghost" data-cam="here">Où suis-je</button><button type="button" class="btn-ghost" data-z="reset">Vue entière</button><button type="button" class="btn-ghost" data-cam="mode" aria-pressed="${mode3d}">${mode3d ? 'Vue 2D' : 'Vue 3D'}</button></div>
           <div class="xm-stage" tabindex="0" aria-label="Carte du Japon en relief. Glisser pour déplacer, molette ou boutons pour rapprocher, flèches du clavier pour se déplacer.">
             <div class="xm-plane">
