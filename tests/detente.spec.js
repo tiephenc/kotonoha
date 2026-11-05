@@ -39,6 +39,7 @@ for (const g of GAMES) {
 }
 
 test('fin de durée : trois choix, prolonger, ressenti facultatif, retour à la séance', async ({ page }) => {
+  test.setTimeout(120_000); // deux fois 61 s d'horloge simulée sur une animation : long sous forte charge
   await page.clock.install();
   const errors = await isolate(page);
   await onboard(page);

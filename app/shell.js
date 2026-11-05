@@ -116,6 +116,11 @@
     if (raf || calm()) return;
     raf = requestAnimationFrame(() => {
       raf = 0;
+      const op = document.querySelector('#v-aujourdhui.on .xopen');
+      if (op) { const y = Math.max(0, Math.min(scrollY, op.offsetHeight));
+        op.querySelectorAll('.xopen-type span').forEach((s, i) => { s.style.transform = `translate3d(${(i ? 1 : -1) * y * .12}px, ${y * .28}px, 0)`; });
+        const f = op.querySelector('.xopen-fox'); if (f) f.style.transform = `translate3d(0, ${-y * .14}px, 0)`;
+        const fd = op.querySelector('.xopen-field'); if (fd) fd.style.transform = `translate3d(0, ${y * .18}px, 0)`; }
       document.querySelectorAll('.xgarden [data-depth]').forEach((l) => {
         const r = l.parentNode.getBoundingClientRect(), off = (innerHeight - r.top) * +l.dataset.depth;
         l.style.transform = `translate3d(0, ${Math.max(0, Math.min(36, 36 - off * .5)).toFixed(1)}px, 0)`;

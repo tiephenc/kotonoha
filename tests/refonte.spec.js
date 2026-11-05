@@ -9,7 +9,9 @@ const seed = (page) => page.evaluate(() => {
 test('aujourd’hui : la séance de 4 h, trois étapes, frise qui fait le total, reprise', async ({ page }) => {
   const errors = await isolate(page);
   await onboard(page);
-  await expect(page.locator('.xsess h1')).toContainText('Séance du jour');
+  await expect(page.locator('.xsess .xhead-t')).toContainText('Séance du jour');
+  await expect(page.locator('.xopen h1')).toHaveAttribute('aria-label', 'Kotonoha');
+  await expect(page.locator('.xopen-facts > div')).toHaveCount(5);
   await expect(page.locator('.xpan')).toHaveCount(3);
   await expect(page.locator('.xpan .emb svg')).toHaveCount(3);
   await expect(page.locator('.xpan.cur')).toHaveCount(1);
@@ -64,6 +66,8 @@ test('voyage : points réels, destination débloquée, trajet animé, souvenir, 
   await expect(page.locator('.xplace[data-p="sapporo"]')).toHaveClass(/s-locked/);
   await page.locator('.xplace[data-p="kamakura"]').focus();
   await page.keyboard.press('Enter');
+  await expect(page.locator('.xm-plane')).toBeVisible();
+  await expect(page.locator('.xplace')).toHaveCount(14);
   await expect(page.locator('#xvinfo h2')).toContainText('Kamakura');
   await page.click('#xgo');
   await expect(page.locator('.xplace[data-p="kamakura"]')).toHaveClass(/s-seen/, { timeout: 15000 });
@@ -99,7 +103,7 @@ test('kamon : migration des anciens badges sans perte, fiche sourcée', async ({
   expect(errors).toEqual([]);
 });
 
-test('progrès : journal hebdomadaire, visualisations réelles, carte mentale zoomable', async ({ page }) => {
+test('progrès : journal hebdomadaire, visualisations réelles, carte mentale sans zoom', async ({ page }) => {
   const errors = await isolate(page);
   await onboard(page);
   await seed(page);
@@ -110,9 +114,8 @@ test('progrès : journal hebdomadaire, visualisations réelles, carte mentale zo
   await page.click('#v-progres .xjournal [data-w="-1"]');
   await expect(page.locator('#v-progres .xjournal')).toHaveAttribute('data-off', '-1');
   await page.evaluate(() => { location.hash = 'carte'; });
-  const vb0 = await page.locator('#v-x-carte .xmap svg').getAttribute('viewBox');
-  await page.click('#v-x-carte [data-z="in"]');
-  expect(await page.locator('#v-x-carte .xmap svg').getAttribute('viewBox')).not.toBe(vb0);
+  await expect(page.locator('#v-x-carte .xmap svg')).toBeVisible();
+  await expect(page.locator('#v-x-carte [data-z]')).toHaveCount(0);
   await noHorizontalOverflow(page);
   expect(errors).toEqual([]);
 });

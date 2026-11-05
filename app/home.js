@@ -153,6 +153,26 @@
       </svg></div>`;
   }
 
+  /* Page d'ouverture : affiche monumentale (champ teint semé de kamon, KOTO/NOHA, grand renard), puis la séance.
+     Les chiffres du bandeau sont réels ; le bouton descend vers la séance du jour. */
+  function hero(p, A, cur) {
+    const ed = examDate(), days = ed ? Math.max(0, Math.ceil((ed.getTime() - today()) / DAY)) : null, hr = new Date().getHours();
+    const kana = hr >= 5 && hr < 11 ? 'おはよう' : hr >= 11 && hr < 18 ? 'こんにちは' : 'こんばんは';
+    const due = dueCards().length, vs = K.voyage ? K.voyage.state() : { at: 'tokyo' }, here = ((window.KX_VOYAGE || { places: [] }).places.find((q) => q.id === vs.at) || { name: 'Tokyo' }).name;
+    const facts = [['Séance du jour', hm(p.T), `${hm(A)} déjà faites`], ['À réviser', String(due), due > 1 ? 'cartes dues' : 'carte due'], ['Parcours', `${validated().length}/210`, 'unités validées'],
+      ['JLPT', days == null ? '—' : 'J-' + days, days == null ? 'à mon rythme' : 'session de ' + sessLabel()], ['En voyage', here, 'carte du Japon']];
+    return `<section class="xopen" aria-labelledby="xopen-t">
+      <div class="xopen-field" aria-hidden="true"></div>
+      <p class="xopen-kana" lang="ja">${kana}</p>
+      <h1 id="xopen-t" class="xopen-type" aria-label="Kotonoha"><span aria-hidden="true">KOTO</span><span aria-hidden="true">NOHA</span></h1>
+      <div class="xopen-v" lang="ja" aria-hidden="true">言の葉</div>
+      <div class="xopen-fox">${K.fox(cur ? (hr >= 23 || hr < 5 ? 'sommeil' : 'accueil') : 'celebration', { label: 'Kitsune, le renard guide de KOTONOHA' })}</div>
+      <div class="xopen-cta"><p>${cur ? `Aujourd’hui : ${esc(cur.t.toLowerCase())} d’abord, ${hm(p.T)} au programme.` : 'La séance du jour est faite. Otsukaresama.'}</p>
+        <a class="xopen-go" href="#xsess">Voir la séance du jour <span aria-hidden="true">↓</span></a></div>
+      <dl class="xopen-facts">${facts.map(([a, b, c]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}<small>${esc(c)}</small></dd></div>`).join('')}</dl>
+    </section>`;
+  }
+
   window.viewTodayAffiche = function () {
     useJokers();
     const el = $('#v-aujourdhui'), d = dayRec(), M = missionSteps(), allM = M.every((x) => x.ok);
@@ -167,10 +187,10 @@
     const date = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
     const pos = Math.min(p.T, A + BRK * Math.min(p.P, Math.floor(A / WORK)));
     let acc = 0;
-    el.innerHTML = `<div class="xsess${night ? ' is-night' : ''}">
+    el.innerHTML = `${hero(p, A, cur)}<div class="xsess${night ? ' is-night' : ''}" id="xsess" tabindex="-1">
       <div class="xbeamwrap"><div class="xbeam" aria-hidden="true"></div></div>
       <header class="xhead"><div class="xfox-perch">${K.fox(pose, { size: 140 })}</div>
-        <h1><span class="k" lang="ja" aria-hidden="true">本日の稽古</span><span class="l">Séance du jour</span></h1>
+        <h2 class="xhead-t"><span class="k" lang="ja" aria-hidden="true">本日の稽古</span><span class="l">Séance du jour</span></h2>
         <div class="xhead-side">
           <p class="xsess-meta"><span class="xdate">${esc(date)}</span><label>Durée <select id="xdur" aria-label="Durée de la séance">${DUR.map((m) => `<option value="${m}"${m === s.min ? ' selected' : ''}>${hm(m)}</option>`).join('')}</select></label>
             <span><b class="num">${hm(A)}</b> d’étude active</span><span><b class="num">${hm(Math.max(0, p.W - A))}</b> de travail restant</span><span>${p.P} pause${p.P > 1 ? 's' : ''} de ${BRK} min</span></p>
@@ -211,6 +231,7 @@
     </div>`;
     wire(el);
     const sel = el.querySelector('#xdur'); if (sel) sel.onchange = () => { sess().min = +sel.value; save(); viewTodayAffiche(); };
+    const go = el.querySelector('.xopen-go'); if (go) go.onclick = (e) => { e.preventDefault(); const t = el.querySelector('#xsess'); t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); t.focus({ preventScroll: true }); };
     const tb = el.querySelector('#xtimer'); if (tb) tb.onclick = () => { try { focOpen(); const c = focState().cur; if (c.ph === 'idle' || c.ph === 'bdone') focStart('work'); } catch (e) { console.error(e); } };
   };
   K.seance = { plan, timeline, stepsState, sess };

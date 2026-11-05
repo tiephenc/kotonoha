@@ -1,5 +1,28 @@
 # KOTONOHA — refontes visuelles
 
+## Mission 5 : ouverture, décor, carte en relief (5 novembre 2026)
+
+- **Page d'ouverture** (Aujourd'hui), inspirée d'une affiche :
+  - champ teint semé de kamon pochoirés ;
+  - « KOTO / NOHA » monumental derrière le grand renard d'origine, 言の葉 en vertical ;
+  - bandeau de faits réels : séance prévue, cartes dues, unités validées, compte à rebours JLPT, lieu du voyage ;
+  - un bouton descend vers la séance du jour.
+  Parallaxe au défilement (titre, renard, motif) ; animations coupées par `prefers-reduced-motion`.
+- **Décor de fond** (`app/decor.js`) : l'intérieur d'un izakaya en pixel art, dessiné dans un canvas de 320 × 200 agrandi sans lissage, fixe derrière le site, à 6 % d'opacité le jour et 10 % la nuit. On y voit :
+  - les poutres, les lanternes et les tablettes du menu ;
+  - le noren de l'entrée, les bouteilles, le comptoir et la marmite fumante ;
+  - par la fenêtre, le satoyama de jour, le village et la pluie la nuit.
+  L'animation tourne à 6 images/s ; elle s'arrête si l'onglet est caché ou si l'utilisateur réduit les animations.
+- **Carte du Japon en relief** :
+  - le plan incliné en perspective CSS 3D, îles extrudées ;
+  - les destinations, le Fuji et les sommets sont des éléments debout qui font toujours face à la caméra (lanterne : accessible, tampon : visitée, cadenas : à débloquer, renard : vous êtes ici) ;
+  - des nuages en altitude ;
+  - une caméra pilotable : pivoter, incliner, rapprocher, « Où suis-je », « Vue entière » ; glisser pour déplacer, Maj + glisser pour pivoter, molette, flèches du clavier ;
+  - une vue 2D au choix, mémorisée ;
+  - un bandeau de progression et un itinéraire cliquable qui recentre la caméra.
+- **Carte mentale** (carte du parcours) : boutons et gestes de zoom retirés.
+- **Accessibilité** : le fond de carte n'est plus masqué aux lecteurs d'écran (les régions y sont activables) ; le bandeau de faits ne s'anime plus en opacité.
+
 ## Mission 4 : l'izakaya de campagne (5 novembre 2026)
 
 Cette refonte remplace la direction « carnet de voyage » ci-dessous. Les données (voyage, kamon, journal) et les fonctions sont conservées ; seuls l'habillage, la navigation et l'accueil changent.
