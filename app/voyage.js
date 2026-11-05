@@ -82,7 +82,7 @@
     const reg = V.regions.map((r) => { const [x, y] = P(r.lat, r.lon); return `<text class="xregion" data-r="${r.id}" x="${x.toFixed(0)}" y="${y.toFixed(0)}" tabindex="0" role="button" aria-label="Région ${esc(r.t)}">${esc(plain(r.j))}</text>`; }).join('');
     const [fx, fy] = P(byId[v.at].lat, byId[v.at].lon);
     const nSeen = V.places.filter((p) => v.seen[p.id]).length, next = V.places.filter((p) => p.pts > pts).sort((a, b) => a.pts - b.pts)[0];
-    el.innerHTML = `<div class="eyebrow">旅 · le voyage</div><h1>Carnet de route au Japon</h1>
+    el.innerHTML = `<h1>Carnet de route au Japon</h1>
       <p class="muted">Vos activités d’apprentissage réelles vous font avancer d’une étape à l’autre. Ces points de voyage récompensent l’effort : <b>ils ne mesurent pas votre niveau de japonais</b> (voir <a href="#maitrise">Maîtrise</a>) et ne bloquent rien. Les pauses ne coûtent jamais rien.</p>
       <div class="xvoy">
         <div class="xmapwrap${unfolded || K.reduced() ? '' : ' unfold'}">
@@ -127,7 +127,7 @@
 
   function regionInfo(el, id) {
     const r = V.regions.find((x) => x.id === id), list = V.places.filter((p) => p.region === id);
-    el.querySelector('#xvinfo').innerHTML = `<div class="eyebrow">Région</div><h2 class="jp">${ruby(r.j)} · ${esc(r.t)}</h2><p>${esc(r.d)}</p>
+    el.querySelector('#xvinfo').innerHTML = `<div class="xmeta">Région</div><h2 class="jp">${ruby(r.j)} · ${esc(r.t)}</h2><p>${esc(r.d)}</p>
       ${list.length ? `<p class="small">Destinations : ${list.map((p) => `<button type="button" class="btn-ghost small" data-go="${p.id}">${esc(p.name)}</button>`).join(' ')}</p>` : '<p class="small muted">Aucune étape du voyage dans cette région pour l’instant.</p>'}`;
     el.querySelectorAll('#xvinfo [data-go]').forEach((b) => b.onclick = () => info(el, b.dataset.go));
   }
@@ -137,7 +137,7 @@
     const way = s !== 'locked' && v.at !== id ? path(v.at, id, pts) : null;
     const legs = way ? way.slice(1).map((n, i) => V.routes.find((r) => (r.a === way[i] && r.b === n) || (r.b === way[i] && r.a === n))) : [];
     const reg = V.regions.find((r) => r.id === p.region), km = window.KX_KAMON && window.KX_KAMON.find((k) => k.id === p.kamon);
-    box.innerHTML = `<div class="eyebrow">${esc(reg ? reg.t : '')}</div><h2 class="jp">${ruby(p.j)} · ${esc(p.name)}</h2>
+    box.innerHTML = `<div class="xmeta">${esc(reg ? reg.t : '')}</div><h2 class="jp">${ruby(p.j)} · ${esc(p.name)}</h2>
       ${s === 'seen' ? `<div class="xvart">${art(p.souvenir[0], 'pop')}<p class="small"><b>Souvenir :</b> ${esc(p.souvenir[1])}</p></div><p>${esc(p.story)}</p><p>${esc(p.culture)}</p>
         ${km ? `<p class="small">Kamon lié : <a href="#kamon-${km.id}">${esc(plain(km.j))}</a></p>` : ''}
         <p class="small">Sources : ${p.src.map(([t, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(t)}</a>`).join(' · ')}</p>`

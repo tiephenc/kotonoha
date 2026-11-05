@@ -1,6 +1,6 @@
 # KOTONOHA — reprise du travail
 
-Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refaire les audits déjà réalisés. Mis à jour le 4 novembre 2026, à la fin de la mission 3 (refonte « carnet de voyage »).
+Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refaire les audits déjà réalisés. Mis à jour le 5 novembre 2026, à la fin de la mission 4 (refonte « izakaya »).
 
 ## 1. Ouvrir la bonne session
 
@@ -11,7 +11,9 @@ Pour une nouvelle session Claude Code. Ce document permet de reprendre sans refa
 
 - Mission 2 : branche `audit/pre-claude`, fusionnée dans `main` (PR n° 1, commit `edb9790`).
 - Mission 3 : branche `refonte/carnet-de-voyage`, fusionnée en avance rapide dans `main` et poussée sans forçage, sur autorisation explicite de l'utilisateur. Le site public est https://tiephenc.github.io/kotonoha/ (GitHub Pages, branche `main`).
-- Version du service worker : `kotonoha-2026-11-04-carnet`. **À changer à chaque publication.**
+- Mission 4 : branche `refonte/izakaya`, fusionnée en avance rapide dans `main` et poussée sans forçage, sur demande explicite de l'utilisateur.
+- Version du service worker : `kotonoha-2026-11-05-izakaya`. **À changer à chaque publication.**
+- Direction de design : `PRODUCT.md` et `DESIGN.md` (versionnés) ; le contrat de direction Impeccable reste local dans `.impeccable/` (ignoré par Git, pour ne pas être servi par GitHub Pages).
 - Sauvegarde d'avant la mission 2, hors Git : `backups/2026-11-04-avant-mission2/` (fichiers d'origine, `SHA256SUMS.txt`, bundle Git complet).
 
 ## 3. Audits déjà faits (ne pas recommencer)

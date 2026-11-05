@@ -89,7 +89,7 @@
       y += 8;
     });
     const line = path.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(0) + ' ' + p[1].toFixed(0)).join(' ');
-    el.innerHTML = `<div class="eyebrow">Progrès</div><h1>Carte du parcours</h1>
+    el.innerHTML = `<h1>Carte du parcours</h1>
       <p class="muted">Trois niveaux, ${MODULES.length} modules, ${order().length} unités. La couleur indique la maîtrise réelle ; le fil relie les modules dans l’ordre des prérequis. Touchez une unité pour voir ses liens.</p>
       ${legend()}
       <div class="xmaptools rel" role="toolbar" aria-label="Zoom"><button type="button" class="btn-ghost" data-z="in" aria-label="Zoomer">＋</button><button type="button" class="btn-ghost" data-z="out" aria-label="Dézoomer">－</button><button type="button" class="btn-ghost" data-z="reset">Vue entière</button><span class="small muted">Glisser pour se déplacer · molette ou pincement pour zoomer</span></div><div class="xmap"><svg viewBox="-2 -2 ${W + 4} ${y + 4}" width="100%" role="group" aria-label="Carte des modules et des unités"><path d="${line}" class="thread"/>${svg}</svg></div>
@@ -126,7 +126,7 @@
       nodes += node(X, Y, 26, `u m${mast(x.n)}`, String(x.n), `#carte-${x.n}`, `${SYL[x.n] ? SYL[x.n].t : ''} · ${x.t}`); });
     nodes += `<a href="#unite-${n}" class="nd center m${s}" aria-label="Ouvrir l’unité ${n}"><circle cx="${cx}" cy="${cy}" r="48"/><text x="${cx}" y="${cy - 4}" class="big">${n}</text><text x="${cx}" y="${cy + 16}" class="sm">${["Non ouverte", "Consultée", "Terminée", "Comprise", "Maîtrisée"][s]}</text></a>`;
     el.innerHTML = `<a class="back-link" href="#carte">Retour à la carte</a>
-      <div class="eyebrow">Carte · ${lvOf(n)} · unité ${n}</div><h1>${esc(SYL[n] ? SYL[n].t : 'Unité ' + n)}</h1>
+      <div class="xmeta">Carte · ${lvOf(n)} · unité ${n}</div><h1>${esc(SYL[n] ? SYL[n].t : 'Unité ' + n)}</h1>
       ${legend()}
       <div class="xedges small"><span class="e-g">— grammaire</span><span class="e-k">— kanji</span><span class="e-p">— avant / après</span><span class="e-s">— kanji partagés</span><span class="e-c">— contrastes</span></div>
       <div class="xmaptools rel" role="toolbar" aria-label="Zoom"><button type="button" class="btn-ghost" data-z="in" aria-label="Zoomer">＋</button><button type="button" class="btn-ghost" data-z="out" aria-label="Dézoomer">－</button><button type="button" class="btn-ghost" data-z="reset">Vue entière</button><span class="small muted">Glisser pour se déplacer · molette ou pincement pour zoomer</span></div><div class="xmap xfocus"><svg viewBox="0 0 ${W} ${H}" width="100%" role="group" aria-label="Liens de l’unité ${n}">${edges}${nodes}</svg></div>

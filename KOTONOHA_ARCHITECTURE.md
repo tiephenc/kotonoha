@@ -1,6 +1,6 @@
 # KOTONOHA — architecture
 
-État au 4 novembre 2026, après la mission 3 (refonte « carnet de voyage », détaillée dans `KOTONOHA_REFONTE.md`).
+État au 5 novembre 2026, après la mission 4 (refonte « izakaya », détaillée dans `KOTONOHA_REFONTE.md`).
 
 ## Vue d'ensemble
 
@@ -8,9 +8,10 @@
 index.html            site complet (HTML, CSS, script classique, données pédagogiques) ~5,7 Mo
 app/plus.css          styles des espaces complémentaires (+ correctifs de contraste du thème clair)
 app/plus.js           noyau KX : registre de vues, crochets de rendu (KX.on, KX.onMatch), stockage local, KX.panzoom, utilitaires
-app/theme.css         système visuel de la refonte (chargé en dernier) : couleurs, typographies, carnet, voyage, kamon, focus, animations
-app/fox.js           renard en six poses (KX.fox), remplace window.kitsune
-app/home.js          Accueil « Carnet du jour » et journal de la semaine (remplace heat et viewTodayAffiche)
+app/theme.css         système visuel izakaya (chargé en dernier) : jetons jour/nuit, onglets en noren, séance, renard, espaces, mouvement
+app/shell.js          coque : six onglets, sous-rubriques, ambiance selon l'heure et lanterne, reprise, transitions et parallaxe
+app/fox.js           renard d'origine en six poses (KX.fox), remplace window.kitsune
+app/home.js          Aujourd'hui : séance de 4 h (KX.seance), frise, jardin ; journal de la semaine (remplace heat et viewTodayAffiche)
 app/kamon-data.js    24 fiches de kamon (dessins, textes, sources) — données rédigées
 app/kamon.js         collection, migration des badges, révélation en sceau (remplace checkBadges et badgeGrid)
 app/voyage-data.js   régions, destinations, trajets (coordonnées réelles projetées) — données rédigées
@@ -45,6 +46,8 @@ Le routeur de `index.html` (`route()`) délègue aux modules :
 - `KX.on(ecran, fn)` est appelé après le rendu d'un écran existant (`entrainer`, `progres`, `aujourdhui`) pour y ajouter des tuiles (`KX.tile`).
 
 - `KX.onMatch(regex, fn)` fait de même pour les écrans à paramètre (`unite-56`).
+- `app/shell.js` enveloppe `KX.after` : après chaque rendu, il allume l'onglet (`tabOf`), ajoute la bande de sous-rubriques et mémorise la dernière activité. La navigation de `index.html` ne contient plus que les six onglets (`data-tab`).
+- `themeOf` est remplacé : « auto » suit l'heure locale (nuit de 19 h à 7 h).
 - Quelques fonctions globales du script principal sont remplacées par les modules (même nom, même rôle) : `kitsune`, `checkBadges`, `badgeGrid`, `heat`, `viewTodayAffiche`. `focOpen`, `focClose` et `focRender` sont enveloppées.
 
 Ainsi les modifications de `index.html` restent minimes et localisées (refonte : une ligne de police et les balises `<link>`/`<script>` des nouveaux modules).
@@ -59,6 +62,7 @@ Ainsi les modifications de `index.html` restent minimes et localisées (refonte 
 | Textes longs (lectures, rédactions, brouillons, conversations, ressentis) | `localStorage['kotonoha.plus.v1']` via `KX.local` | non (sur l'appareil) | oui (`plus` dans le fichier d'export, fusion prudente à l'import) |
 | Kamon obtenus (`S.g.kamon` : identifiant → date ; `S.g.kamonInit`) | `S.g` | oui | oui |
 | Voyage (`S.x.voyage` : lieu actuel, lieux visités) | `S.x` | oui | oui |
+| Séance du jour (`S.x.sess` : durée choisie, plan figé du jour) et dernière activité (`S.x.last`) | `S.x` | oui | oui |
 | Préférences d'affichage (durée de pause, mode de conversation…) | `localStorage['kotonoha.detente.*']`, `kotonoha.atelier.*` | non | non |
 | Corpus Anki importé | IndexedDB / `CORE`, `ANKID` (vides dans la version publique) | selon le code existant | inchangé |
 
@@ -89,6 +93,6 @@ Toutes les données importées ou synchronisées passent par `normTypes()` (dans
 
 ## Service worker
 
-La version est `kotonoha-2026-11-04-carnet`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
+La version est `kotonoha-2026-11-05-izakaya`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
 
 **À chaque publication, changer `VERSION` dans `sw.js`.**

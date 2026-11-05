@@ -75,7 +75,7 @@ ${text}`;
   /* ---------- Vues : atelier (hub) ---------- */
   function renderHub(el) {
     const R = redacs().slice().reverse(), lv = curLv();
-    el.innerHTML = `<div class="eyebrow">S’entraîner</div><h1>Atelier</h1>
+    el.innerHTML = `<h1>Atelier</h1>
       <p class="muted">Produire du japonais : écrire sur un sujet, puis le faire corriger ; converser dans des situations réelles, avec des explications après les échanges.</p>
       <h2 class="xh2">Écrire</h2>
       ${LV.map((L) => `<details class="card panel xread"${L === lv ? ' open' : ''}><summary><h2><span class="tag">${L}</span> Sujets</h2></summary>
@@ -109,7 +109,7 @@ ${text}`;
     const text0 = prev ? prev.texte : K.local.get(draftKey, '');
     const aides = suj ? suj.g.map((g, i) => { const n = (suj.u && suj.u[i]) || unitFor(g); return `<li>〜${esc(g)}${n ? ` · <a href="#unite-${n}">unité ${n}</a>` : ''}</li>`; }).join('') : '';
     el.innerHTML = `<a class="back-link" href="#atelier">Retour à l’atelier</a>
-      <div class="eyebrow">Écrire · ${lv}</div><h1>${esc(suj ? suj.t : prev ? prev.titre : 'Texte libre')}</h1>
+      <div class="xmeta">Écrire · ${lv}</div><h1>${esc(suj ? suj.t : prev ? prev.titre : 'Texte libre')}</h1>
       ${suj ? `<p class="muted">${esc(suj.c)}</p>` : '<p class="muted">Écrivez sur le sujet de votre choix.</p>'}
       ${suj ? `<details class="card panel"><summary>Aide facultative</summary><p class="small">Points de grammaire à essayer :</p><ul class="small">${aides}</ul>
         <p class="small muted">Registre conseillé : ${lv === 'N2' ? 'forme neutre (だ・である) pour un texte argumenté, ou です・ます, mais un seul des deux' : 'です・ます, du début à la fin'}.</p></details>` : ''}
@@ -165,7 +165,7 @@ ${text}`;
     const sc = D.scenarios.find((s) => 'conversation-' + s.id === h);
     const C = { i: 0, picks: [], mode: pref.get('mode', 'guide'), expl: pref.get('expl', true), tts: pref.get('tts', false), seed: Date.now() % 233280 };
     el.innerHTML = `<a class="back-link" href="#atelier">Retour à l’atelier</a>
-      <div class="eyebrow">Converser · <span class="tag">${sc.lv}</span> ${esc(sc.cat)} · registre ${esc(sc.reg)}</div><h1>${esc(sc.t)}</h1>
+      <div class="xmeta">Converser · <span class="tag">${sc.lv}</span> ${esc(sc.cat)} · registre ${esc(sc.reg)}</div><h1>${esc(sc.t)}</h1>
       <p class="muted">${esc(sc.role)}</p>
       <div class="toolbar xconvopts">
         <div class="seg" role="group" aria-label="Mode"><button type="button" data-m="guide" aria-pressed="${C.mode === 'guide'}">Réponses proposées</button><button type="button" data-m="libre" aria-pressed="${C.mode === 'libre'}">Réponse libre</button></div>
@@ -238,7 +238,7 @@ ${text}`;
   function renderLibre(el) {
     if (!canAI()) { el.innerHTML = '<a class="back-link" href="#atelier">Retour à l’atelier</a><h1>Conversation libre</h1><p class="muted">Indisponible ici : cette fonction n’existe que lorsque KOTONOHA tourne dans un artefact claude.ai. Utilisez la consigne de jeu de rôle depuis l’atelier.</p>'; return; }
     const lv = curLv(), H = [];
-    el.innerHTML = `<a class="back-link" href="#atelier">Retour à l’atelier</a><div class="eyebrow">Converser · ${lv}</div><h1>Conversation libre</h1>
+    el.innerHTML = `<a class="back-link" href="#atelier">Retour à l’atelier</a><div class="xmeta">Converser · ${lv}</div><h1>Conversation libre</h1>
       <p class="muted">Écrivez en japonais. Les corrections viennent à la fin, sur demande.</p>
       <div class="xchat" id="xchat" aria-live="polite"></div>
       <form class="xfree"><label class="xlab">Votre message<textarea rows="2" lang="ja" maxlength="400" required></textarea></label><div class="toolbar"><button class="btn" type="submit">Envoyer</button><button class="btn sec" type="button" id="xfin">Terminer et corriger</button></div></form>`;

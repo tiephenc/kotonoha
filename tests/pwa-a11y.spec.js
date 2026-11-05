@@ -23,22 +23,26 @@ test.describe('hors connexion', () => {
   });
 });
 
-const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture', 'voyage', 'kamon', 'kamon-katabami', 'detente-musique', 'detente-pinceau', 'carnet'];
+const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture', 'voyage', 'kamon', 'kamon-katabami', 'detente-musique', 'detente-pinceau', 'carnet', 'profil', 'calendrier'];
 
 test('accessibilité (axe-core, WCAG 2 A/AA) : écrans principaux et nouveaux espaces', async ({ page }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(360_000);
   await isolate(page);
   await onboard(page);
   const report = [];
-  for (const v of VIEWS) {
-    await page.evaluate((h) => { location.hash = h; }, v);
-    await page.waitForTimeout(400);
-    const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).include('main').analyze();
-    for (const x of r.violations) report.push(`${v} · ${x.id} (${x.impact}) · ${x.nodes.length} élément(s) · ${x.nodes[0].target.join(' ')}`);
+  // Les deux ambiances (jour et nuit) sont auditées : le mode automatique suit l'heure.
+  for (const th of ['jour', 'nuit']) {
+    await page.evaluate((t) => { S.theme = t; save(); applyTheme(); }, th);
+    for (const v of VIEWS) {
+      await page.evaluate((h) => { location.hash = h; }, v);
+      await page.waitForTimeout(400);
+      const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).include('main').analyze();
+      for (const x of r.violations) report.push(`${v} · ${x.id} (${x.impact}) · ${x.nodes.length} élément(s) · ${x.nodes[0].target.join(' ')} · ${th}`);
+    }
   }
   console.log('AXE\n' + (report.join('\n') || 'aucune violation'));
   test.info().annotations.push({ type: 'axe', description: report.join(' | ') || 'aucune violation' });
   // Les violations des nouveaux espaces (préfixe v-x-) doivent être nulles ; celles de l'existant sont rapportées.
-  const mine = report.filter((l) => /^(aujourdhui|calendrier|maitrise|detente|lire|atelier|redaction|conversation|carte|culture|voyage|kamon|carnet|progres)/.test(l));
+  const mine = report.filter((l) => /^(aujourdhui|parcours|unite|revision|entrainer|calendrier|maitrise|detente|lire|atelier|redaction|conversation|carte|culture|voyage|kamon|carnet|progres|profil)/.test(l));
   expect(mine, mine.join('\n')).toEqual([]);
 });

@@ -13,7 +13,7 @@
       const L = notes().slice().sort((a, b) => b.at - a.at);
       const F = q ? L.filter((n) => (String(n.titre) + ' ' + String(n.texte) + ' ' + (Array.isArray(n.tags) ? n.tags.join(' ') : '')).toLowerCase().includes(q.toLowerCase())) : L;
       const cur = edit ? L.find((n) => n.id === edit) : null;
-      el.innerHTML = `<div class="eyebrow">Profil</div><h1>Carnet</h1>
+      el.innerHTML = `<h1>Carnet</h1>
         <p class="muted">Vos notes libres : questions à poser, nuances repérées, phrases entendues, objectifs. Elles restent sur cet appareil et sont incluses dans l’export de vos données.</p>
         <div class="card panel"><h2>${cur ? 'Modifier la note' : 'Nouvelle note'}</h2>
           <form id="xcf" class="xform"><label>Titre<input name="titre" maxlength="120" required value="${esc(cur ? cur.titre : '')}"></label>

@@ -54,7 +54,7 @@
         <ol class="xtexts">${U.map((n) => { const r = UNITS[n].reading, d = S.units[n] && S.units[n].done && S.units[n].done.lecture;
           return `<li${d ? ' class="done"' : ''}><a href="#unite-${n}/lecture"><span class="jp">${ruby(r.title)}</span><small>Unité ${n} · ${r.qs ? r.qs.length : 0} question${r.qs && r.qs.length > 1 ? 's' : ''}${d ? ' · lu' : ''}</small></a></li>`; }).join('')}</ol></details>`;
     };
-    el.innerHTML = `<div class="eyebrow">S’entraîner</div><h1>Lire</h1>
+    el.innerHTML = `<h1>Lire</h1>
       <p class="muted">Les textes du parcours, gradués du N4 au N2, avec questions et corrections ; et vos propres lectures (actualités, articles, pages), analysées par le dictionnaire du site.</p>
       <div class="grid2">
         <div class="card panel"><h2>Ajouter une lecture</h2>
@@ -95,7 +95,7 @@
     const paras = x.text.split(/\n\s*\n|\n/).filter((p) => p.trim());
     const unknownFirst = a.words.slice().sort((p, q) => (p.known - q.known));
     el.innerHTML = `<a class="back-link" href="#lire">Retour à Lire</a>
-      <div class="eyebrow">${x.news ? 'Actualité' : 'Lecture'} · ${esc(x.source || 'source non précisée')}${x.pub ? ' · publié le ' + new Date(x.pub + 'T00:00:00').toLocaleDateString('fr-FR') : ''}</div>
+      <div class="xmeta">${x.news ? 'Actualité' : 'Lecture'} · ${esc(x.source || 'source non précisée')}${x.pub ? ' · publié le ' + new Date(x.pub + 'T00:00:00').toLocaleDateString('fr-FR') : ''}</div>
       <h1 class="xrtitle" lang="ja">${esc(x.title)}</h1>
       <div class="xstats"><div><b>${esc(a.est)}</b><span>niveau estimé (indicatif, d’après le vocabulaire reconnu)</span></div><div><b>${a.chars}</b><span>caractères</span></div><div><b>${a.words.length}</b><span>mots reconnus</span></div><div><b>${a.kInfo.filter((k) => !k.known).length}</b><span>kanji à découvrir</span></div></div>
       ${K.safeUrl(x.url) ? `<p class="small">Source : <a href="${esc(K.safeUrl(x.url))}" target="_blank" rel="noopener noreferrer">${esc(x.url)}</a></p>` : ''}

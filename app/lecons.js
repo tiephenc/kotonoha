@@ -19,7 +19,7 @@
       u.kanji && u.kanji.length && ['字', 'Tracer ses kanji', `${u.kanji.map((k) => k[0]).slice(0, 6).join(' ')}…`, `#ecrire-${encodeURIComponent(u.kanji[0][0])}`],
     ].filter(Boolean);
     const box = document.createElement('section'); box.className = 'xlesson card panel'; box.dataset.xlesson = n; box.setAttribute('aria-label', 'Prolonger la leçon');
-    box.innerHTML = `<div class="eyebrow">Prolonger la leçon</div><h2>Pratiquer l’unité ${n} autrement</h2>
+    box.innerHTML = `<h2>Pratiquer l’unité ${n} autrement</h2>
       <div class="xlgrid">${items.map(([kj, t, d, href]) => `<a class="xlitem" href="${esc(href)}"><span class="kj" aria-hidden="true">${kj}</span><b>${esc(t)}</b><span>${esc(d)}</span></a>`).join('')}</div>`;
     el.appendChild(box);
   });

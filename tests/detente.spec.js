@@ -6,7 +6,7 @@ const GAMES = ['etang', 'sable', 'musique', 'pinceau', 'ricochets', 'rizieres', 
 test('salon : accès depuis l’en-tête, durées, huit expériences', async ({ page }) => {
   const errors = await isolate(page);
   await onboard(page);
-  await page.click('#xdetbtn');
+  await page.click('nav.main a[data-tab="detente"]');
   await expect(page.locator('#v-x-detente h1')).toHaveText('Faire une vraie pause');
   await expect(page.locator('.xgame')).toHaveCount(8);
   await page.click('label:has(input[name=xdur][value=micro])');

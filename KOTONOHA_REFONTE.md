@@ -1,4 +1,72 @@
-# KOTONOHA — refonte « carnet de voyage » (mission 3)
+# KOTONOHA — refontes visuelles
+
+## Mission 4 : l'izakaya de campagne (5 novembre 2026)
+
+Cette refonte remplace la direction « carnet de voyage » ci-dessous. Les données (voyage, kamon, journal) et les fonctions sont conservées ; seuls l'habillage, la navigation et l'accueil changent.
+
+### Direction artistique
+
+- Un vieil izakaya de campagne (kominka, satoyama), traduit en langage graphique et non en décor : la **teinture au pochoir des noren** (katazome). Aplats teints, filets blancs réservés, motif pochoir de feuilles de « kotonoha » et de crosses de fougère.
+- **Jour** : coton écru, bois clair, vert mousse, kakishibu (brun-orangé). **Nuit** : bois sombre, toile indigo, lanternes ambrées, rouge profond. Le même établissement à deux moments, pas un simple thème clair ou sombre.
+- Le mode « Selon l'heure » passe à la nuit de 19 h à 7 h. La lanterne de l'en-tête force jour ou nuit.
+- Typographie :
+  - Dela Gothic One pour les grands caractères japonais ;
+  - Anton pour les titres latins monumentaux ;
+  - Shippori Mincho pour les titres ;
+  - Zen Kaku Gothic New pour le texte.
+- Tout est dans `app/theme.css` (jetons en tête, puis composants). Choix enregistré dans `PRODUCT.md` et `.impeccable/surfaces/index-html.md`.
+
+### Navigation
+
+- Six onglets : Aujourd'hui, Apprendre, Pratiquer, Voyager, Détente, Profil. L'onglet courant est un pan de noren qui pend de la poutre de l'en-tête. Sur mobile, les onglets forment une barre de tissu teint en bas de l'écran.
+- Chaque onglet regroupe des écrans existants, rappelés par une bande de sous-rubriques en tête d'écran. Toutes les anciennes adresses fonctionnent (`#revision`, `#progres`, `#unite-12/…`).
+- Un grand caractère d'onglet (今日, 学ぶ, 練習, 旅, 憩い, 私), coupé par le bord, signe chaque espace (décoratif, masqué aux lecteurs d'écran).
+
+### Aujourd'hui : la séance de 4 heures
+
+- La première vue est la séance, en trois pans de noren :
+  - Réviser ;
+  - Avancer (sections du parcours enchaînées) ;
+  - Défi et pratique.
+- Chaque pan reprend l'ancien emblème d'étape (`hanaArt` d'origine), son contenu, sa durée, l'avancement réel et un accès direct. L'étape en cours est relevée.
+- **Durée réglable** : 2 à 6 h, 4 h par défaut. Une pause de 10 min toutes les 50 min de travail.
+- Les durées sont figées pour la journée au premier affichage. Quand toutes les sections prévues sont faites, la liste se prolonge avec les suivantes.
+- Une **frise** pose les étapes et les pauses bout à bout. Les durées, alignées à droite, totalisent exactement la séance. Un repère indique où l'on en est, d'après le temps actif mesuré.
+- Le bouton « Lancer un bloc de 50 min » ouvre le Focus. « Reprendre » renvoie à la dernière activité d'apprentissage (mémorisée 20 h).
+- Sous la séance : une lisière de jardin en trois couches SVG (collines, cèdres, fougères, lanterne de pierre allumée la nuit) avec une parallaxe légère, puis les recommandations, le voyage et le journal de la semaine.
+
+### Renard
+
+- Retour au dessin d'origine : masque géométrique crème, flamme et marques vermillon, col à vagues seigaiha.
+- Six poses : accueil, étude (pinceau), focus (lanterne), repos (thé), sommeil, célébration. Seuls changent le regard, l'inclinaison et l'objet.
+- Animations discrètes (respiration, oreille, clignement, lanterne), coupées par `prefers-reduced-motion`.
+
+### Espaces
+
+- **Focus** : salle du soir (bois sombre, bandeau de noren indigo, lueur de lanterne), avec le renard en pose focus, y compris avant le premier bloc.
+- **Voyager** : carte ancienne, terres sur washi à l'encre, mer en lavis ; noms de régions en grands caractères vermillon.
+- **Kamon** : chaque kamon obtenu est un sceau réservé en blanc sur un carré de tissu teint ; les kamon à découvrir sont en pointillés.
+- **Détente** : jardin moussu, bandeau de feuilles, cartes unies.
+
+### Mouvement
+
+- Plusieurs mouvements :
+  - les pans se déroulent à l'arrivée et ondulent au survol ;
+  - l'onglet courant se déplie ;
+  - transitions d'onglets (View Transitions, quand le navigateur les connaît) ;
+  - apparitions au défilement (`animation-timeline: view()` là où c'est pris en charge) ;
+  - parallaxe du jardin ;
+  - bascule jour/nuit en fondu.
+- Tout est coupé par `prefers-reduced-motion`. Les animations utilisent `transform` et `opacity`.
+
+### Corrections découvertes en route
+
+- De nuit, le texte des cartes de révision était sombre sur fond sombre (`--washi-ink`) : corrigé.
+- Contrastes du rouge de nuit relevés ; boutons de compte du Profil (rôles d'onglet) et listes de réglages sans libellé : corrigés.
+
+---
+
+## Mission 3 : carnet de voyage (4 novembre 2026)
 
 Réalisée le 4 novembre 2026. Ce document décrit ce qui a changé, comment, et avec quelles limites.
 

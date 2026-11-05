@@ -62,7 +62,7 @@
     const k = queue.shift();
     const box = document.createElement('div'); box.id = 'xkmreveal'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-modal', 'true'); box.setAttribute('aria-labelledby', 'xkmrt');
     box.innerHTML = `<div class="xkmr"><div class="xkmr-fox">${K.fox ? K.fox('celebration') : ''}</div><div class="xkmr-seal">${mon(k, true)}</div>
-      <p class="eyebrow">Nouveau kamon</p><h2 id="xkmrt" class="jp">${ruby(k.j)}</h2><p class="muted">${esc(k.motif)}</p>
+      <p class="xmeta">Nouveau kamon</p><h2 id="xkmrt" class="jp">${ruby(k.j)}</h2><p class="muted">${esc(k.motif)}</p>
       <div class="toolbar"><a class="btn" href="#kamon-${k.id}" data-x>Découvrir son histoire</a><button class="btn sec" type="button" data-x>Plus tard</button></div></div>`;
     document.body.appendChild(box);
     const close = () => { box.remove(); document.removeEventListener('keydown', esck); if (queue.length) setTimeout(() => reveal([]), 300); };
@@ -91,7 +91,7 @@
   function renderCollection(el) {
     sync();
     const O = K.kamon.owned(), n = D.filter((k) => O[k.id]).length;
-    el.innerHTML = `<div class="eyebrow">Progrès</div><h1>Collection de kamon</h1>
+    el.innerHTML = `<h1>Collection de kamon</h1>
       <p class="muted">Chaque grande étape du parcours vous fait découvrir un emblème de famille réel, avec son histoire. Les fiches distinguent les faits, les traditions, les légendes et les fictions ; les dessins sont des schémas réalisés pour KOTONOHA.</p>
       <div class="xkmhead"><div class="xkmcount"><b>${n}</b><span>sur ${D.length}</span></div><div class="bar" aria-hidden="true"><i style="width:${n / D.length * 100}%"></i></div></div>
       <div class="xkmgrid">${D.map((k) => `<a href="#kamon-${k.id}" class="xkmc${O[k.id] ? ' own' : ''}">${mon(k, !!O[k.id])}<span class="jp">${O[k.id] ? esc(plain(k.j)) : '？'}</span><small>${O[k.id] ? new Date(O[k.id]).toLocaleDateString('fr-FR') : esc(k.need)}</small></a>`).join('')}</div>
@@ -103,7 +103,7 @@
     el.innerHTML = `<a class="back-link" href="#kamon">Retour à la collection</a>
       <article class="xkmfiche${own ? ' own' : ''}">
         <div class="xkmart">${mon(k, own)}<p class="small muted">${own ? `Obtenu le ${new Date(O[k.id]).toLocaleDateString('fr-FR')}` : `À découvrir : ${esc(k.need)}`}</p></div>
-        <div class="xkmtxt"><div class="eyebrow">Kamon ${i + 1} sur ${D.length}</div><h1 class="jp">${ruby(k.j)}</h1><p class="xkmr2">${esc(k.r)}</p>
+        <div class="xkmtxt"><div class="xmeta">Kamon ${i + 1} sur ${D.length}</div><h1 class="jp">${ruby(k.j)}</h1><p class="xkmr2">${esc(k.r)}</p>
           ${own ? `<h2>Le motif</h2><p>${esc(k.motif)}</p><h2>Signification</h2>${items(k.sens)}<h2>Contexte historique</h2>${items(k.hist)}<h2>Récit</h2>${items(k.recit)}`
           : `<p>${esc(k.motif)}</p><p class="muted">Son histoire se dévoilera quand vous l’obtiendrez. Rien ne se perd : prenez votre temps.</p>`}
           <h2>Sources</h2><ul class="small">${k.src.map(([t, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(t)}</a></li>`).join('')}</ul>

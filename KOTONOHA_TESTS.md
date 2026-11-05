@@ -33,23 +33,22 @@ WEBKIT=1 npx playwright test --project=webkit
 | `carte-culture.spec.js` | Carte (toutes les unités, accès par Progrès), vue d'une unité (grammaire, kanji, avant/après, popup), jours fériés 2026–2027 (reports, jour chômé intercalé), sources, kamon |
 | `carnet.spec.js` | Ajout, recherche, modification, suppression, persistance, échappement |
 | `securite.spec.js` | Sauvegarde piégée importée par l'interface (aucune exécution, types normalisés, adresse neutralisée), en-tête CSP |
-| `refonte.spec.js` | Carnet du jour, voyage (points réels, déblocage, trajet animé, souvenir, persistance), migration des badges en kamon sans perte et fiche sourcée, journal et visualisations, zoom de la carte, Focus, panneau de leçon |
-| `pwa-a11y.spec.js` | Hors connexion (service worker, réseau coupé), audit axe-core WCAG 2 A/AA sur les écrans principaux, y compris voyage, kamon, fiche de kamon, atelier musical, pinceau et carnet |
+| `refonte.spec.js` | Séance du jour (plan, frise qui totalise exactement la durée, changement de durée, reprise), six onglets et onglet allumé selon l'écran, sous-rubriques, bascule jour/nuit persistante, six poses du renard ; puis, comme avant : carnet du jour, voyage (points réels, déblocage, trajet animé, souvenir, persistance), migration des badges en kamon sans perte et fiche sourcée, journal et visualisations, zoom de la carte, Focus, panneau de leçon |
+| `pwa-a11y.spec.js` | Hors connexion (service worker, réseau coupé), audit axe-core WCAG 2 A/AA, de jour **et** de nuit, sur 25 écrans, y compris voyage, kamon, fiche de kamon, atelier musical, pinceau et carnet |
 
 ## Résultats
 
-Campagne finale de la refonte (4 novembre 2026) : 6 configurations × 39 tests, avec une nouvelle tentative autorisée.
+Campagne de la refonte izakaya (5 novembre 2026) : 6 configurations × 40 tests, avec une nouvelle tentative autorisée.
 
-| Configuration | Moteur | Résultat |
-|---|---|---|
-| chromium | Chromium (bureau) | tout réussi |
-| chrome | Google Chrome installé | tout réussi |
-| edge | Microsoft Edge installé | tout réussi |
-| firefox | Firefox (Playwright) | tout réussi, sauf le test hors connexion (sauté, voir limites) |
-| mobile | Chromium, émulation Pixel 7 | tout réussi |
-| tablette-chromium | Chromium, émulation Galaxy Tab S4 | tout réussi |
-
-**Bilan :** 233 réussis, 1 sauté (hors connexion sous Firefox), 0 échec. Lors de la campagne, l'audit d'accessibilité a révélé sur mobile et tablette une liste du journal qui défilait sans être atteignable au clavier ; elle a été corrigée (`tabindex`, libellé), puis l'audit et les tests de la refonte ont été relancés sur les 6 configurations : 47 réussis, 1 sauté.
+- Première campagne complète : 231 réussis, 8 échecs. Deux régressions réelles :
+  - les lignes d'information au-dessus des titres (« Actualité · source · date ») étaient masquées ;
+  - un débordement de 8 px sur tablette.
+  Elles ont été corrigées.
+- Deuxième campagne complète, après la revue de finition : 228 réussis, 11 échecs, 1 sauté.
+  - Le test de l'accueil cherchait le renard à son ancienne place.
+  - Une collision de classe CSS (`.xsay`) rendait illisible le bouton « Écouter » de la conversation.
+  Les deux ont été corrigés.
+- Relance des fichiers concernés (`refonte`, `pwa-a11y`, `atelier`) sur les 6 configurations : 77 réussis, 1 sauté (hors connexion sous Firefox), 0 échec.
 
 **Accessibilité (axe-core) :**
 - Plus aucune violation dans les nouveaux espaces.

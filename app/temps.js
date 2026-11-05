@@ -129,7 +129,7 @@
       cells += `<button type="button" class="xc st-${s.s}${k === todayK ? ' today' : ''}" data-k="${k}" aria-label="${new Date(y, mo, d).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })} : ${LABEL[s.s]}${s.a.active >= 60 ? ', ' + Math.round(s.a.active / 60) + ' minutes actives' : ''}"><span>${d}</span>${extra}</button>`;
     }
     const legend = ['faite', 'bonus', 'prevue', 'nonfaite', 'reportee', 'repos', 'pause'].map((s) => `<span class="xl st-${s}"><i></i>${LABEL[s]}${counts[s] ? ' · ' + counts[s] : ''}</span>`).join('');
-    el.innerHTML = `<div class="eyebrow">Progrès</div><h1>Calendrier</h1>
+    el.innerHTML = `<h1>Calendrier</h1>
       <p class="muted">Un repère, pas une contrainte : prévoyez vos jours d’étude, reportez une séance, posez une pause. Les séances non faites ne sont ni comptées comme des fautes ni rattrapées de force.</p>
       ${comebackCard()}
       <div class="grid2">${paceCard()}${statsCard()}</div>
@@ -207,7 +207,7 @@
     });
     const tot = [0, 0, 0, 0, 0]; rows.forEach((r) => r.c.forEach((v, i) => tot[i] += v));
     const consolidate = rows.flatMap((r) => r.U).filter((x) => x.m.s === 2 || x.m.s === 3).slice(0, 12);
-    el.innerHTML = `<div class="eyebrow">Progrès</div><h1>Maîtrise</h1>
+    el.innerHTML = `<h1>Maîtrise</h1>
       <p class="muted">Terminer une unité ne veut pas dire la maîtriser. Quatre états, calculés sur vos résultats réels :</p>
       <ul class="xms small"><li><i class="m1"></i><b>Consultée</b> : unité ouverte.</li><li><i class="m2"></i><b>Terminée</b> : toutes les étapes faites.</li><li><i class="m3"></i><b>Comprise</b> : test d’unité réussi (70 % ou plus).</li><li><i class="m4"></i><b>Maîtrisée</b> : comprise, et au moins 80 % de ses cartes retenues trois semaines ou plus sans oublis répétés.</li></ul>
       <div class="xstats">${[1, 2, 3, 4].map((i) => `<div><b>${tot[i]}</b><span>${MS[i].toLowerCase()}${tot[i] > 1 ? 's' : ''}</span></div>`).join('')}</div>

@@ -72,7 +72,7 @@
     const row = (e) => { const d = new Date(e.k + 'T00:00:00'); return `<li class="t-${e.t}"><time datetime="${e.k}">${d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })}</time>
       <span class="jp">${ruby(e.j)}</span><span class="tag">${e.t === 'shuku' ? '祝日 · férié' : '行事 · coutume'}</span><span class="d">${ruby(e.f)}</span>
       <a class="small" href="${esc(e.src[1])}" target="_blank" rel="noopener noreferrer">${esc(e.src[0])}</a></li>`; };
-    el.innerHTML = `<div class="eyebrow">Culture</div><h1>Le Japon au fil de l’année</h1>
+    el.innerHTML = `<h1>Le Japon au fil de l’année</h1>
       <p class="muted">Jours fériés et coutumes, avec leurs sources. Les jours fériés suivent la loi japonaise (reports du dimanche compris) ; les dates d’équinoxe sont celles publiées par l’Observatoire national ; certaines coutumes varient selon les régions.</p>
       <div class="card panel"><h2>Dans les deux prochains mois</h2>${up.length ? `<ul class="xcult">${up.map(row).join('')}</ul>` : '<p class="small muted">Rien de particulier.</p>'}</div>
       <details class="card panel"><summary><h2>Toute l’année à venir</h2></summary><ul class="xcult">${year.map(row).join('')}</ul></details>`;
@@ -84,7 +84,7 @@
     const e = events(Date.now(), 14)[0]; if (!e) return;
     const d = new Date(e.k + 'T00:00:00'), box = document.createElement('a');
     box.className = 'xcultnote'; box.href = '#culture'; box.dataset.xcult = '1';
-    box.innerHTML = `<span class="eyebrow">Bientôt au Japon</span><span><span class="jp">${ruby(e.j)}</span> · ${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>`;
+    box.innerHTML = `<span class="xmeta">Bientôt au Japon</span><span><span class="jp">${ruby(e.j)}</span> · ${d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}</span>`;
     el.appendChild(box);
   });
   K.on('progres', (el) => {

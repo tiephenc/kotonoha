@@ -25,7 +25,7 @@ test('lecture personnelle : analyse, dictionnaire, résumé, persistance, suppre
   await page.check('#xlf [name=news]');
   await page.click('#xlf button[type=submit]');
   await expect(page.locator('.xrtitle')).toHaveText('経済のニュース');
-  await expect(page.locator('.eyebrow').filter({ hasText: 'Actualité' })).toBeVisible();
+  await expect(page.locator('.xmeta').filter({ hasText: 'Actualité' })).toBeVisible();
   // un mot conjugué renvoie à sa forme de dictionnaire
   await expect(page.locator('.xtextbox .w[data-w="遅れる"]')).toBeVisible();
   await page.locator('.xtextbox .w[data-w="遅れる"]').click();

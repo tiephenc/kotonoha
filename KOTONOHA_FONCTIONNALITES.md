@@ -1,6 +1,6 @@
 # KOTONOHA — fonctionnalités
 
-État réel au 4 novembre 2026, après la refonte « carnet de voyage » (mission 3). Le détail de la refonte est dans `KOTONOHA_REFONTE.md`.
+État réel au 5 novembre 2026, après la refonte « izakaya » (mission 4). Le détail des refontes est dans `KOTONOHA_REFONTE.md`.
 
 Légende :
 - ✅ **Opérationnel et testé** ;
@@ -41,10 +41,11 @@ Vérification : `smoke.spec.js` parcourt 13 écrans et contrôle la persistance.
 | Salle de détente (`#detente`) | ✅ | Durées de 30 s à 9 min, 8 expériences sans japonais ni score (étang aux koi, jardin de sable, atelier musical, pinceau, ricochets, rizières, lucioles, souffle), fin en trois choix, ressenti facultatif, aucun son automatique, sortie immédiate (Échap). Accès par l'en-tête et pendant la pause Focus. | Voir `KOTONOHA_PAUSES_ET_MINIJEUX.md`. | `detente.spec.js` |
 | Culture (`#culture`) | ✅ | Jours fériés calculés selon la loi (lundis mobiles, reports, jour chômé intercalé), équinoxes publiées, 8 coutumes avec sources ; annonce discrète sur l'Accueil. | Coutumes aux dates usuelles (お盆 varie selon les régions). Équinoxes renseignées jusqu'en 2028. | `carte-culture.spec.js` |
 | Collection de kamon (`#kamon`) | ✅ | 24 blasons remplacent les badges. Fiche : nom japonais, représentation, signification, contexte historique, récit, sources ; faits, traditions et interprétations distingués. Apparition en sceau. Migration : chaque ancien badge donne le kamon correspondant avec sa date d'origine ; `S.g.badges` n'est pas modifié. | Dessins schématiques, pas des reproductions d'armoiries précises. | `refonte.spec.js` |
-| Carnet du jour (Accueil) | ✅ | Renard selon le moment, trois étapes du jour, journal de la semaine, aperçu du voyage. | — | `refonte.spec.js` |
+| Aujourd'hui : séance du jour | ✅ | Séance de 4 h réglable (2 à 6 h) en trois étapes avec les anciens emblèmes : contenu, durée, avancement réel, accès direct. Pauses de 10 min toutes les 50 min, frise qui totalise la séance, minuteur Focus, reprise de la dernière activité. | Durées estimées à partir des temps prévus des sections et des cartes dues. | `refonte.spec.js` |
+| Navigation en six onglets | ✅ | Aujourd'hui, Apprendre, Pratiquer, Voyager, Détente, Profil, avec sous-rubriques ; anciennes adresses conservées. Ambiance jour ou nuit (selon l'heure, ou forcée par la lanterne). | — | `refonte.spec.js` |
 | Journal de la semaine | ✅ | Remplace les soirées d'étude : états terminée, en cours, repos, reportée, libre, non réalisée ; durées réelles (temps actif) ; le repos n'est jamais un échec ; navigation semaine par semaine. | Temps actif mesuré depuis le 4/11/2026. | `refonte.spec.js` |
 | Voyage au Japon (`#voyage`) | ✅ | Carte illustrée (géographie réelle simplifiée), 8 régions, 14 destinations (Tokyo → Sapporo) avec récit, culture, souvenir et sources ; trajets en train, bateau, à pied ou par la route, animés. Points de voyage calculés sur l'activité réelle, la maîtrise comptant davantage. | Les points ne mesurent pas le niveau de japonais ; rien de pédagogique n'est bloqué ; aucune perte de points en cas de pause. | `refonte.spec.js` |
-| Renard (`KX.fox`) | ✅ | Six poses (accueil, étude, repos, sommeil, célébration, focus), animations discrètes coupées par `prefers-reduced-motion`. | — | `refonte.spec.js` |
+| Renard (`KX.fox`) | ✅ | Dessin d'origine (masque géométrique), six poses (accueil, étude, focus, repos, sommeil, célébration), animations discrètes coupées par `prefers-reduced-motion`. | — | `refonte.spec.js` |
 | Focus refait | ✅ | Panneau de nuit, lanternes de progression, renard animé, ambiances activables une à une (jamais automatiques), pause/reprise, accès à la détente, bouton « Retour à la séance », transitions d'entrée et de sortie. | — | `refonte.spec.js` |
 | Leçons prolongées | ✅ | Panneau « Prolonger la leçon » dans chaque unité : écoute, sujet d'écriture tiré de l'unité, conversation du niveau, lecture, carte de l'unité, tracé des kanji. | Les laboratoires restent aussi accessibles séparément. | `refonte.spec.js` |
 | Visualisations (Progrès) | ✅ | Révisions et temps actif sur 30 jours, révisions prévues sur 14 jours, maîtrise par niveau, réussite par compétence ; toutes sur les données réelles, avec un message quand il n'y en a pas encore. | — | `refonte.spec.js` |

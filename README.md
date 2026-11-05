@@ -11,7 +11,8 @@ Site gratuit pour préparer le JLPT du N4 au N2, en français. Il comprend :
 - un atelier d'expression écrite et de conversation ;
 - un calendrier adaptatif, le temps d'étude actif et la maîtrise réelle de chaque unité ;
 - une carte du parcours, un calendrier culturel japonais et un carnet ;
-- un carnet de voyage illustré : voyage au Japon débloqué par l'activité réelle, collection de kamon documentés, journal de la semaine ;
+- une séance du jour d'environ 4 h, prête dès l'ouverture, dans l'univers d'un vieil izakaya de campagne (jour et nuit) ;
+- un voyage au Japon débloqué par l'activité réelle, une collection de kamon documentés et un journal de la semaine ;
 - une salle de détente (huit expériences sans japonais, sans score).
 
 Le site s'installe comme une application et fonctionne hors connexion.

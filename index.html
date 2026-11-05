@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Yuji+Syuku&family=Anton&family=Dela+Gothic+One&family=Klee+One:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@500;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Yuji+Syuku&family=Anton&family=Dela+Gothic+One&display=swap" rel="stylesheet">
 <style>
 :root{
   /* Affiche : rouge beni, papier crème, encre — le jour */
@@ -880,13 +880,12 @@ kbd{font:600 11px var(--sans);border:1px solid currentColor;border-radius:3px;pa
 <header class="top"><div class="wrap">
   <a class="brand" href="#aujourdhui"><span class="jp">言の葉</span><span class="lat">Kotonoha</span></a>
   <nav class="main" aria-label="Navigation principale">
-    <a href="#aujourdhui" data-nav="aujourdhui"><span class="nk" aria-hidden="true">今日</span>Accueil</a>
-    <a href="#parcours" data-nav="parcours"><span class="nk" aria-hidden="true">学</span>Apprendre</a>
-    <a href="#vocab" data-nav="vocab" id="navvocab"><span class="nk" aria-hidden="true">語</span><span class="nl" data-short="Mots">Vocabulaire</span> <span id="vocBadge"></span></a>
-    <a href="#revision" data-nav="revision"><span class="nk" aria-hidden="true">復</span>Réviser <span id="dueBadge"></span></a>
-    <a href="#entrainer" data-nav="entrainer"><span class="nk" aria-hidden="true">練</span>S'entraîner <span id="errBadge"></span></a>
-    <a href="#progres" data-nav="progres"><span class="nk" aria-hidden="true">進</span>Progrès</a>
-    <a href="#profil" data-nav="profil"><span class="nk" aria-hidden="true">私</span>Profil</a>
+    <a href="#aujourdhui" data-tab="aujourdhui"><span class="nk" aria-hidden="true" lang="ja">今日</span>Aujourd’hui</a>
+    <a href="#parcours" data-tab="apprendre"><span class="nk" aria-hidden="true" lang="ja">学</span>Apprendre<span id="vocBadge" hidden></span></a>
+    <a href="#revision" data-tab="pratiquer"><span class="nk" aria-hidden="true" lang="ja">練</span>Pratiquer <span id="dueBadge"></span><span id="errBadge" hidden></span></a>
+    <a href="#voyage" data-tab="voyager"><span class="nk" aria-hidden="true" lang="ja">旅</span>Voyager</a>
+    <a href="#detente" data-tab="detente"><span class="nk" aria-hidden="true" lang="ja">憩</span>Détente</a>
+    <a href="#profil" data-tab="profil"><span class="nk" aria-hidden="true" lang="ja">私</span>Profil</a>
   </nav>
   <button class="palbtn" id="palbtn" type="button" aria-label="Rechercher (Ctrl+K)" title="Rechercher (Ctrl+K)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
   <button class="focbtn" id="focbtn" type="button" aria-label="Minuteur de concentration" title="Minuteur de concentration"><span class="fl">Focus</span></button>
@@ -10072,7 +10071,7 @@ document.addEventListener('keydown',e=>{if(!$('#v-revision').classList.contains(
 function deckStats(list){const t=today();let seen=0,due=0;list.forEach(c=>{const s=st(c.id);if(isSeen(s)){seen++;if(s.d<=t)due++;}});return {n:list.length,seen,due,fresh:list.length-seen};}
 function viewPaquets(el){
   el=el||$('#v-paquets');const site=siteCards(),ss=deckStats(site);
-  const sel=(id,opts,v)=>`<select id="${id}" class="furisel">${opts.map(([k,t])=>`<option value="${k}"${String(v)===String(k)?' selected':''}>${t}</option>`).join('')}</select>`;
+  const sel=(id,opts,v)=>`<select id="${id}" class="furisel" aria-label="${({nmax:'Nouvelles cartes par jour (unités)',aknew:'Nouvelles cartes par jour (paquets Anki)',akdir:'Sens des cartes Anki'})[id]||'Réglage'}">${opts.map(([k,t])=>`<option value="${k}"${String(v)===String(k)?' selected':''}>${t}</option>`).join('')}</select>`;
   el.innerHTML=`<h2 style="margin-top:28px">Mes paquets de cartes</h2>
    ${HASAK?`   <p class="muted">Vos cinq paquets Anki « ${esc(ANKID.src.split(' · ')[0])} » sont intégrés au site avec leur historique : les cartes déjà étudiées dans Anki reprennent à leur intervalle et à leur facilité. Vos fichiers Anki ne sont pas modifiés ; les révisions se font désormais ici et votre progression est sauvegardée avec le reste du site.</p>`:'<p class="muted">Les cartes du vocabulaire, des kanji et de la grammaire des unités ouvertes, révisées par répétition espacée.</p>'}
    <div class="card"><table class="voc decks"><thead><tr><th>Paquet</th><th>Cartes</th><th>Apprises</th><th>Dues</th><th>Actif</th></tr></thead><tbody>
@@ -10154,11 +10153,11 @@ function applyTheme(){document.documentElement.dataset.theme=themeOf();}
 if(window.matchMedia)matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if((S.theme||'auto')==='auto'){applyTheme();}});
 function viewProfil(){
   const el=$('#v-profil');
-  const sel=(id,opts,v)=>`<select id="${id}" class="furisel">${opts.map(([k,t])=>`<option value="${k}"${String(v)===String(k)?' selected':''}>${t}</option>`).join('')}</select>`;
+  const sel=(id,opts,v)=>`<select id="${id}" class="furisel" aria-label="${({nmax:'Nouvelles cartes par jour (unités)',aknew:'Nouvelles cartes par jour (paquets Anki)',akdir:'Sens des cartes Anki'})[id]||'Réglage'}">${opts.map(([k,t])=>`<option value="${k}"${String(v)===String(k)?' selected':''}>${t}</option>`).join('')}</select>`;
   el.innerHTML=`<h1>Profil</h1><p class="muted">Vos réglages, vos paquets de cartes et votre sauvegarde.</p>
    <div class="card" style="margin-top:18px"><h2>Réglages</h2>
     <div class="settings">
-     <label>Thème ${sel('st-theme',[['auto','Automatique (selon l’appareil)'],['jour','Jour'],['nuit','Nuit']],{soir:'nuit',affiche:'jour'}[S.theme]||S.theme||'auto')}</label>
+     <label>Ambiance ${sel('st-theme',[['auto','Selon l’heure (nuit de 19 h à 7 h)'],['jour','Jour'],['nuit','Nuit']],{soir:'nuit',affiche:'jour'}[S.theme]||S.theme||'auto')}</label>
      <label>Objectif quotidien ${sel('st-goal',[[20,'20 XP · léger'],[40,'40 XP · régulier'],[80,'80 XP · intensif'],[120,'120 XP · sprint']],S.g.goal)}</label>
      <label>Furigana ${sel('st-furi',[['all','tous'],['auto','selon mon niveau'],['none','aucun']],S.furi)}</label>
      ${profSettings()}
@@ -11323,7 +11322,7 @@ function accountCard(){if(!SB)return '';
     <p class="small" id="acmsg" role="status" aria-live="polite">${esc(SBmsg)}</p></div>`;
   return `<div class="card acct" id="acct"><h2>Mon compte</h2>
     <p class="small muted">Facultatif : sans compte, tout fonctionne et la progression reste sur cet appareil. Un compte la synchronise entre votre ordinateur, votre téléphone et votre tablette.</p>
-    <div class="seg" role="tablist" aria-label="Compte"><button type="button" data-t="in" aria-selected="true">Se connecter</button><button type="button" data-t="up" aria-selected="false">Créer un compte</button></div>
+    <div class="seg" role="tablist" aria-label="Compte"><button type="button" role="tab" data-t="in" aria-selected="true">Se connecter</button><button type="button" role="tab" data-t="up" aria-selected="false">Créer un compte</button></div>
     <form id="acform" class="acform"><label>E-mail <input type="email" id="acmail" autocomplete="email" required></label>
      <label>Mot de passe <input type="password" id="acpass" minlength="8" autocomplete="current-password" required></label>
      <label class="acup" hidden>Pseudo <input id="acps" maxlength="30" placeholder="facultatif" autocomplete="nickname"></label>
@@ -11784,5 +11783,6 @@ if('speechSynthesis' in window) speechSynthesis.getVoices();
 <script src="app/lecons.js"></script>
 <script src="app/home.js"></script>
 <script src="app/focus.js"></script>
+<script src="app/shell.js"></script>
 </body>
 </html>

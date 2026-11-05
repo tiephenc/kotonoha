@@ -6,15 +6,49 @@ const seed = (page) => page.evaluate(() => {
   S.g.rv = 150; S.rh = { [KX.dayKey(Date.now() - 864e5)]: 120 }; save();
 });
 
-test('accueil : carnet du jour, renard, mission, journal, voyage', async ({ page }) => {
+test('aujourd’hui : la séance de 4 h, trois étapes, frise qui fait le total, reprise', async ({ page }) => {
   const errors = await isolate(page);
   await onboard(page);
-  await expect(page.locator('.xhero h1')).toHaveText('Carnet du jour');
-  await expect(page.locator('.xhero svg.fox')).toBeVisible();
-  await expect(page.locator('.xstep')).toHaveCount(3);
-  await expect(page.locator('.xjday')).toHaveCount(7);
-  await expect(page.locator('.xvoyprev')).toBeVisible();
+  await expect(page.locator('.xsess h1')).toContainText('Séance du jour');
+  await expect(page.locator('.xpan')).toHaveCount(3);
+  await expect(page.locator('.xpan .emb svg')).toHaveCount(3);
+  await expect(page.locator('.xpan.cur')).toHaveCount(1);
+  await expect(page.locator('.xhead svg.fox')).toBeVisible();
+  const chk = () => page.evaluate(() => { const p = KX.seance.plan(), seg = KX.seance.timeline(p); return { T: p.T, sum: seg.reduce((a, g) => a + g.m, 0), parts: p.rev + p.les + p.def + p.P * 10, brk: seg.filter((g) => g.id === 'brk').length, P: p.P }; });
+  let r = await chk();
+  expect(r.T).toBe(240); expect(r.sum).toBe(240); expect(r.parts).toBe(240); expect(r.brk).toBe(r.P);
+  await expect(page.locator('.xtl-list .tot b')).toHaveText('4 h 00');
+  await page.selectOption('#xdur', '180');
+  await expect(page.locator('.xtl-list .tot b')).toHaveText('3 h 00');
+  r = await chk(); expect(r.T).toBe(180); expect(r.sum).toBe(180); expect(r.parts).toBe(180);
+  await page.evaluate(() => { location.hash = 'unite-1'; });
+  await expect(page.locator('#v-unite')).toHaveClass(/\bon\b/);
+  await page.evaluate(() => { location.hash = 'aujourdhui'; });
+  await expect(page.locator('.xresume')).toContainText('Unité 1');
   await noHorizontalOverflow(page);
+  expect(errors).toEqual([]);
+});
+
+test('coque : six onglets, onglet allumé selon l’écran, sous-rubriques, jour et nuit', async ({ page }) => {
+  const errors = await isolate(page);
+  await onboard(page);
+  await expect(page.locator('nav.main a[data-tab]')).toHaveCount(6);
+  for (const [h, tab] of [['aujourdhui', 'aujourdhui'], ['unite-1', 'apprendre'], ['vocab', 'apprendre'], ['revision', 'pratiquer'], ['atelier', 'pratiquer'], ['kamon', 'voyager'], ['detente', 'detente'], ['progres', 'profil'], ['calendrier', 'profil']]) {
+    await page.evaluate((x) => { location.hash = x; }, h);
+    await expect(page.locator(`nav.main a[data-tab="${tab}"]`)).toHaveAttribute('aria-current', 'page');
+    await expect(page.locator('nav.main a[aria-current="page"]')).toHaveCount(1);
+  }
+  await page.evaluate(() => { location.hash = 'kamon'; });
+  await expect(page.locator('section.view.on > .xsub a[aria-current="page"]')).toHaveText('Kamon');
+  await page.click('.xsub a[href="#culture"]');
+  await expect(page.locator('nav.main a[data-tab="voyager"]')).toHaveAttribute('aria-current', 'page');
+  const t0 = await page.evaluate(() => document.documentElement.dataset.theme);
+  await page.click('#xlamp');
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).not.toBe(t0);
+  await page.reload();
+  await expect.poll(() => page.evaluate(() => document.documentElement.dataset.theme)).not.toBe(t0);
+  const poses = await page.evaluate(() => ['accueil', 'etude', 'focus', 'repos', 'sommeil', 'celebration'].map((p) => { const d = document.createElement('div'); d.innerHTML = KX.fox(p); return d.querySelector('svg.fox.p-' + p) ? 1 : 0; }));
+  expect(poses).toEqual([1, 1, 1, 1, 1, 1]);
   expect(errors).toEqual([]);
 });
 

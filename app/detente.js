@@ -54,7 +54,7 @@
     const cur = pref.get('dur', 'court');
     el.innerHTML = `<div class="xdet">
       <div class="xdet-head">
-        <div><div class="eyebrow">休憩室 · salle de détente</div><h1>Faire une vraie pause</h1>
+        <div><h1>Faire une vraie pause</h1>
         <p>Ici, pas de japonais, rien à réussir et rien à perdre. Choisissez une durée, puis une expérience ; vous pouvez partir à tout moment.</p></div>
         <div class="xdet-fox" aria-hidden="true">${K.fox ? K.fox('sommeil') : ''}</div>
       </div>
