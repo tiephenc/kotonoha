@@ -50,6 +50,15 @@ test('culture : jours fériés calculés selon la loi, sources', async ({ page }
   expect(h.n26).toBe(18);
   await page.evaluate(() => { location.hash = 'culture'; });
   await expect(page.locator('#v-x-culture h1')).toBeVisible();
+  // Éphéméride : on arrache la page pour passer à la suivante
+  await expect(page.locator('.xhk-page')).toBeVisible();
+  await expect(page.locator('.xhk-tools .num')).toContainText('Page 1 sur');
+  await expect(page.locator('#xhkprev')).toBeDisabled();
+  await page.click('#xhknext');
+  await expect(page.locator('.xhk-tools .num')).toContainText('Page 2 sur');
+  await expect(page.locator('.xhk-page .xhk-ev .tag')).toBeVisible();
+  await page.click('#xhkprev');
+  await expect(page.locator('.xhk-tools .num')).toContainText('Page 1 sur');
   const links = await page.locator('#v-x-culture a[target=_blank]').evaluateAll((as) => as.map((a) => a.rel));
   expect(links.length).toBeGreaterThan(6);
   links.forEach((r) => expect(r).toContain('noopener'));

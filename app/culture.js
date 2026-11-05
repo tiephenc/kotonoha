@@ -67,15 +67,50 @@
   }
 
 
+  /* Éphéméride à pages détachables (himekuri) : une page par jour férié ou coutume à venir ; on arrache la page pour passer à la suivante. */
+  const WD = ['日', '月', '火', '水', '木', '金', '土'], WDF = ['dimanche', 'lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
+  const MOIS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  let page = 0;
+  function pageHtml(e, now, first) {
+    const d = e ? new Date(e.k + 'T00:00:00') : new Date(now), red = e ? e.t === 'shuku' || d.getDay() === 0 : d.getDay() === 0;
+    const left = e ? Math.round((new Date(e.k + 'T00:00:00') - new Date(K.dayKey(now) + 'T00:00:00')) / 864e5) : 0;
+    const when = left === 0 ? 'aujourd’hui' : left === 1 ? 'demain' : `dans ${left} jours`;
+    return `<article class="xhk-page${red ? ' red' : ''}" aria-live="polite">
+      <header class="xhk-top"><span class="y">${d.getFullYear()}</span><span class="m"><b lang="ja">${d.getMonth() + 1}月</b>${MOIS[d.getMonth()]}</span></header>
+      <div class="xhk-day"><span class="n">${d.getDate()}</span><span class="w"><b lang="ja">${WD[d.getDay()]}曜日</b>${WDF[d.getDay()]}</span></div>
+      ${e ? `<div class="xhk-ev"><span class="tag">${e.t === 'shuku' ? '祝日 · jour férié' : '行事 · coutume'}</span><p class="jp">${ruby(e.j)}</p><p class="d">${ruby(e.f)}</p>
+        <p class="small"><span class="when">${when}</span> · <a href="${esc(e.src[1])}" target="_blank" rel="noopener noreferrer">${esc(e.src[0])}</a></p></div>`
+      : `<div class="xhk-ev"><p class="d">${first ? `Prochain rendez-vous : <b><span class="jp">${ruby(first.j)}</span></b>, ${(() => { const n = Math.round((new Date(first.k + 'T00:00:00') - new Date(K.dayKey(now) + 'T00:00:00')) / 864e5); return n === 0 ? 'aujourd’hui' : n === 1 ? 'demain' : `dans ${n} jours`; })()}.` : 'Aucun événement dans l’année à venir.'}</p><p class="small muted">Arrachez la page pour découvrir les fêtes et coutumes à venir.</p></div>`}
+    </article>`;
+  }
   function render(el) {
-    const now = Date.now(), up = events(now, 60), year = events(now, 365);
+    const now = Date.now(), year = events(now, 365), pages = [null].concat(year);
+    page = Math.min(page, pages.length - 1);
     const row = (e) => { const d = new Date(e.k + 'T00:00:00'); return `<li class="t-${e.t}"><time datetime="${e.k}">${d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'long' })}</time>
       <span class="jp">${ruby(e.j)}</span><span class="tag">${e.t === 'shuku' ? '祝日 · férié' : '行事 · coutume'}</span><span class="d">${ruby(e.f)}</span>
       <a class="small" href="${esc(e.src[1])}" target="_blank" rel="noopener noreferrer">${esc(e.src[0])}</a></li>`; };
     el.innerHTML = `<h1>Le Japon au fil de l’année</h1>
-      <p class="muted">Jours fériés et coutumes, avec leurs sources. Les jours fériés suivent la loi japonaise (reports du dimanche compris) ; les dates d’équinoxe sont celles publiées par l’Observatoire national ; certaines coutumes varient selon les régions.</p>
-      <div class="card panel"><h2>Dans les deux prochains mois</h2>${up.length ? `<ul class="xcult">${up.map(row).join('')}</ul>` : '<p class="small muted">Rien de particulier.</p>'}</div>
+      <p class="muted">Un éphéméride à pages détachables, comme les himekuri des maisons japonaises : jours fériés selon la loi japonaise (reports compris), équinoxes publiées par l’Observatoire national, coutumes avec leurs sources. Certaines coutumes varient selon les régions.</p>
+      <div class="xhk">
+        <div class="xhk-block">
+          <div class="xhk-bar" aria-hidden="true"><i></i><i></i></div>
+          <div class="xhk-stack" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="xhk-cur">${pageHtml(pages[page], now, year[0])}</div>
+        </div>
+        <div class="xhk-tools">
+          <button type="button" class="btn" id="xhknext" ${page >= pages.length - 1 ? 'disabled' : ''}>Arracher la page</button>
+          <button type="button" class="btn sec" id="xhkprev" ${page === 0 ? 'disabled' : ''}>Page précédente</button>
+          <span class="small muted num">Page ${page + 1} sur ${pages.length}</span>
+        </div>
+      </div>
       <details class="card panel"><summary><h2>Toute l’année à venir</h2></summary><ul class="xcult">${year.map(row).join('')}</ul></details>`;
+    const go = (d) => {
+      const cur = el.querySelector('.xhk-page');
+      const done = () => { page = Math.max(0, Math.min(pages.length - 1, page + d)); render(el); const b = el.querySelector(d > 0 ? '#xhknext' : '#xhkprev'); (b && !b.disabled ? b : el.querySelector('.xhk-tools .btn:not([disabled])'))?.focus(); };
+      if (d > 0 && cur && !K.reduced()) { cur.classList.add('tear'); setTimeout(done, 520); } else done();
+    };
+    el.querySelector('#xhknext').onclick = () => go(1);
+    el.querySelector('#xhkprev').onclick = () => go(-1);
   }
 
   K.view({ name: 'culture', title: 'Culture', nav: 'aujourdhui', match: (h) => h === 'culture', render });

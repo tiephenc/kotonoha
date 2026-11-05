@@ -50,7 +50,12 @@
   K.kamon = { sync, list: () => D, owned: () => (S.g.kamon || {}), studyDays, modulesDone };
 
   /* ---------- Dessin ---------- */
-  const mon = (k, owned, size) => `<svg viewBox="0 0 100 100" class="kmn${owned ? ' own' : ''}" ${size ? `width="${size}" height="${size}"` : ''} aria-hidden="true"><g fill="currentColor">${k.svg}</g></svg>`;
+  /* Dessins : ceux de app/kamon-art.js (fichiers Wikimedia Commons fidèles ou redessins), sinon le schéma d'origine. */
+  const ART = window.KX_KAMON_ART || {};
+  const mon = (k, owned, size) => { const a = ART[k.id]; return `<svg viewBox="${a ? a.vb : '0 0 100 100'}" class="kmn${owned ? ' own' : ''}" ${size ? `width="${size}" height="${size}"` : ''} aria-hidden="true"><g fill="currentColor">${a ? a.svg : k.svg}</g></svg>`; };
+  const credit = (k) => { const a = ART[k.id]; if (!a) return ''; const c = a.cr;
+    return c ? `<p class="small muted xkmcr">Dessin : <a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">${esc(c.file)}</a>, ${esc(c.author)}, Wikimedia Commons${c.licUrl ? `, licence <a href="${esc(c.licUrl)}" target="_blank" rel="noopener noreferrer">${esc(c.lic)}</a>` : `, ${esc(c.lic)}`} ; ${esc(c.mod)}.</p>`
+      : '<p class="small muted xkmcr">Dessin : redessiné pour KOTONOHA d’après le motif traditionnel (aucun fichier libre fidèle disponible).</p>'; };
   K.kamon.svg = mon;
   const LAB = { fait: 'Fait', tradition: 'Tradition', 'légende': 'Légende', 'interprétation': 'Interprétation', fiction: 'Fiction' };
   const items = (L) => L.map(([t, x]) => `<p class="kmi"><span class="kml t-${t === 'légende' ? 'legende' : t === 'interprétation' ? 'interp' : t}">${LAB[t] || t}</span>${esc(x)}</p>`).join('');
@@ -92,7 +97,7 @@
     sync();
     const O = K.kamon.owned(), n = D.filter((k) => O[k.id]).length;
     el.innerHTML = `<h1>Collection de kamon</h1>
-      <p class="muted">Chaque grande étape du parcours vous fait découvrir un emblème de famille réel, avec son histoire. Les fiches distinguent les faits, les traditions, les légendes et les fictions ; les dessins sont des schémas réalisés pour KOTONOHA.</p>
+      <p class="muted">Chaque grande étape du parcours vous fait découvrir un emblème de famille réel, avec son histoire. Les fiches distinguent les faits, les traditions, les légendes et les fictions ; les dessins reprennent les blasons d’origine (fichiers Wikimedia Commons crédités sur chaque fiche).</p>
       <div class="xkmhead"><div class="xkmcount"><b>${n}</b><span>sur ${D.length}</span></div><div class="bar" aria-hidden="true"><i style="width:${n / D.length * 100}%"></i></div></div>
       <div class="xkmgrid">${D.map((k) => `<a href="#kamon-${k.id}" class="xkmc${O[k.id] ? ' own' : ''}">${mon(k, !!O[k.id])}<span class="jp">${O[k.id] ? esc(plain(k.j)) : '？'}</span><small>${O[k.id] ? new Date(O[k.id]).toLocaleDateString('fr-FR') : esc(k.need)}</small></a>`).join('')}</div>
       <p class="small muted">Les anciens badges ont été convertis : leurs dates d’obtention sont conservées. Les jalons de jours d’étude ne demandent jamais de jours consécutifs.</p>`;
@@ -106,8 +111,7 @@
         <div class="xkmtxt"><div class="xmeta">Kamon ${i + 1} sur ${D.length}</div><h1 class="jp">${ruby(k.j)}</h1><p class="xkmr2">${esc(k.r)}</p>
           ${own ? `<h2>Le motif</h2><p>${esc(k.motif)}</p><h2>Signification</h2>${items(k.sens)}<h2>Contexte historique</h2>${items(k.hist)}<h2>Récit</h2>${items(k.recit)}`
           : `<p>${esc(k.motif)}</p><p class="muted">Son histoire se dévoilera quand vous l’obtiendrez. Rien ne se perd : prenez votre temps.</p>`}
-          <h2>Sources</h2><ul class="small">${k.src.map(([t, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(t)}</a></li>`).join('')}</ul>
-          <p class="small muted">Dessin simplifié réalisé pour KOTONOHA d’après le motif historique.</p>
+          <h2>Sources</h2><ul class="small">${k.src.map(([t, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(t)}</a></li>`).join('')}</ul>${credit(k)}
           <div class="toolbar">${i > 0 ? `<a class="btn sec" href="#kamon-${D[i - 1].id}">← Précédent</a>` : ''}${i < D.length - 1 ? `<a class="btn sec" href="#kamon-${D[i + 1].id}">Suivant →</a>` : ''}</div></div>
       </article>`;
   }

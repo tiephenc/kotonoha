@@ -274,3 +274,10 @@ Les laboratoires sont ainsi reliés aux leçons, tout en restant accessibles sé
 - Les dessins (renard, kamon, carte) sont des illustrations SVG faites à la main : simples, pas des œuvres d'illustrateur.
 - Les sources des destinations sont surtout Wikipédia japonaise. Des sources institutionnelles (offices de tourisme, musées) seraient préférables.
 - Safari réel n'a pas été testé ; WebKit sous Windows reste instable (voir `KOTONOHA_TESTS.md`).
+
+## Mission 9 : itinéraire unique, éphéméride (5 novembre 2026)
+
+- **Voyager** : la carte à zoom est remplacée par un itinéraire unique, sans zoom. Les 14 étapes se suivent dans l'ordre des points requis, assez espacées pour que rien ne se chevauche (serpentin de trois rangées sur ordinateur, colonne en zigzag sous 700 px). Une étape s'ouvre quand les points sont atteints et que la précédente a été visitée. Dans la ville où l'on se trouve, trois points d'intérêt réels (une phrase factuelle chacun) : s'y arrêter est mémorisé dans `S.x.voyage.poi`, avec un lien de recherche Wikipédia. La silhouette du Japon reste en fond, très atténuée.
+- **Culture** : un éphéméride à pages détachables. La première page est le jour même avec le prochain rendez-vous ; « Arracher la page » fait tomber la page (animation désactivée si mouvement réduit) et montre la fête ou coutume suivante. La liste de l'année reste disponible, sources comprises.
+- **Kamon** : les vrais blasons remplacent les schémas. 19 dessins viennent de fichiers SVG de Wikimedia Commons (série « Japanese Crest »), formes inchangées, couleurs adaptées au thème jour/nuit, fond carré retiré ; auteur et licence (CC BY-SA 3.0/4.0 ou domaine public) sont cités sur chaque fiche et dans `LICENCES-KAMON.md`. Kikyō, mitsuboshi, takanoha, tsuru et rindō, sans fichier libre fidèle, sont redessinés d'après le motif traditionnel et signalés comme tels. Données des fiches et migration des badges inchangées. Génération : `tools/kamon-art/`.
+- Tests : `refonte.spec.js` (crédit des dessins, aucun contenu actif dans les SVG ; itinéraire unique, pas de zoom, arrêt à un point d'intérêt persistant) et `carte-culture.spec.js` (pages arrachées et retour).

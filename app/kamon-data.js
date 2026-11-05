@@ -1,7 +1,7 @@
 /* KOTONOHA · collection de kamon (家紋) — contenus documentés.
    Chaque fiche sépare : fait (attesté), tradition (croyance ou usage transmis), légende (récit merveilleux),
-   interprétation (lecture discutée), fiction (œuvre dramatique). Les dessins sont des schémas réalisés pour
-   KOTONOHA d'après les motifs ; ce ne sont pas des reproductions héraldiques exactes.
+   interprétation (lecture discutée), fiction (œuvre dramatique). Les dessins affichés viennent de app/kamon-art.js
+   (fichiers Wikimedia Commons fidèles, ou redessins d'après le motif) ; le champ svg ci-dessous n'est qu'un schéma de secours.
    Sources : articles de Wikipédia en japonais (titres indiqués), pages officielles quand elles existent. */
 (function () {
   const W = (t) => ['Wikipédia (ja) · ' + t, 'https://ja.wikipedia.org/wiki/' + encodeURIComponent(t)];

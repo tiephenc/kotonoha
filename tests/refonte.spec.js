@@ -67,17 +67,27 @@ test('voyage : points réels, destination débloquée, trajet animé, souvenir, 
   await expect(page.locator('.xplace[data-p="sapporo"]')).toHaveClass(/s-locked/);
   await page.locator('.xplace[data-p="kamakura"]').focus();
   await page.keyboard.press('Enter');
-  await expect(page.locator('.xm-plane')).toBeVisible();
   await expect(page.locator('.xplace')).toHaveCount(14);
+  // Un seul chemin, sans zoom : une étape n'ouvre que si la précédente est visitée
+  await expect(page.locator('#xzin, #xzout, .xm-zoom, .xm-plane')).toHaveCount(0);
+  const line = await page.evaluate(() => { const P = KX_VOYAGE.places, nikko = P.find((q) => q.id === 'nikko'); return KX.voyage.placeState(nikko, 99999, { seen: { tokyo: 1 } }); });
+  expect(line).toBe('locked');
   await expect(page.locator('#xvinfo h2')).toContainText('Kamakura');
   await page.click('#xgo');
   await expect(page.locator('.xplace[data-p="kamakura"]')).toHaveClass(/s-seen/, { timeout: 15000 });
   const v = await page.evaluate(() => S.x.voyage);
   expect(v.at).toBe('kamakura');
   await expect(page.locator('.xsouvc[data-p="kamakura"]')).toBeVisible();
+  // Arrêt à un point d'intérêt une fois dans la ville, mémorisé (on referme d'abord les kamons révélés)
+  for (let i = 0; i < 6 && await page.locator('#xkmreveal').count(); i++) { await page.click('#xkmreveal button.sec'); await page.waitForTimeout(350); }
+  await page.locator('.xplace[data-p="kamakura"]').click();
+  await page.locator('.xpoi-b[data-poi="0"]').click();
+  await expect(page.locator('.xpoi-b[data-poi="0"]')).toHaveAttribute('aria-pressed', 'true');
+  expect(Object.keys(await page.evaluate(() => S.x.voyage.poi))).toContain('kamakura:0');
   expect(await page.evaluate(() => KX.voyage.points().total)).toBeGreaterThanOrEqual(pts);
   await page.reload();
   await expect(page.locator('.xplace[data-p="kamakura"]')).toHaveClass(/s-seen/);
+  expect(await page.evaluate(() => S.x.voyage.poi['kamakura:0'])).toBeTruthy();
   await noHorizontalOverflow(page);
   expect(errors).toEqual([]);
 });
@@ -101,6 +111,13 @@ test('kamon : migration des anciens badges sans perte, fiche sourcée', async ({
   links.forEach((r) => expect(r).toContain('noopener'));
   const ok = await page.evaluate(() => KX_KAMON.every((k) => k.src.length && k.hist.length && k.recit.length && k.sens.length));
   expect(ok).toBe(true);
+  // Vrais dessins : fichier Commons crédité (auteur, licence) ou redessin signalé ; aucun contenu actif dans les SVG
+  await expect(page.locator('.xkmfiche .xkmcr')).toContainText('Mukai');
+  await expect(page.locator('.xkmfiche .xkmcr')).toContainText('CC BY-SA 3.0');
+  const art = await page.evaluate(() => KX_KAMON.map((k) => { const a = KX_KAMON_ART[k.id]; return a ? (/<script|on\w+=|href=|<image|<foreignObject/i.test(a.svg) ? 'unsafe:' + k.id : 'ok') : 'missing:' + k.id; }));
+  expect(art.filter((x) => x !== 'ok')).toEqual([]);
+  await page.evaluate(() => { location.hash = 'kamon-kikyo'; });
+  await expect(page.locator('.xkmfiche .xkmcr')).toContainText('redessiné');
   expect(errors).toEqual([]);
 });
 

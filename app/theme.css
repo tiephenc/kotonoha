@@ -593,8 +593,6 @@ svg.kit { margin: 0; width: auto; max-width: 100%; animation: none; will-change:
 .xkmc { border-radius: 3px !important; background: var(--paper) !important; border: 1px solid var(--line-2) !important; }
 .xkmc.own { background: var(--accent) var(--cloth) !important; color: var(--accent-ink) !important; border-color: var(--accent) !important; }
 .xkmc.own svg { color: var(--rsv); }
-.xkmc.own svg * { fill: currentColor; stroke: currentColor; }
-.xkmc.own svg [fill="none"] { fill: none; }
 .xkmc.own .jp, .xkmc.own small { color: var(--accent-ink) !important; }
 .xkmc:not(.own) { background: transparent !important; border-style: dashed !important; }
 
@@ -1177,3 +1175,99 @@ html, body { overflow-x: clip; }
 .xvleg .ls-locked { background: rgba(247, 240, 224, .85) !important; box-shadow: inset 0 0 0 2px rgba(34, 24, 15, .35); border-radius: 50%; }
 :root[data-theme="nuit"] .xvleg .ls-open { background: #201811 !important; box-shadow: inset 0 0 0 2.5px #F0705F; }
 :root[data-theme="nuit"] .xvleg .ls-locked { background: rgba(32, 24, 17, .85) !important; box-shadow: inset 0 0 0 2px rgba(242, 229, 203, .3); }
+
+/* ---------- Culture : éphéméride à pages détachables (himekuri) ---------- */
+.xhk { display: grid; justify-items: center; gap: 16px; margin: 18px 0 26px; }
+.xhk-block { position: relative; width: min(100%, 380px); padding-top: 26px; }
+.xhk-bar { position: absolute; left: -10px; right: -10px; top: 0; height: 30px; z-index: 3; border-radius: 4px; background: linear-gradient(#6E4A2A, #4A2E19); box-shadow: 0 6px 10px -6px rgba(30, 15, 5, .7); }
+:root[data-theme="nuit"] .xhk-bar { background: linear-gradient(#3A2817, #22180F); }
+.xhk-bar i { position: absolute; top: -12px; width: 14px; height: 24px; border-radius: 7px 7px 3px 3px; border: 3px solid #B47718; border-bottom: 0; }
+.xhk-bar i:first-child { left: 28%; } .xhk-bar i:last-child { right: 28%; }
+.xhk-stack { position: absolute; inset: 0; pointer-events: none; }
+.xhk-stack i { position: absolute; left: 6px; right: 6px; top: 30px; bottom: 0; background: #EFE6D2; border-radius: 0 0 4px 4px; box-shadow: 0 1px 0 rgba(0, 0, 0, .12); }
+.xhk-stack i:nth-child(1) { transform: translateY(10px); left: 12px; right: 12px; background: #E3D7BD; }
+.xhk-stack i:nth-child(2) { transform: translateY(6px); left: 9px; right: 9px; background: #E8DDC5; }
+.xhk-stack i:nth-child(3) { transform: translateY(3px); }
+:root[data-theme="nuit"] .xhk-stack i { background: #3A2C1F; } :root[data-theme="nuit"] .xhk-stack i:nth-child(1) { background: #2A1D13; } :root[data-theme="nuit"] .xhk-stack i:nth-child(2) { background: #322418; }
+.xhk-cur { position: relative; z-index: 2; }
+.xhk-page { --c: #22180F; background: #FBF6EA; color: #22180F; border-radius: 0 0 4px 4px; padding: 16px 22px 20px; text-align: center; box-shadow: 0 14px 26px -16px rgba(30, 15, 5, .6);
+  background-image: linear-gradient(90deg, transparent 0 calc(50% - .5px), rgba(34, 24, 15, .05) 50%, transparent calc(50% + .5px)); transform-origin: 50% 0; }
+.xhk-page::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: repeating-linear-gradient(90deg, transparent 0 7px, rgba(34, 24, 15, .14) 7px 9px); }
+.xhk-page.red { --c: #A3302A; }
+.xhk-top { display: flex; justify-content: space-between; align-items: baseline; font: 700 13px var(--sans); color: var(--c); border-bottom: 1.5px solid currentColor; padding-bottom: 6px; }
+.xhk-top .m { display: flex; gap: 8px; align-items: baseline; } .xhk-top .m b { font: 800 18px var(--display); }
+.xhk-day { display: grid; justify-items: center; margin: 4px 0 6px; color: var(--c); }
+.xhk-day .n { font: 400 clamp(110px, 30vw, 168px)/.95 var(--mon-l); letter-spacing: -.01em; }
+.xhk-day .w { display: flex; gap: 10px; align-items: baseline; font: 700 15px var(--sans); text-transform: capitalize; }
+.xhk-day .w b { font: 800 20px var(--display); }
+.xhk-ev { border-top: 1px dashed rgba(34, 24, 15, .3); padding-top: 10px; display: grid; gap: 6px; }
+.xhk-ev .tag { justify-self: center; background: var(--c) !important; color: #FBF6EA !important; }
+.xhk-ev .jp { margin: 0; font: 800 22px var(--display); color: #22180F; }
+.xhk-ev .d { margin: 0; font-size: 14.5px; line-height: 1.5; color: #47372A; }
+.xhk-ev .small, .xhk-ev .muted { color: #66523D !important; }
+.xhk-ev a { color: #92271F; }
+.xhk-ev .when { font-weight: 700; color: var(--c); }
+.xhk-tools { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; justify-content: center; }
+.xhk-tools .btn:disabled { opacity: .45; }
+@media (prefers-reduced-motion: no-preference) {
+  .xhk-page { animation: xhkin .35s var(--ease) both; }
+  .xhk-page.tear { animation: xhktear .52s cubic-bezier(.5, 0, .75, .4) forwards; }
+}
+@keyframes xhkin { from { opacity: .4; } }
+@keyframes xhktear { 0% { transform: rotate(0); } 25% { transform: rotate(-4deg) translateY(4px); } 100% { transform: rotate(-24deg) translate(-40px, 160px); opacity: 0; } }
+
+/* ---------- Voyager : un seul chemin, aéré, sans zoom ---------- */
+.xvoy:has(.xroutemap) { grid-template-columns: minmax(0, 1fr); }
+.xvoy:has(.xroutemap) .xvside { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .xvoy:has(.xroutemap) .xvside { grid-template-columns: minmax(0, 1fr); } }
+.xroutemap { display: flex; flex-direction: column; }
+.xroute-stage { position: relative; background: #DCD6C2; }
+:root[data-theme="nuit"] .xroute-stage { background: #10172A; }
+.xroute-stage svg { display: block; width: 100%; height: auto; max-height: none; cursor: default; }
+.xsil .xland path { fill: rgba(141, 166, 107, .32) !important; stroke: rgba(79, 107, 47, .35) !important; stroke-width: 2 !important; }
+.xsil .xland-side path { fill: rgba(122, 66, 32, .16) !important; }
+:root[data-theme="nuit"] .xsil .xland path { fill: rgba(42, 59, 34, .55) !important; stroke: rgba(63, 87, 38, .6) !important; }
+:root[data-theme="nuit"] .xsil .xland-side path { fill: rgba(0, 0, 0, .25) !important; }
+/* Tronçons */
+.xleg { fill: none; stroke-linecap: round; stroke-width: 6; }
+.xleg.l-done { stroke: #F4EAD6; filter: drop-shadow(0 0 4px rgba(229, 154, 46, .9)); }
+.xleg.l-next { stroke: #E59A2E; stroke-dasharray: 10 9; }
+.xleg.l-todo { stroke: rgba(94, 51, 28, .35); stroke-dasharray: 2 11; stroke-width: 5; }
+:root[data-theme="nuit"] .xleg.l-done { stroke: #F6DDA8; filter: drop-shadow(0 0 5px rgba(246, 180, 81, .95)); }
+:root[data-theme="nuit"] .xleg.l-next { stroke: #F6B451; }
+:root[data-theme="nuit"] .xleg.l-todo { stroke: rgba(242, 229, 203, .22); }
+.xleg.active { stroke-width: 9; }
+@media (prefers-reduced-motion: no-preference) { .xleg.l-next { animation: xdash 1.4s linear infinite; } }
+@keyframes xdash { to { stroke-dashoffset: -19; } }
+.xmode circle { fill: #F7F0E0; stroke: #7A4220; stroke-width: 1.5; }
+.xmode .mi { fill: none; stroke: #5E331C; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.xmode.l-todo { opacity: .45; }
+:root[data-theme="nuit"] .xmode circle { fill: #201811; stroke: #6B5236; } :root[data-theme="nuit"] .xmode .mi { stroke: #E8D5B0; }
+/* Jeton du renard */
+.xfox-tok .halo { fill: rgba(229, 154, 46, .22); stroke: #E59A2E; stroke-width: 2; }
+@media (prefers-reduced-motion: no-preference) { .xfox-tok .halo { animation: xtokp 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; } }
+@keyframes xtokp { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.18); opacity: .7; } }
+/* Étapes : anneaux et étiquettes toujours lisibles (l'espacement l'autorise) */
+.xroutemap .xm-pins { position: absolute; inset: 0; }
+.xroutemap .xplace { position: absolute; width: 48px; height: 48px; margin: -24px 0 0 -24px; padding: 0; border: 0; background: none; display: grid; place-items: center; cursor: pointer; z-index: 2; }
+.xroutemap .xplace.here .node { opacity: 0; }
+.xroutemap .xplace .pin-lbl { position: absolute; top: 44px; left: 50%; transform: translateX(-50%) !important; opacity: 1 !important; display: grid; gap: 1px; text-align: center; padding: 3px 9px; white-space: nowrap; background: var(--paper); border: 1.5px solid var(--line-2); border-radius: 3px; font: 700 13px/1.25 var(--sans); color: var(--ink); box-shadow: var(--shadow); pointer-events: none; }
+.xroutemap .xplace .pin-lbl b { font-weight: 800; } .xroutemap .xplace .pin-lbl small { font-weight: 500; font-size: 11.5px; color: var(--ink-3); }
+.xroutemap .xplace.here .pin-lbl { top: 50px; background: var(--noren); color: var(--rsv); border-color: var(--noren); } .xroutemap .xplace.here .pin-lbl small { color: var(--rsv-2); }
+.xroutemap .xplace.s-locked .pin-lbl { opacity: .75 !important; }
+.xroutemap .xplace.sel .node { transform: scale(1.18); }
+.xpoi { list-style: none; padding: 0; margin: 6px 0 12px; display: grid; gap: 8px; }
+.xpoi li { display: grid; gap: 4px; }
+.xpoi-b { display: grid; gap: 2px; width: 100%; text-align: left; padding: 10px 12px; border: 1.5px dashed var(--line-2); border-radius: 3px; background: none; color: var(--ink); font: inherit; cursor: pointer; }
+.xpoi-b span { font-size: 13.5px; color: var(--ink-3); }
+.xpoi li.ok .xpoi-b { border-style: solid; border-color: var(--lamp); background: var(--gold-soft); }
+.xpoi li.ok .xpoi-b span { color: var(--ink-2); }
+.xpoi-b:hover { border-color: var(--ink-3); }
+.xroute-stage #xjp { max-height: none !important; height: auto !important; width: 100% !important; touch-action: auto; cursor: default; }
+.xsil { opacity: .55; } :root[data-theme="nuit"] .xsil { opacity: .8; }
+.xroutemap .xvleg .ls-seen { background: #E59A2E !important; box-shadow: none; border-radius: 50%; }
+.xroutemap .xvleg .ls-open { background: #F4EAD6 !important; box-shadow: inset 0 0 0 2.5px #A3302A; border-radius: 50%; }
+
+/* ---------- Kamon : vrais dessins ; les réserves (blanc d'origine) prennent la couleur du fond de la carte ---------- */
+.xkmc.own .kmn { --kmp: var(--accent); }
+.xkmcr { margin-top: 10px; }
