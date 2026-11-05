@@ -67,49 +67,68 @@
 
   /* ---------- Paysage en pixel art (dessiné une fois) ---------- */
   let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  /* Couleurs du site : jour (coton écru, mousse, kakishibu, garance) et nuit (bois sombre, indigo, lanternes) */
+  const PAL = {
+    jour: { sky0: '#E9E1CC', sky1: '#E3DCC6', sky2: '#D9D4BE', star: 'rgba(0,0,0,0)', star2: 'rgba(0,0,0,0)', moon: '#F7EFC8', moon2: '#FBF5DA', moon3: '#EFE4BE', moonGlow: 'rgba(247,239,200,.25)',
+      snow: '#F7F0E0', fuji: '#6E8297', fuji2: '#748AA0', haze: 'rgba(247,240,224,.55)', streak: 'rgba(122,66,32,.08)',
+      cliffTop: '#8C5A33', cliff: '#6B3E1E', cliff2: '#7A4824', grass: '#7D9A5C', grass2: '#84A263', grassEdge: '#9DB878', grassDot: '#6F8C4E',
+      water: '#9CC0C4', water2: '#D7E8E6', foam: 'rgba(247,240,224,.7)', river: '#6F9AA0', cloud: 'rgba(247,240,224,.55)', cloud2: 'rgba(255,255,255,.35)',
+      pathEdge: '#5E331C', pathDone: '#F4EAD6', pathTodo: '#B8A68A', pathDone2: '#FFF8E6', pathTodo2: '#C9B898',
+      post: '#4A2E19', lamp: '#E59A2E', lamp2: '#C98A2B', lampOff: '#B9A88C', lampGlow: 'rgba(229,154,46,.22)',
+      trunk: '#4A2E19', sakura: '#D89A8E', sakura2: '#EBBCB2', leaf: '#4F6B2F', leaf2: '#64843E', torii: '#A3302A', toriiTop: '#22180F',
+      wall: '#F4EAD6', roof: '#47372A', roof2: '#5E4A38', pagoda: '#5E331C', roofD: '#22180F', stone: '#9C8E78', castle: '#F7F0E0', bamboo: '#5E7D3A', bamboo2: '#4F6B2F' },
+    nuit: { sky0: '#0F1220', sky1: '#141B30', sky2: '#1B2640', star: '#D8CFB8', star2: '#F6D9A0', moon: '#F2E5CB', moon2: '#FBF1DA', moon3: '#E3D2B0', moonGlow: 'rgba(246,180,81,.10)',
+      snow: '#E8E0CC', fuji: '#2A3350', fuji2: '#2F3A5A', haze: 'rgba(160,170,200,.16)', streak: 'rgba(160,170,200,.07)',
+      cliffTop: '#3A2A1D', cliff: '#22180F', cliff2: '#2A1D13', grass: '#24331C', grass2: '#2A3A20', grassEdge: '#3F5726', grassDot: '#33472A',
+      water: '#5E7FA8', water2: '#A9BEE6', foam: 'rgba(200,215,240,.4)', river: '#2E4A72', cloud: 'rgba(150,160,190,.16)', cloud2: 'rgba(220,225,240,.08)',
+      pathEdge: '#140D08', pathDone: '#E8C98E', pathTodo: '#55493A', pathDone2: '#F6DDA8', pathTodo2: '#6A5C49',
+      post: '#140D08', lamp: '#F6B451', lamp2: '#E89E3A', lampOff: '#4A3B2C', lampGlow: 'rgba(246,180,81,.2)',
+      trunk: '#140D08', sakura: '#B66E64', sakura2: '#D9968A', leaf: '#1A2614', leaf2: '#24331C', torii: '#C8442E', toriiTop: '#140D08',
+      wall: '#E8D5B0', roof: '#1B2640', roof2: '#26324F', pagoda: '#2A1D13', roofD: '#0F0B08', stone: '#5A4E40', castle: '#E8E0CC', bamboo: '#3F5726', bamboo2: '#2F421D' },
+  };
   function paint(cv, st, cur) {
-    const g = cv.getContext('2d'), { path, seg } = geometry(st); seed = 11;
+    const g = cv.getContext('2d'), { path, seg } = geometry(st), C = PAL[document.documentElement.dataset.theme === 'nuit' ? 'nuit' : 'jour']; seed = 11;
     const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x | 0, y | 0, w | 0, h | 0); };
     const blob = (x, y, r, c, c2) => { for (let dy = -r; dy <= r; dy++) { const w = Math.round(Math.sqrt(r * r - dy * dy)); R(x - w, y + dy, w * 2, 1, dy < -r / 3 && c2 ? c2 : c); } };
     // Ciel et mer de nuages
-    const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#120E2A'); sky.addColorStop(.45, '#1C1640'); sky.addColorStop(1, '#241B4E'); g.fillStyle = sky; g.fillRect(0, 0, W, H);
-    for (let i = 0; i < 90; i++) R(rnd() * W, rnd() * 260, 1, 1, i % 6 ? '#C9C1E8' : '#F2D6F0');
-    blob(62, 46, 17, '#F6D9E4', '#FBE9EF'); blob(56, 42, 5, '#EAC4D4'); g.fillStyle = 'rgba(246,217,228,.08)'; g.beginPath(); g.arc(62, 46, 34, 0, 7); g.fill();
+    const sky = g.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, C.sky0); sky.addColorStop(.45, C.sky1); sky.addColorStop(1, C.sky2); g.fillStyle = sky; g.fillRect(0, 0, W, H);
+    for (let i = 0; i < 90; i++) R(rnd() * W, rnd() * 260, 1, 1, i % 6 ? C.star : C.star2);
+    blob(62, 46, 17, C.moon, C.moon2); blob(56, 42, 5, C.moon3); g.fillStyle = C.moonGlow; g.beginPath(); g.arc(62, 46, 34, 0, 7); g.fill();
     // Mont Fuji, au loin derrière la dernière île
-    for (let y = 36; y < 170; y++) { const w = (y - 36) * 1.35 + 5; R(196 - w, y, w * 2, 1, y < 64 ? '#EDE7F7' : y < 72 && (y + Math.floor(w)) % 3 ? '#EDE7F7' : y % 9 ? '#3A3070' : '#40367A'); }
-    for (let k = 0; k < 7; k++) { const x = 70 + k * 36, y = 150 + (k % 3) * 6; g.fillStyle = 'rgba(200,180,240,.22)'; g.beginPath(); g.ellipse(x, y, 34, 7, 0, 0, 7); g.fill(); }
-    for (let i = 0; i < 26; i++) { const y = 130 + rnd() * 760, x = rnd() * W, w = 30 + rnd() * 60; g.fillStyle = 'rgba(120,100,190,.12)'; g.fillRect(x, y, w, 3); g.fillRect(x + 8, y - 2, w * .6, 2); }
+    for (let y = 36; y < 170; y++) { const w = (y - 36) * 1.35 + 5; R(196 - w, y, w * 2, 1, y < 64 ? C.snow : y < 72 && (y + Math.floor(w)) % 3 ? C.snow : y % 9 ? C.fuji : C.fuji2); }
+    for (let k = 0; k < 7; k++) { const x = 70 + k * 36, y = 150 + (k % 3) * 6; g.fillStyle = C.haze; g.beginPath(); g.ellipse(x, y, 34, 7, 0, 0, 7); g.fill(); }
+    for (let i = 0; i < 26; i++) { const y = 130 + rnd() * 760, x = rnd() * W, w = 30 + rnd() * 60; g.fillStyle = C.streak; g.fillRect(x, y, w, 3); g.fillRect(x + 8, y - 2, w * .6, 2); }
     // Îles : relief (falaise) puis dessus
     const isle = (lv) => { const [y0, y1] = BANDS[lv], top = y1 - 42, bot = y0 + 34, rows = [];
       for (let y = top; y <= bot; y++) { const k = Math.min(1, (y - top) / 26, (bot - y) / 22), near = path.reduce((a, p) => (Math.abs(p[1] - y) < Math.abs(a[1] - y) ? p : a), path[0]);
         const cx = near[0] * .55 + 160 * .45, hw = (92 + Math.sin(y / 23) * 22 + Math.sin(y / 7.3) * 8) * Math.max(0, Math.sqrt(Math.max(0, k))); if (hw > 2) rows.push([y, cx - hw, cx + hw]); }
-      rows.forEach(([y, a, b]) => { for (let d = 1; d <= 16; d++) R(a, y + d, b - a, 1, d < 4 ? '#3B2E5C' : (Math.floor(a + d) % 5 ? '#2A2148' : '#33285A')); });
-      rows.forEach(([y, a, b]) => { R(a, y, b - a, 1, y % 3 ? '#2E4A3A' : '#335240'); R(a, y, 2, 1, '#41654E'); R(b - 2, y, 2, 1, '#41654E'); for (let x = a + (y % 7); x < b; x += 9) R(x, y, 1, 1, '#3E6049'); });
+      rows.forEach(([y, a, b]) => { for (let d = 1; d <= 16; d++) R(a, y + d, b - a, 1, d < 4 ? C.cliffTop : (Math.floor(a + d) % 5 ? C.cliff : C.cliff2)); });
+      rows.forEach(([y, a, b]) => { R(a, y, b - a, 1, y % 3 ? C.grass : C.grass2); R(a, y, 2, 1, C.grassEdge); R(b - 2, y, 2, 1, C.grassEdge); for (let x = a + (y % 7); x < b; x += 9) R(x, y, 1, 1, C.grassDot); });
       return rows; };
     const isl = { N4: isle('N4'), N3: isle('N3'), N2: isle('N2') };
     // Cascades et rivières entre les îles
-    WF.forEach(([x, y, h]) => { for (let k = 0; k < h; k++) R(x, y + k, 6, 1, k % 4 ? '#8FB2E8' : '#CFE1FF'); R(x - 3, y + h, 12, 3, 'rgba(220,235,255,.5)'); });
-    for (let y = 700; y < 860; y++) R(250 + Math.sin(y / 12) * 6, y, 5, 1, '#3E5C8E');
+    WF.forEach(([x, y, h]) => { for (let k = 0; k < h; k++) R(x, y + k, 6, 1, k % 4 ? C.water : C.water2); R(x - 3, y + h, 12, 3, C.foam); });
+    for (let y = 700; y < 860; y++) R(250 + Math.sin(y / 12) * 6, y, 5, 1, C.river);
     // Mer de nuages entre les îles (brume volumétrique)
-    [[372, 1], [660, 0], [930, 1]].forEach(([y, o]) => { for (let k = 0; k < 9; k++) { const x = (k * 43 + o * 20) % (W + 40) - 20, r = 18 + (k % 3) * 7; g.fillStyle = 'rgba(176,156,226,.20)'; g.beginPath(); g.ellipse(x, y + (k % 2) * 6, r * 1.8, r * .55, 0, 0, 7); g.fill(); g.fillStyle = 'rgba(236,226,255,.10)'; g.beginPath(); g.ellipse(x - 4, y - 3 + (k % 2) * 6, r * 1.2, r * .32, 0, 0, 7); g.fill(); } });
+    [[372, 1], [660, 0], [930, 1]].forEach(([y, o]) => { for (let k = 0; k < 9; k++) { const x = (k * 43 + o * 20) % (W + 40) - 20, r = 18 + (k % 3) * 7; g.fillStyle = C.cloud; g.beginPath(); g.ellipse(x, y + (k % 2) * 6, r * 1.8, r * .55, 0, 0, 7); g.fill(); g.fillStyle = C.cloud2; g.beginPath(); g.ellipse(x - 4, y - 3 + (k % 2) * 6, r * 1.2, r * .32, 0, 0, 7); g.fill(); } });
     // Le chemin
     const done = seg[cur];
-    path.forEach(([x, y], k) => { R(x - 3, y - 2, 7, 5, '#251C3E'); });
-    path.forEach(([x, y], k) => { R(x - 2, y - 1, 5, 3, k <= done ? '#D9C4A6' : '#776A91'); if (k % 3 === 0) R(x - 1, y, 2, 1, k <= done ? '#F4E3C2' : '#9387B0'); });
+    path.forEach(([x, y], k) => { R(x - 3, y - 2, 7, 5, C.pathEdge); });
+    path.forEach(([x, y], k) => { R(x - 2, y - 1, 5, 3, k <= done ? C.pathDone : C.pathTodo); if (k % 3 === 0) R(x - 1, y, 2, 1, k <= done ? C.pathDone2 : C.pathTodo2); });
     // Lanternes le long du chemin (allumées jusqu'à l'étape en cours)
     for (let k = 7; k < path.length; k += 11) { const [x, y] = path[k], lit = k <= done, ox = (k % 2 ? 9 : -10);
-      R(x + ox, y - 8, 1, 8, '#1B1430'); R(x + ox - 1, y - 11, 3, 4, lit ? '#F6B451' : '#5B4E7A'); if (lit) { g.fillStyle = 'rgba(246,180,81,.18)'; g.fillRect(x + ox - 5, y - 15, 11, 11); } }
+      R(x + ox, y - 8, 1, 8, C.post); R(x + ox - 1, y - 11, 3, 4, lit ? C.lamp : C.lampOff); if (lit) { g.fillStyle = C.lampGlow; g.fillRect(x + ox - 5, y - 15, 11, 11); } }
     // Décors des régions
-    const tree = (x, y, pink) => { R(x - 1, y, 3, 6, '#1D1430'); blob(x, y - 3, 5 + (rnd() * 3 | 0), pink ? '#C66BB0' : '#1E3A2E', pink ? '#E9A0D2' : '#2A4D3B'); };
-    const torii = (x, y, s = 1) => { R(x - 9 * s, y - 14 * s, 18 * s, 2 * s, '#C23A3A'); R(x - 10 * s, y - 16 * s, 20 * s, 2 * s, '#2A1830'); R(x - 7 * s, y - 12 * s, 2 * s, 12 * s, '#C23A3A'); R(x + 5 * s, y - 12 * s, 2 * s, 12 * s, '#C23A3A'); R(x - 7 * s, y - 9 * s, 14 * s, 1 * s, '#C23A3A'); };
-    const house = (x, y) => { R(x - 8, y - 6, 16, 7, '#D9C9A8'); R(x - 6, y - 4, 3, 3, '#F6B451'); R(x + 2, y - 4, 3, 3, '#F6B451'); R(x - 11, y - 10, 22, 4, '#2B2552'); R(x - 9, y - 12, 18, 2, '#3A3470'); };
-    const pagoda = (x, y) => { for (let k = 0; k < 4; k++) { const w = 22 - k * 4, yy = y - k * 9; R(x - w / 2, yy - 6, w, 6, '#3A2A48'); R(x - w / 2 + 2, yy - 5, w - 4, 4, k ? '#F6B451' : '#E8B05A'); R(x - w / 2 - 3, yy - 9, w + 6, 3, '#1E1838'); } R(x, y - 42, 1, 6, '#F6B451'); };
-    const castle = (x, y) => { R(x - 16, y - 8, 32, 8, '#8C82A8'); for (let k = 0; k < 3; k++) { const w = 28 - k * 8, yy = y - 8 - k * 10; R(x - w / 2, yy - 7, w, 7, '#E9E2F2'); R(x - w / 2 + 3, yy - 5, 3, 3, '#F6B451'); R(x + w / 2 - 6, yy - 5, 3, 3, '#F6B451'); R(x - w / 2 - 3, yy - 10, w + 6, 3, '#2B2552'); } };
+    const tree = (x, y, pink) => { R(x - 1, y, 3, 6, C.trunk); blob(x, y - 3, 5 + (rnd() * 3 | 0), pink ? C.sakura : C.leaf, pink ? C.sakura2 : C.leaf2); };
+    const torii = (x, y, s = 1) => { R(x - 9 * s, y - 14 * s, 18 * s, 2 * s, C.torii); R(x - 10 * s, y - 16 * s, 20 * s, 2 * s, C.toriiTop); R(x - 7 * s, y - 12 * s, 2 * s, 12 * s, C.torii); R(x + 5 * s, y - 12 * s, 2 * s, 12 * s, C.torii); R(x - 7 * s, y - 9 * s, 14 * s, 1 * s, C.torii); };
+    const house = (x, y) => { R(x - 8, y - 6, 16, 7, C.wall); R(x - 6, y - 4, 3, 3, C.lamp); R(x + 2, y - 4, 3, 3, C.lamp); R(x - 11, y - 10, 22, 4, C.roof); R(x - 9, y - 12, 18, 2, C.roof2); };
+    const pagoda = (x, y) => { for (let k = 0; k < 4; k++) { const w = 22 - k * 4, yy = y - k * 9; R(x - w / 2, yy - 6, w, 6, C.pagoda); R(x - w / 2 + 2, yy - 5, w - 4, 4, k ? C.lamp : C.lamp2); R(x - w / 2 - 3, yy - 9, w + 6, 3, C.roofD); } R(x, y - 42, 1, 6, C.lamp); };
+    const castle = (x, y) => { R(x - 16, y - 8, 32, 8, C.stone); for (let k = 0; k < 3; k++) { const w = 28 - k * 8, yy = y - 8 - k * 10; R(x - w / 2, yy - 7, w, 7, C.castle); R(x - w / 2 + 3, yy - 5, 3, 3, C.lamp); R(x + w / 2 - 6, yy - 5, 3, 3, C.lamp); R(x - w / 2 - 3, yy - 10, w + 6, 3, C.roof); } };
     const free = (x, y) => !path.some((p) => Math.abs(p[0] - x) < 16 && Math.abs(p[1] - y) < 12);
     const onIsle = (rows, x, y) => rows.some(([yy, a, b]) => yy === Math.round(y) && x > a + 6 && x < b - 6);
     const scatter = (rows, n, fn) => { let c = 0, guard = 0; while (c < n && guard++ < 600) { const r = rows[(rnd() * rows.length) | 0]; if (!r) break; const x = r[1] + rnd() * (r[2] - r[1]), y = r[0]; if (onIsle(rows, x, y) && free(x, y)) { fn(x, y); c++; } } };
     scatter(isl.N4, 16, (x, y) => tree(x, y, rnd() < .35)); scatter(isl.N4, 5, house);
-    scatter(isl.N3, 14, (x, y) => { if (rnd() < .55) { for (let k = 0; k < 4; k++) R(x + k * 2, y - 12 - (k % 2) * 3, 1, 14, k % 2 ? '#3F6E3A' : '#2F5A2E'); } else tree(x, y, rnd() < .5); });
+    scatter(isl.N3, 14, (x, y) => { if (rnd() < .55) { for (let k = 0; k < 4; k++) R(x + k * 2, y - 12 - (k % 2) * 3, 1, 14, k % 2 ? C.bamboo : C.bamboo2); } else tree(x, y, rnd() < .5); });
     scatter(isl.N2, 14, (x, y) => tree(x, y, rnd() < .6));
     const P = geometry(st).pts, last = P.length - 1;
     const side = (p, d) => p[0] + (p[0] < 160 ? d : -d);
@@ -118,7 +137,7 @@
     castle(P[last][0], P[last][1] - 16);
     for (let k = 0; k < 3; k++) { const x = P[4 + k] ? P[4 + k][0] + (k % 2 ? 26 : -26) : 100; house(x, P[4 + k] ? P[4 + k][1] + 10 : 700); }
     // Pont rouge sur la rivière du N3
-    const bp = P[12] || [160, 470]; for (let k = 0; k < 18; k++) R(bp[0] - 30 + k, bp[1] + 14 - Math.round(Math.sin(k / 17 * Math.PI) * 4), 1, 2, '#C23A3A'); R(bp[0] - 32, bp[1] + 16, 40, 3, '#3E5C8E');
+    const bp = P[12] || [160, 470]; for (let k = 0; k < 18; k++) R(bp[0] - 30 + k, bp[1] + 14 - Math.round(Math.sin(k / 17 * Math.PI) * 4), 1, 2, C.torii); R(bp[0] - 32, bp[1] + 16, 40, 3, C.river);
   }
 
   /* ---------- Personnage : un petit voyageur noir en pixel art ---------- */
@@ -215,6 +234,7 @@
       box.innerHTML = `${head}<h2>${esc(s.t)}</h2><p>${s.done} / ${s.units.length} unités validées · ${xpOf.toLocaleString('fr-FR')} XP gagnés ici.</p><a class="btn" href="${href}">Continuer : unité ${ns.n >= s.a && ns.n <= s.b ? ns.n : n}</a><ul class="xch-units">${rows}</ul>`;
     }
   }
+  new MutationObserver(() => { const v = document.getElementById('v-x-chemin'); if (v && v.classList.contains('on')) render(v); }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   K.view({ name: 'chemin', title: 'Le chemin', nav: 'parcours', match: (h) => h === 'chemin', render });
   K.chemin = { syncXP, level, stages, current };
 })();

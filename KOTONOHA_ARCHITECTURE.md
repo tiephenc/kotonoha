@@ -95,6 +95,6 @@ Toutes les données importées ou synchronisées passent par `normTypes()` (dans
 
 ## Service worker
 
-La version est `kotonoha-2026-11-05-chemin`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
+La version est `kotonoha-2026-11-05-carte2d`. La page et `app/*.js|css` sont servis réseau d'abord (avec copie de secours), pour que page et modules restent cohérents après une mise à jour. Les autres fichiers sont servis cache d'abord.
 
 **À chaque publication, changer `VERSION` dans `sw.js`.**

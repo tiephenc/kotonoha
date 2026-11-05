@@ -1,5 +1,19 @@
 # KOTONOHA — refontes visuelles
 
+## Mission 8 : carte du Japon en 2D, chemin aux couleurs du site, accueil (5 novembre 2026)
+
+- **Carte du Japon** : carte d'aventure en 2D stylisée, aux couleurs du site de jour comme de nuit. La perspective 3D, la rotation et l'inclinaison sont retirées ; le zoom, le déplacement, « Où suis-je » et « Vue entière » restent. On y voit :
+  - des îles en plateau, avec un dessus de mousse et des falaises teintes ;
+  - des forêts, des cerisiers, des montagnes et le Fuji enneigé ;
+  - des repères près des destinations (torii, pagodes, temples, châteaux, onsen, pins) ;
+  - les trajets ouverts lumineux, les autres en pointillé ;
+  - la brume qui dérive sur les zones inexplorées ;
+  - les destinations en anneaux : dorée et cochée une fois visitée, cerclée de rouge et pulsante si elle est accessible, « ? » si elle est encore inexplorée ;
+  - le renard sur la destination actuelle.
+  Les étiquettes n'apparaissent qu'au survol, au focus, à la sélection, et là où vous êtes.
+- **Le chemin** : le paysage, le bandeau, la brume et les étapes suivent les couleurs du site (écru, mousse, kakishibu et lanternes le jour ; bois sombre, indigo et lanternes la nuit). Le paysage se redessine quand on change d'ambiance.
+- **Accueil** : le bloc d'appel est supprimé. « KOTONOHA » tient sur une ligne, entièrement lisible ; le renard est en dessous et flotte doucement (animation coupée par `prefers-reduced-motion`).
+
 ## Mission 7 : le chemin, cartes à jouer, ouverture sur grand écran (5 novembre 2026)
 
 - **Le chemin** (`#chemin`, onglet Apprendre) : carte de progression nocturne en pixel art, du N4 au N2, avec une étape par module et un petit voyageur noir. XP de parcours sans double comptage. Détails, architecture et barème : `KOTONOHA_CHEMIN.md`.

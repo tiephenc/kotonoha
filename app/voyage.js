@@ -68,9 +68,8 @@
      Le plan (SVG : mer, îles en relief, routes) est incliné en perspective ; les destinations, le Fuji et le renard
      sont des éléments HTML debout sur ce plan (ils compensent la rotation pour toujours faire face). Caméra pilotable
      à la souris, au doigt et au clavier ; vue 2D sur demande ; tout reste utilisable sans animation. */
-  const CAM0 = { rx: 48, rz: -10, s: matchMedia('(max-width: 760px)').matches ? 1.25 : 1.55, tx: 0, ty: 0 };
-  let cam = Object.assign({}, CAM0), mode3d = true, unfolded = false, framed = false;
-  try { mode3d = localStorage.getItem('kotonoha.voyage.3d') !== '0'; } catch (e) {}
+  const CAM0 = { rx: 0, rz: 0, s: matchMedia('(max-width: 760px)').matches ? 1.25 : 1.55, tx: 0, ty: 0 };
+  let cam = Object.assign({}, CAM0); const mode3d = false; let unfolded = false, framed = false; // carte plane, stylisée
   const PCT = (lat, lon) => { const [x, y] = P(lat, lon); return [(x / 900 * 100).toFixed(2), (y / 960 * 100).toFixed(2)]; };
   const STATE_T = { seen: 'Visitée', open: 'Accessible', locked: 'À débloquer' };
   function applyCam(el) {
@@ -86,13 +85,24 @@
     const a = pin.getBoundingClientRect(), b = st.getBoundingClientRect();
     cam.tx += (b.left + b.width / 2) - (a.left + a.width / 2); cam.ty += (b.top + b.height * .58) - (a.top + a.height / 2); applyCam(el);
   }
+  // Repères dessinés près des destinations (2D, style carte d'aventure)
+  const LMK = { tokyo: 'pagoda', kamakura: 'temple', nikko: 'torii', hakone: 'onsen', kyoto: 'torii', nara: 'pagoda', osaka: 'castle', kanazawa: 'castle', kumano: 'torii', hiroshima: 'temple', miyajima: 'torii', matsushima: 'pine', hakodate: 'castle', sapporo: 'temple' };
+  const LMSVG = {
+    torii: '<path class="lr" d="M-9 -12h18v2.4h-18zM-7 -9.6h2.2V0h-2.2zM4.8 -9.6H7V0H4.8zM-6.5 -7h13v1.6h-13z"/><path class="ld" d="M-10.5 -14h21v2h-21z"/>',
+    pagoda: '<path class="ld" d="M-8 -3h16l-2 -3h-12zM-6.5 -9h13l-2 -3h-9zM-5 -15h10l-1.6 -3h-6.8z"/><path class="lw" d="M-5 -3h10v3h-10zM-4 -9h8v3h-8zM-3 -15h6v3h-6z"/><path class="ll" d="M-1.5 -2h3v2h-3zM-1 -8h2v2h-2z"/>',
+    castle: '<path class="ls" d="M-10 -4h20v4h-20z"/><path class="lw" d="M-7 -10h14v6h-14zM-4.5 -16h9v6h-9z"/><path class="ld" d="M-9 -11h18l-2 -2h-14zM-6 -17h12l-2 -2h-8z"/><path class="ll" d="M-4 -8h2v2h-2zM2 -8h2v2h-2z"/>',
+    temple: '<path class="lw" d="M-8 -6h16v6h-16z"/><path class="ld" d="M-11 -6h22l-4 -6h-14z"/><path class="ll" d="M-2 -5h4v5h-4z"/>',
+    onsen: '<path class="lw" d="M-8 -3a8 3 0 0 0 16 0z"/><path class="lst" d="M-4 -6q-2 -3 0 -6M0 -6q-2 -3 0 -6M4 -6q-2 -3 0 -6"/>',
+    pine: '<path class="lt" d="M0 -16l7 9h-4l5 6h-16l5 -6h-4z"/><path class="ld" d="M-1 -1h2v3h-2z"/>',
+  };
   function pinHtml(p, s, v) {
     const [x, y] = PCT(p.lat, p.lon), here = v.at === p.id;
-    const icon = s === 'seen' ? '<svg viewBox="0 0 24 24" class="stamp"><circle cx="12" cy="12" r="10"/><path d="M7 12.5 L10.5 16 L17 8.5"/></svg>'
-      : s === 'open' ? '<svg viewBox="0 0 24 40" class="lantern"><path class="cord" d="M12 0V6"/><rect class="cap" x="6" y="5" width="12" height="3"/><rect class="body" x="3" y="8" width="18" height="24" rx="8"/><path class="rib" d="M4 16H20M4 24H20"/><rect class="cap" x="6" y="32" width="12" height="3"/></svg>'
-      : '<svg viewBox="0 0 24 24" class="lock"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+    const icon = here ? `<svg viewBox="-16 -16 32 32" class="foxpin">${foxHead()}</svg>`
+      : s === 'seen' ? '<svg viewBox="0 0 24 24" class="ic"><path d="M6.5 12.5 L10.5 16.5 L17.5 8.5"/></svg>'
+      : s === 'open' ? '<svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="4.5"/></svg>'
+      : '<span class="qm" aria-hidden="true">?</span>';
     return `<button type="button" class="xplace s-${s}${here ? ' here' : ''}" data-p="${p.id}" style="left:${x}%;top:${y}%" aria-label="${esc(p.name)} : ${STATE_T[s].toLowerCase()}${here ? ', vous êtes ici' : ''}">
-      <span class="pin"><span class="pin-head">${here ? `<svg viewBox="-16 -16 32 32" class="foxpin">${foxHead()}</svg>` : icon}</span><span class="pin-stem"></span><span class="pin-lbl">${esc(p.name)}<small>${s === 'locked' ? p.pts.toLocaleString('fr-FR') + ' pts' : STATE_T[s]}</small></span></span><span class="pin-base"></span></button>`;
+      <span class="node">${icon}</span><span class="pin-lbl">${s === 'locked' ? 'Inexploré' : esc(p.name)}<small>${s === 'locked' ? p.pts.toLocaleString('fr-FR') + ' pts' : here ? 'Vous êtes ici' : STATE_T[s]}</small></span><span class="pin-base"></span></button>`;
   }
   function render(el) {
     const v = state(), pt = points(), pts = pt.total;
@@ -112,20 +122,21 @@
           <div class="xm-hud"><div><b>${pts.toLocaleString('fr-FR')}</b> points de voyage · <b>${nSeen}</b> / ${V.places.length} destinations</div>
             ${next ? `<div class="xm-next"><span>Prochaine : ${esc(next.name)}</span><span class="bar"><i style="width:${Math.min(100, pts / next.pts * 100)}%"></i></span><span>${(next.pts - pts).toLocaleString('fr-FR')} pts</span></div>` : '<div>Toutes les destinations sont ouvertes.</div>'}</div>
           <div class="xmaptools" role="toolbar" aria-label="Caméra de la carte">
-            <span class="xmt-g" role="group" aria-label="Rotation"><button type="button" class="btn-ghost" data-cam="left" aria-label="Pivoter vers la gauche"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg></button><button type="button" class="btn-ghost" data-cam="right" aria-label="Pivoter vers la droite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4"/></svg></button></span>
-            <span class="xmt-g" role="group" aria-label="Inclinaison"><button type="button" class="btn-ghost" data-cam="up" aria-label="Incliner davantage"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button><button type="button" class="btn-ghost" data-cam="down" aria-label="Redresser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button></span>
             <span class="xmt-g" role="group" aria-label="Distance"><button type="button" class="btn-ghost" data-z="in" aria-label="Rapprocher"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" class="btn-ghost" data-z="out" aria-label="Éloigner"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button></span>
-            <button type="button" class="btn-ghost" data-cam="here">Où suis-je</button><button type="button" class="btn-ghost" data-z="reset">Vue entière</button><button type="button" class="btn-ghost" data-cam="mode" aria-pressed="${mode3d}">${mode3d ? 'Vue 2D' : 'Vue 3D'}</button></div>
+            <button type="button" class="btn-ghost" data-cam="here">Où suis-je</button><button type="button" class="btn-ghost" data-z="reset">Vue entière</button></div>
           <div class="xm-stage" tabindex="0" aria-label="Carte du Japon en relief. Glisser pour déplacer, molette ou boutons pour rapprocher, flèches du clavier pour se déplacer.">
             <div class="xm-plane">
               <svg id="xjp" viewBox="0 0 900 960" role="group" aria-label="Fond de carte : îles, régions et itinéraires">
-                <defs><pattern id="xsea" width="40" height="20" patternUnits="userSpaceOnUse"><path d="M0 20a20 20 0 0 1 40 0M6 20a14 14 0 0 1 28 0M12 20a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-opacity=".16" stroke-width="1.2"/></pattern></defs>
+                <defs><radialGradient id="xfogg"><stop offset="0" class="fg0"/><stop offset=".6" class="fg1"/><stop offset="1" class="fg2"/></radialGradient><pattern id="xsea" width="40" height="20" patternUnits="userSpaceOnUse"><path d="M0 20a20 20 0 0 1 40 0M6 20a14 14 0 0 1 28 0M12 20a8 8 0 0 1 16 0" fill="none" stroke="currentColor" stroke-opacity=".16" stroke-width="1.2"/></pattern></defs>
                 <rect class="xseabg" x="-200" y="-200" width="1300" height="1360"/><rect x="-200" y="-200" width="1300" height="1360" fill="url(#xsea)" class="xseapat"/>
                 <g class="xland-side">${[7, 6, 5, 4, 3, 2, 1].map((d) => `<g transform="translate(0 ${d * 1.6})">${isl}</g>`).join('')}</g>
                 <g class="xland">${isl}</g>
+                <g class="xtrees" aria-hidden="true">${V.places.map((q, i) => { const [x, y] = P(q.lat, q.lon); return [[-26, 10], [22, 16], [-14, 24], [30, -6]].map(([dx, dy], k) => `<circle class="${(i + k) % 3 ? 'tr' : 'sk'}" cx="${(x + dx).toFixed(1)}" cy="${(y + dy).toFixed(1)}" r="${4 + ((i + k) % 3)}"/>`).join(''); }).join('')}</g>
+                <g class="xlmk" aria-hidden="true">${V.places.map((q) => { const [x, y] = P(q.lat, q.lon), k = LMK[q.id]; return k ? `<g transform="translate(${(x + 20).toFixed(1)} ${(y - 6).toFixed(1)}) scale(1.4)">${LMSVG[k]}</g>` : ''; }).join('')}</g>
                 <g class="xregions">${reg}</g>
                 <g class="xroutes">${routeSvg}</g>
                 <g class="xveh" style="display:none"></g>
+                <g class="xfogs" aria-hidden="true">${V.places.filter((q) => placeState(q, pts, v) === 'locked').map((q) => { const [x, y] = P(q.lat, q.lon); return `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="74" ry="46" fill="url(#xfogg)"/>`; }).join('')}</g>
               </svg>
               <div class="xm-peak fuji" style="left:${fjx}%;top:${fjy}%" aria-hidden="true"><svg viewBox="0 0 60 44"><path class="m" d="M0 44 L24 6 Q30 0 36 6 L60 44Z"/><path class="snow" d="M18 16 L24 6 Q30 0 36 6 L42 16 L36 20 L31 14 L26 21 L22 16Z"/></svg><span lang="ja">富士山</span></div>
               ${peaks.map(([a, b, k]) => { const [x, y] = PCT(a, b); return `<div class="xm-peak" style="left:${x}%;top:${y}%;--k:${k}" aria-hidden="true"><svg viewBox="0 0 60 44"><path class="m" d="M0 44 L26 8 Q30 3 34 8 L60 44Z"/><path class="snow" d="M20 17 L26 8 Q30 3 34 8 L40 17 L34 15 L30 19 L26 15Z"/></svg></div>`; }).join('')}
@@ -161,7 +172,6 @@
       left: () => { cam.rz -= 15; }, right: () => { cam.rz += 15; }, up: () => { cam.rx = clamp(0, 64, cam.rx + 8); }, down: () => { cam.rx = clamp(0, 64, cam.rx - 8); },
       in: () => { cam.s = clamp(.6, 3, cam.s * 1.25); }, out: () => { cam.s = clamp(.6, 3, cam.s / 1.25); }, reset: () => { cam = Object.assign({}, CAM0); applyCam(el); flyTo(el, 'kyoto'); },
       here: () => { applyCam(el); flyTo(el, state().at); },
-      mode: () => { mode3d = !mode3d; el.querySelector('.xm3d').classList.toggle('is-3d', mode3d); try { localStorage.setItem('kotonoha.voyage.3d', mode3d ? '1' : '0'); } catch (e) {} },
     };
     el.querySelectorAll('[data-cam],[data-z]').forEach((b) => b.onclick = () => { (act[b.dataset.cam || b.dataset.z] || (() => {}))(); if (b.dataset.cam !== 'here') applyCam(el); });
     let drag = null;

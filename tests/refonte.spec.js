@@ -10,7 +10,8 @@ test('aujourd’hui : la séance de 4 h, trois étapes, frise qui fait le total,
   const errors = await isolate(page);
   await onboard(page);
   await expect(page.locator('.xsess .xhead-t')).toContainText('Séance du jour');
-  await expect(page.locator('.xopen h1')).toHaveAttribute('aria-label', 'Kotonoha');
+  await expect(page.locator('.xopen h1')).toHaveText('KOTONOHA');
+  await expect(page.locator('.xopen-cta, .xopen-go')).toHaveCount(0);
   await expect(page.locator('.xopen-facts > div')).toHaveCount(5);
   await expect(page.locator('.xpan')).toHaveCount(3);
   await expect(page.locator('.xpan .xpcard .art svg')).toHaveCount(3);

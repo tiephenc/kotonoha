@@ -164,11 +164,9 @@
     return `<section class="xopen" aria-labelledby="xopen-t">
       <div class="xopen-field" aria-hidden="true"></div>
       <p class="xopen-kana" lang="ja">${kana}</p>
-      <h1 id="xopen-t" class="xopen-type" aria-label="Kotonoha"><span aria-hidden="true">KOTO</span><span aria-hidden="true">NOHA</span></h1>
+      <h1 id="xopen-t" class="xopen-type">KOTONOHA</h1>
       <div class="xopen-v" lang="ja" aria-hidden="true">言の葉</div>
       <div class="xopen-fox">${K.fox(cur ? (hr >= 23 || hr < 5 ? 'sommeil' : 'accueil') : 'celebration', { label: 'Kitsune, le renard guide de KOTONOHA' })}</div>
-      <div class="xopen-cta"><p>${cur ? `${esc(cur.t)} d’abord · ${hm(p.T).replace(/ /g, ' ')} au programme` : 'Séance du jour terminée. Otsukaresama.'}</p>
-        <a class="xopen-go" href="#xsess">Voir la séance du jour <span aria-hidden="true">↓</span></a></div>
       <dl class="xopen-facts">${facts.map(([a, b, c]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}<small>${esc(c)}</small></dd></div>`).join('')}</dl>
     </section>`;
   }
@@ -231,7 +229,6 @@
     </div>`;
     wire(el);
     const sel = el.querySelector('#xdur'); if (sel) sel.onchange = () => { sess().min = +sel.value; save(); viewTodayAffiche(); };
-    const go = el.querySelector('.xopen-go'); if (go) go.onclick = (e) => { e.preventDefault(); const t = el.querySelector('#xsess'); t.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); t.focus({ preventScroll: true }); };
     const tb = el.querySelector('#xtimer'); if (tb) tb.onclick = () => { try { focOpen(); const c = focState().cur; if (c.ph === 'idle' || c.ph === 'bdone') focStart('work'); } catch (e) { console.error(e); } };
   };
   K.seance = { plan, timeline, stepsState, sess };
