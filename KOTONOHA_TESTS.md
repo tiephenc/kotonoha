@@ -34,6 +34,7 @@ WEBKIT=1 npx playwright test --project=webkit
 | `carnet.spec.js` | Ajout, recherche, modification, suppression, persistance, échappement |
 | `securite.spec.js` | Sauvegarde piégée importée par l'interface (aucune exécution, types normalisés, adresse neutralisée), en-tête CSP |
 | `refonte.spec.js` | Séance du jour (plan, frise qui totalise exactement la durée, changement de durée, reprise), six onglets et onglet allumé selon l'écran, sous-rubriques, bascule jour/nuit persistante, six poses du renard ; puis, comme avant : carnet du jour, voyage (points réels, déblocage, trajet animé, souvenir, persistance), migration des badges en kamon sans perte et fiche sourcée, journal et visualisations, zoom de la carte, Focus, panneau de leçon |
+| `chemin.spec.js` | Carte du chemin (32 étapes, trois états, historique, accès à la leçon en cours, étapes verrouillées inertes), XP de parcours (aucun double comptage : recalcul, activité rejouée, exercices plafonnés, journal tronqué, une prime de révision par jour, barème des niveaux, persistance), marche du voyageur et sauvegarde de sa position |
 | `pwa-a11y.spec.js` | Hors connexion (service worker, réseau coupé), audit axe-core WCAG 2 A/AA, de jour **et** de nuit, sur 25 écrans, y compris voyage, kamon, fiche de kamon, atelier musical, pinceau et carnet |
 
 ## Résultats

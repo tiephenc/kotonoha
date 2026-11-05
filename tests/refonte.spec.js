@@ -13,7 +13,7 @@ test('aujourd’hui : la séance de 4 h, trois étapes, frise qui fait le total,
   await expect(page.locator('.xopen h1')).toHaveAttribute('aria-label', 'Kotonoha');
   await expect(page.locator('.xopen-facts > div')).toHaveCount(5);
   await expect(page.locator('.xpan')).toHaveCount(3);
-  await expect(page.locator('.xpan .emb svg')).toHaveCount(3);
+  await expect(page.locator('.xpan .xpcard .art svg')).toHaveCount(3);
   await expect(page.locator('.xpan.cur')).toHaveCount(1);
   await expect(page.locator('.xhead svg.fox')).toBeVisible();
   const chk = () => page.evaluate(() => { const p = KX.seance.plan(), seg = KX.seance.timeline(p); return { T: p.T, sum: seg.reduce((a, g) => a + g.m, 0), parts: p.rev + p.les + p.def + p.P * 10, brk: seg.filter((g) => g.id === 'brk').length, P: p.P }; });

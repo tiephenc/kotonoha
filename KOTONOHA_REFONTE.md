@@ -1,5 +1,15 @@
 # KOTONOHA — refontes visuelles
 
+## Mission 7 : le chemin, cartes à jouer, ouverture sur grand écran (5 novembre 2026)
+
+- **Le chemin** (`#chemin`, onglet Apprendre) : carte de progression nocturne en pixel art, du N4 au N2, avec une étape par module et un petit voyageur noir. XP de parcours sans double comptage. Détails, architecture et barème : `KOTONOHA_CHEMIN.md`.
+- **Étapes de la séance** : les anciens emblèmes deviennent de grandes cartes à jouer inclinées, avec le numéro aux deux coins.
+- **Ouverture à 1920 × 800** :
+  - le motif de kamon couvre toute la largeur (le calque du motif était limité à la colonne centrale de la grille) ;
+  - le renard est décalé pour ne plus masquer le logo ;
+  - le bloc d'appel est compact.
+- **Sécurité** : les données de la salle lofi (volume, tempo, accords, boucles) sont normalisées avant d'être affichées ou jouées, et un test vérifie qu'une sauvegarde piégée n'injecte rien.
+
 ## Mission 6 : salle lofi, carte plus lisible, grand écran (5 novembre 2026)
 
 - **Salle lofi** (`app/lofi.js`) : c'est désormais l'écran principal de Détente (`#detente`).

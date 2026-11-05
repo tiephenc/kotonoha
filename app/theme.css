@@ -954,3 +954,110 @@ html, body { overflow-x: clip; }
 .xlofi-over h1 { background: rgba(20, 14, 10, .62); padding: 6px 10px 8px; border-radius: 2px; width: fit-content; }
 .xvinfo .xvart { display: grid; grid-template-columns: 140px 1fr; gap: 14px; align-items: center; } .xvinfo .xvart .xsouv { width: 140px; height: auto; }
 .xlofi { grid-template-columns: minmax(0, 1fr); } .xlofi-studio { min-width: 0; }
+
+/* Ouverture, écrans larges et bas : motif sur toute la largeur, renard décalé du logo, appel compact */
+.xopen-field { grid-column: 1 / -1 !important; grid-row: 1 / -1; }
+.xopen-fox { position: relative; left: min(19vw, 300px); width: clamp(200px, min(24vw, 40vh), 340px) !important; margin-bottom: 70px; }
+.xopen-cta { max-width: 250px !important; padding: 12px 14px 14px !important; bottom: 104px; }
+.xopen-cta p { font: 700 14px/1.4 var(--sans) !important; margin-bottom: 10px !important; }
+.xopen-go { padding: 9px 13px; font-size: 14px; }
+@media (max-width: 1100px) { .xopen-fox { left: min(14vw, 160px); } }
+@media (max-width: 760px) { .xopen-fox { left: 0; width: 56vw !important; margin-bottom: 18px; } }
+
+/* Étapes : les anciens emblèmes en grandes cartes à jouer */
+.xpan-top { display: grid; grid-template-columns: auto 1fr auto; align-items: start; gap: 12px; }
+.xpcard { position: relative; width: 112px; height: 156px; padding: 22px 10px; background: #F4EAD6; border-radius: 7px; box-shadow: 0 0 0 2px #F4EAD6, 0 0 0 4px rgba(0, 0, 0, .28), 0 12px 20px -10px rgba(0, 0, 0, .6);
+  color: var(--dye); transform: rotate(-3deg); transition: transform .45s var(--ease); }
+.xpan.cur .xpcard { transform: rotate(-3deg) translateY(-6px); }
+.xpan:hover .xpcard { transform: rotate(0) translateY(-4px); }
+.xpcard::before { content: ""; position: absolute; inset: 6px; border: 1.5px solid currentColor; border-radius: 4px; opacity: .55; pointer-events: none; }
+.xpcard .art { display: block; width: 100%; height: 100%; overflow: hidden; border-radius: 2px; }
+.xpcard .art svg { width: 100%; height: 100%; display: block; }
+.xpcard .art .e2 { fill: #241A13; }
+.xpcard .cn { position: absolute; left: 9px; top: 4px; font: 400 18px/1 var(--mon-l); color: var(--dye); }
+.xpcard .cn.r { left: auto; top: auto; right: 9px; bottom: 4px; transform: rotate(180deg); }
+.xpan .xpan-top .jp { align-self: center; }
+.xpan .xstate { align-self: start; }
+.xpan .xno, .xpan .emb { display: none; }
+@media (prefers-reduced-motion: reduce) { .xpcard, .xpan:hover .xpcard { transition: none; } }
+@media (max-width: 560px) { .xpcard { width: 86px; height: 120px; padding: 18px 8px; } }
+
+/* ---------- Le chemin : carte de progression nocturne ---------- */
+.xch { display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-areas: "hud hud" "map info"; gap: 16px; align-items: start; }
+.xch-hud { grid-area: hud; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; background: #1C1640; color: #EDE6FF; border: 2px solid #0E0A1E; border-radius: var(--r); }
+.xch-stat { padding: 12px 16px; border-left: 1px solid rgba(237, 230, 255, .14); display: grid; gap: 4px; align-content: start; }
+.xch-stat:first-child { border-left: 0; }
+.xch-stat span { font: 700 11.5px/1.2 var(--sans); letter-spacing: .08em; text-transform: uppercase; color: #E9A0D2; }
+.xch-stat b { font: 400 30px/1 var(--mon-l); letter-spacing: .02em; color: #FFE7B8; }
+.xch-stat small { font-size: 12.5px; color: #CFC6EA; line-height: 1.35; }
+.xch-bar { height: 10px; background: rgba(255, 255, 255, .12); border-radius: 2px; overflow: hidden; margin: 6px 0 2px; }
+.xch-bar i { display: block; height: 100%; background: linear-gradient(90deg, #E9A0D2, #F6B451); transition: width 1s var(--ease); }
+.xch-main { grid-area: map; position: relative; }
+.xch-tools { position: absolute; z-index: 5; top: 10px; left: 10px; display: flex; gap: 6px; }
+.xch-tools .btn-ghost { min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; background: rgba(28, 22, 64, .85) !important; color: #EDE6FF !important; border: 1px solid rgba(237, 230, 255, .3) !important; font-weight: 700; padding: 0 12px; }
+.xch-tools svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+.xch-view { height: clamp(520px, 80vh, 900px); overflow: auto; border: 3px solid #0E0A1E; border-radius: var(--r); background: #120E2A; cursor: grab; overscroll-behavior: contain; scrollbar-color: #4A3D7A #120E2A; }
+.xch-view.panning { cursor: grabbing; user-select: none; }
+.xch-view:focus-visible { outline: 3px solid #F6B451; outline-offset: 2px; }
+.xch-world { --z: 1; position: relative; width: calc(100% * var(--z)); margin: 0 auto; aspect-ratio: 320 / 960; }
+.xch-world > canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+/* Brume : cache en partie ce qui reste à découvrir */
+.xch-fog { position: absolute; left: 0; right: 0; top: 0; pointer-events: none; background: linear-gradient(to top, rgba(30, 22, 64, 0), rgba(42, 30, 82, .62) 90px, rgba(42, 30, 82, .72)); overflow: hidden; }
+.xch-fog i { position: absolute; left: -30%; width: 160%; height: 120px; border-radius: 50%; background: radial-gradient(closest-side, rgba(190, 170, 240, .28), rgba(190, 170, 240, 0)); }
+.xch-fog i:nth-child(1) { bottom: 0; } .xch-fog i:nth-child(2) { bottom: 38%; } .xch-fog i:nth-child(3) { bottom: 72%; }
+/* Lucioles, pétales, eau */
+.xch-life { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.xch-life .ff { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #F6E9A0; box-shadow: 0 0 8px 2px rgba(246, 233, 160, .7); opacity: .7; }
+.xch-life .pt { position: absolute; top: -3%; width: 7px; height: 5px; border-radius: 70% 0 70% 0; background: #F2A9D6; opacity: .75; }
+.xch-life .wf { position: absolute; width: 1.9%; background: repeating-linear-gradient(to bottom, rgba(220, 235, 255, .55) 0 4px, transparent 4px 10px); background-size: 100% 20px; opacity: .8; }
+.xch-reg span { position: absolute; left: 3%; display: grid; font: 700 12px var(--sans); letter-spacing: .14em; color: rgba(233, 160, 210, .8); }
+.xch-reg b { font: 800 22px var(--display); letter-spacing: .1em; color: rgba(237, 230, 255, .55); }
+/* Étapes */
+.xch-st { position: absolute; width: 48px; height: 48px; margin: -24px 0 0 -24px; padding: 0; border: 0; background: none; cursor: pointer; z-index: 3; display: grid; place-items: center; }
+.xch-st .ring { position: relative; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; border: 2px solid; transition: transform .3s var(--ease); }
+.xch-st svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.xch-st.s-done .ring { background: #F6B451; border-color: #FFE7B8; color: #2A1C12; box-shadow: 0 0 12px 3px rgba(246, 180, 81, .55); }
+.xch-st.s-cur .ring { width: 44px; height: 44px; background: #E9A0D2; border-color: #FFF0FA; color: #2A1C3A; box-shadow: 0 0 0 6px rgba(233, 160, 210, .25), 0 0 26px 8px rgba(233, 160, 210, .55); }
+.xch-st.s-cur svg circle { fill: currentColor; }
+.xch-st.s-lock .ring { background: rgba(40, 30, 80, .75); border-color: rgba(200, 190, 240, .35); color: rgba(220, 210, 255, .6); cursor: default; }
+.xch-st:hover .ring, .xch-st:focus-visible .ring, .xch-st.sel .ring { transform: scale(1.15); }
+.xch-st.sel.s-done .ring { box-shadow: 0 0 0 4px #FFF, 0 0 16px 4px rgba(246, 180, 81, .7); }
+.xch-st:focus-visible { outline: none; } .xch-st:focus-visible .ring { outline: 3px solid #FFF; outline-offset: 3px; }
+.xch-st .tip { position: absolute; left: 50%; bottom: 46px; transform: translateX(-50%) translateY(4px); white-space: nowrap; padding: 5px 9px; border-radius: 3px; background: #0E0A1E; color: #EDE6FF; font: 700 12.5px var(--sans); opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; }
+.xch-st:hover .tip, .xch-st:focus-visible .tip { opacity: 1; transform: translateX(-50%); }
+/* Le voyageur */
+.xch-hero { position: absolute; z-index: 4; width: 30px; height: 33px; transform: translate(-50%, -100%); pointer-events: none; filter: drop-shadow(0 0 6px rgba(233, 160, 210, .8)); }
+.xch-hero canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+.xch-hero.flip canvas { transform: scaleX(-1); }
+.xch-hero::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 22px; height: 7px; margin-left: -11px; border-radius: 50%; background: rgba(0, 0, 0, .45); }
+/* Panneau d'historique */
+.xch-info { grid-area: info; position: sticky; top: 90px; }
+.xch-info h2 { margin: 2px 0 8px; }
+.xch-units { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; font-size: 13.5px; }
+.xch-units li { display: grid; gap: 1px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.xch-units li span { color: var(--ink-3); font-size: 12.5px; }
+.xch-units li.ok a { font-weight: 700; }
+@media (prefers-reduced-motion: no-preference) {
+  .xch-fog i { animation: xfog 22s ease-in-out infinite alternate; } .xch-fog i:nth-child(2) { animation-duration: 30s; animation-direction: alternate-reverse; } .xch-fog i:nth-child(3) { animation-duration: 26s; }
+  .xch-life .ff { animation: xff 5s ease-in-out infinite; }
+  .xch-life .pt { animation: xpetal 11s linear infinite; }
+  .xch-life .wf { animation: xwater .8s linear infinite; }
+  .xch-st.s-cur .ring { animation: xhalo 2.4s ease-in-out infinite; }
+  .xch-st.s-done .ring { animation: xglowd 4s ease-in-out infinite; }
+  .xch-hero canvas { animation: xbobh 1.6s ease-in-out infinite; } .xch-hero.walking canvas { animation: xstep .32s steps(2) infinite; }
+}
+@keyframes xfog { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
+@keyframes xff { 0%, 100% { transform: translate(0, 0); opacity: .2; } 50% { transform: translate(10px, -14px); opacity: .95; } }
+@keyframes xpetal { from { transform: translate(0, 0) rotate(0); } to { transform: translate(60px, 105vh) rotate(540deg); } }
+@keyframes xwater { to { background-position: 0 20px; } }
+@keyframes xhalo { 0%, 100% { box-shadow: 0 0 0 6px rgba(233, 160, 210, .25), 0 0 26px 8px rgba(233, 160, 210, .5); } 50% { box-shadow: 0 0 0 11px rgba(233, 160, 210, .12), 0 0 34px 12px rgba(233, 160, 210, .7); } }
+@keyframes xglowd { 0%, 100% { box-shadow: 0 0 10px 2px rgba(246, 180, 81, .45); } 50% { box-shadow: 0 0 16px 5px rgba(246, 180, 81, .7); } }
+@keyframes xbobh { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes xstep { 0% { transform: translateY(0); } 100% { transform: translateY(-3px); } }
+@media (max-width: 960px) {
+  .xch { grid-template-columns: minmax(0, 1fr); grid-template-areas: "hud" "map" "info"; }
+  .xch-hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .xch-stat:nth-child(3) { border-left: 0; } .xch-stat:nth-child(n+3) { border-top: 1px solid rgba(237, 230, 255, .14); }
+  .xch-info { position: static; }
+}
+@media (max-width: 560px) { .xch-view { height: 70vh; } .xch-stat b { font-size: 24px; } }

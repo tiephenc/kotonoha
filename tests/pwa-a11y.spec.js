@@ -25,7 +25,7 @@ test.describe('hors connexion', () => {
   });
 });
 
-const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-jeux', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture', 'voyage', 'kamon', 'kamon-katabami', 'detente-musique', 'detente-pinceau', 'carnet', 'profil', 'calendrier'];
+const VIEWS = ['aujourdhui', 'parcours', 'unite-1', 'revision', 'entrainer', 'progres', 'calendrier', 'maitrise', 'detente', 'detente-jeux', 'chemin', 'detente-rizieres', 'lire', 'atelier', 'redaction-n3-conseil', 'conversation-medecin', 'carte', 'carte-60', 'culture', 'voyage', 'kamon', 'kamon-katabami', 'detente-musique', 'detente-pinceau', 'carnet', 'profil', 'calendrier'];
 
 test('accessibilité (axe-core, WCAG 2 A/AA) : écrans principaux et nouveaux espaces', async ({ page }) => {
   test.setTimeout(360_000);
@@ -45,6 +45,6 @@ test('accessibilité (axe-core, WCAG 2 A/AA) : écrans principaux et nouveaux es
   console.log('AXE\n' + (report.join('\n') || 'aucune violation'));
   test.info().annotations.push({ type: 'axe', description: report.join(' | ') || 'aucune violation' });
   // Les violations des nouveaux espaces (préfixe v-x-) doivent être nulles ; celles de l'existant sont rapportées.
-  const mine = report.filter((l) => /^(aujourdhui|parcours|unite|revision|entrainer|calendrier|maitrise|detente|lire|atelier|redaction|conversation|carte|culture|voyage|kamon|carnet|progres|profil)/.test(l));
+  const mine = report.filter((l) => /^(aujourdhui|chemin|parcours|unite|revision|entrainer|calendrier|maitrise|detente|lire|atelier|redaction|conversation|carte|culture|voyage|kamon|carnet|progres|profil)/.test(l));
   expect(mine, mine.join('\n')).toEqual([]);
 });

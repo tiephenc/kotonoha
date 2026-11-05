@@ -99,3 +99,23 @@ test('aucun son ne démarre sans action', async ({ page }) => {
   for (const g of GAMES) { await page.evaluate((x) => { location.hash = 'detente-' + x; }, g); await page.waitForTimeout(300); }
   expect(await page.evaluate(() => window.__ac)).toBe(0);
 });
+
+test('salle lofi : une sauvegarde piégée n’injecte rien', async ({ page }) => {
+  const errors = await isolate(page);
+  await onboard(page);
+  await page.evaluate(() => {
+    const evil = '"><img src=x onerror="window.__pwn=1">';
+    KX.local.set('lofi-vol', evil);
+    KX.local.set('lofi', { cur: { grid: { m0: [evil] }, prog: [evil, 'Am7', 'Dm7', 'G7'], bpm: evil, swing: evil }, slots: [{ grid: {}, prog: [evil], bpm: evil }, null, null] });
+    location.hash = 'detente';
+  });
+  await expect(page.locator('.xlofi-scene canvas')).toBeVisible();
+  await page.reload();
+  await expect(page.locator('.xlofi-scene canvas')).toBeVisible();
+  await page.click('[data-load="0"]');
+  expect(await page.locator('#v-x-detente img').count()).toBe(0);
+  expect(await page.evaluate(() => window.__pwn)).toBeUndefined();
+  await expect(page.locator('#xlvol')).toHaveValue('0');
+  await expect(page.locator('#xlbpm')).toHaveValue('78');
+  expect(errors).toEqual([]);
+});

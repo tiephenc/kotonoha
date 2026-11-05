@@ -167,7 +167,7 @@
       <h1 id="xopen-t" class="xopen-type" aria-label="Kotonoha"><span aria-hidden="true">KOTO</span><span aria-hidden="true">NOHA</span></h1>
       <div class="xopen-v" lang="ja" aria-hidden="true">言の葉</div>
       <div class="xopen-fox">${K.fox(cur ? (hr >= 23 || hr < 5 ? 'sommeil' : 'accueil') : 'celebration', { label: 'Kitsune, le renard guide de KOTONOHA' })}</div>
-      <div class="xopen-cta"><p>${cur ? `Aujourd’hui : ${esc(cur.t.toLowerCase())} d’abord, ${hm(p.T).replace(/ /g, ' ')} au programme.` : 'La séance du jour est faite. Otsukaresama.'}</p>
+      <div class="xopen-cta"><p>${cur ? `${esc(cur.t)} d’abord · ${hm(p.T).replace(/ /g, ' ')} au programme` : 'Séance du jour terminée. Otsukaresama.'}</p>
         <a class="xopen-go" href="#xsess">Voir la séance du jour <span aria-hidden="true">↓</span></a></div>
       <dl class="xopen-facts">${facts.map(([a, b, c]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}<small>${esc(c)}</small></dd></div>`).join('')}</dl>
     </section>`;
@@ -204,7 +204,7 @@
       <ol class="xnoren" aria-label="Les trois étapes de la séance">
         ${ST.map((x) => `<li class="xpan p-${x.id}${x.ok ? ' ok' : ''}${x === cur ? ' cur' : ''}" style="--pct:${Math.round(Math.min(1, x.pct) * 100)}%">
           <span class="xplamp${x.ok ? ' lit' : ''}" aria-hidden="true"><svg viewBox="0 0 24 40"><path class="cord" d="M12 0V6"/><rect class="cap" x="6" y="5" width="12" height="3"/><rect class="body" x="3" y="8" width="18" height="24" rx="8"/><path class="rib" d="M4 16H20M4 24H20"/><rect class="cap" x="6" y="32" width="12" height="3"/></svg></span>
-          <div class="xpan-top"><span class="xno" aria-hidden="true">${x.i + 1}</span><span class="emb">${emblem(x.id)}</span><span class="jp" lang="ja" aria-hidden="true">${x.jp}</span>
+          <div class="xpan-top"><span class="xpcard" aria-hidden="true"><b class="cn">${x.i + 1}</b><span class="art">${emblem(x.id)}</span><b class="cn r">${x.i + 1}</b></span><span class="jp" lang="ja" aria-hidden="true">${x.jp}</span>
             <span class="xstate">${x.ok ? '<span lang="ja" aria-hidden="true">済</span> Fait' : x === cur ? 'En cours' : 'Ensuite'}</span></div>
           <h2><span class="xsr">Étape ${x.i + 1} : </span>${esc(x.t)}<span class="min num">${hm(x.min)}</span></h2>
           ${x.chain ? `<ul class="xchain">${x.chain.slice(0, 6).map((c) => `<li class="${c.ok ? 'ok' : ''}"><a href="#unite-${c.n}/${c.sec}">Unité ${c.n} · ${esc(c.secT)}</a><span class="num">${c.m} min</span></li>`).join('')}${x.chain.length > 6 ? `<li class="more">et ${x.chain.length - 6} section${x.chain.length - 6 > 1 ? 's' : ''} de plus</li>` : ''}</ul>

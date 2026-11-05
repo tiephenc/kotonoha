@@ -23,10 +23,19 @@
     return { grid: g, prog: ['Fmaj7', 'Em7', 'Dm7', 'Cmaj7'], bpm: 78, swing: .18 };
   };
   const clone = (o) => JSON.parse(JSON.stringify(o));
-  function load() { const x = K.local.get('lofi', null); const p = PRESET(); if (!x || !x.cur) return { cur: p, slots: [null, null, null] };
-    ROWS.forEach(([id]) => { if (!Array.isArray(x.cur.grid[id]) || x.cur.grid[id].length !== STEPS) x.cur.grid[id] = Array(STEPS).fill(0); });
-    if (!Array.isArray(x.cur.prog) || x.cur.prog.length !== 4 || !x.cur.prog.every((k) => CH[k])) x.cur.prog = p.prog;
-    x.cur.bpm = Math.min(96, Math.max(60, +x.cur.bpm || 78)); x.cur.swing = Math.min(.4, Math.max(0, +x.cur.swing || 0)); if (!Array.isArray(x.slots)) x.slots = [null, null, null]; return x; }
+  // Les données viennent du stockage local, qui peut être rempli par l'import d'une sauvegarde :
+  // tout est ramené à des valeurs sûres (pas 0/1, accords connus, nombres bornés) avant d'être affiché ou joué.
+  function norm(m) {
+    const p = PRESET(); if (!m || typeof m !== 'object') return p;
+    const grid = {}; ROWS.forEach(([id]) => { const r = m.grid && Array.isArray(m.grid[id]) ? m.grid[id] : []; grid[id] = Array.from({ length: STEPS }, (_, i) => (r[i] ? 1 : 0)); });
+    const prog = Array.isArray(m.prog) && m.prog.length === 4 && m.prog.every((k) => typeof k === 'string' && Object.prototype.hasOwnProperty.call(CH, k)) ? m.prog.slice() : p.prog;
+    return { grid, prog, bpm: Math.round(Math.min(96, Math.max(60, +m.bpm || 78))), swing: Math.min(.4, Math.max(0, +m.swing || 0)) };
+  }
+  function load() {
+    const x = K.local.get('lofi', null), s = Array.isArray(x && x.slots) ? x.slots : [];
+    return { cur: norm(x && x.cur), slots: [0, 1, 2].map((i) => (s[i] ? norm(s[i]) : null)) };
+  }
+  const vol = () => Math.min(1, Math.max(0, Number(K.local.get('lofi-vol', .7)) || 0));
   let ST = load();
   const persist = () => K.local.set('lofi', ST);
 
@@ -39,7 +48,7 @@
     AC = new C();
     const comp = AC.createDynamicsCompressor(); comp.threshold.value = -16; comp.ratio.value = 3;
     const lp = AC.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4200; lp.Q.value = .4;
-    OUT = AC.createGain(); OUT.gain.value = K.local.get('lofi-vol', .7);
+    OUT = AC.createGain(); OUT.gain.value = vol();
     OUT.connect(lp); lp.connect(comp); comp.connect(AC.destination);
     return AC;
   }
@@ -163,7 +172,7 @@
           <button type="button" class="xlofi-play" id="xlplay" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="pl" d="M8 5v14l11-7z"/><path class="pa" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg><span>Lecture</span></button>
           <label class="xlofi-tog"><input type="checkbox" id="xlrain" ${opt.rain ? 'checked' : ''}><span>Pluie</span></label>
           <label class="xlofi-tog"><input type="checkbox" id="xlvin" ${opt.vinyl ? 'checked' : ''}><span>Vinyle</span></label>
-          <label class="xlofi-vol">Volume <input type="range" id="xlvol" min="0" max="1" step="0.05" value="${K.local.get('lofi-vol', .7)}"></label>
+          <label class="xlofi-vol">Volume <input type="range" id="xlvol" min="0" max="1" step="0.05" value="${vol()}"></label>
         </div>
       </section>
       <section class="xlofi-studio" aria-labelledby="xlst">
@@ -203,7 +212,7 @@
     el.querySelector('#xlclear').onclick = () => { ROWS.forEach(([id]) => { ST.cur.grid[id] = Array(STEPS).fill(0); }); persist(); render(el); };
     el.querySelector('#xlex').onclick = () => { ST.cur = PRESET(); persist(); render(el); };
     el.querySelectorAll('[data-save]').forEach((b) => b.onclick = () => { ST.slots[+b.dataset.save] = clone(ST.cur); persist(); render(el); K.toast && K.toast('Boucle ' + (+b.dataset.save + 1) + ' enregistrée.'); });
-    el.querySelectorAll('[data-load]').forEach((b) => b.onclick = () => { const x = ST.slots[+b.dataset.load]; if (x) { ST.cur = clone(x); persist(); render(el); } });
+    el.querySelectorAll('[data-load]').forEach((b) => b.onclick = () => { const x = ST.slots[+b.dataset.load]; if (x) { ST.cur = norm(clone(x)); persist(); render(el); } });
   }
   function playStepSingle(r, i, t) { // aperçu d'une seule ligne quand on active un pas
     const c = ST.cur, ch = CH[c.prog[0]], sixteenth = 60 / c.bpm / 4;

@@ -8,7 +8,7 @@
   /* ---------- Onglets ---------- */
   const TABS = {
     aujourdhui: { k: '今日', t: 'Aujourd’hui', big: '今日' },
-    apprendre: { k: '学', t: 'Apprendre', big: '学ぶ', sub: [['parcours', 'Parcours'], ['vocab', 'Vocabulaire'], ['lire', 'Lire'], ['carte', 'Carte du parcours']] },
+    apprendre: { k: '学', t: 'Apprendre', big: '学ぶ', sub: [['parcours', 'Parcours'], ['chemin', 'Le chemin'], ['vocab', 'Vocabulaire'], ['lire', 'Lire'], ['carte', 'Carte du parcours']] },
     pratiquer: { k: '練', t: 'Pratiquer', big: '練習', sub: [['revision', 'Réviser'], ['entrainer', 'S’entraîner'], ['atelier', 'Atelier'], ['examens', 'Examens blancs'], ['erreurs', 'Carnet d’erreurs']] },
     voyager: { k: '旅', t: 'Voyager', big: '旅', sub: [['voyage', 'Carte du voyage'], ['kamon', 'Kamon'], ['culture', 'Culture']] },
     detente: { k: '憩', t: 'Détente', big: '憩い', sub: [['detente', 'Salle lofi'], ['detente-jeux', 'Jeux']] },
@@ -16,7 +16,7 @@
   };
   function tabOf(h, view) {
     if (/^(aujourdhui|defi)$/.test(h)) return 'aujourdhui';
-    if (/^(unite-|parcours|vocab|lire|lecture|carte|lv-)/.test(h)) return 'apprendre';
+    if (/^(unite-|parcours|chemin|vocab|lire|lecture|carte|lv-)/.test(h)) return 'apprendre';
     if (/^(revision|entrainer|examens|ecrire|labo|erreurs|atelier|redaction|conversation|paquets)/.test(h)) return 'pratiquer';
     if (/^(voyage|kamon|culture)/.test(h)) return 'voyager';
     if (/^detente/.test(h)) return 'detente';
